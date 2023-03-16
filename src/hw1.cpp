@@ -1,6 +1,6 @@
 #include "hw1.h"
 
-Image3 hw_1_1() {
+Image3 hw_1_1(const std::vector<std::string> &params) {
     // Homework 1.1: modify this function to 
     // generate camera rays and output the ray directions
 

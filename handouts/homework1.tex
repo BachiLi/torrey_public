@@ -35,14 +35,22 @@ It will generate an image \lstinline{hw_1_1.exr} that looks like the following:
 
 \lstinline{.exr} is an image format that is suitable for storing \emph{high-dynamic range} images. Basically, instead of storing 8-bit (0-255) per color channel, we store a floating point number per channel. To view \lstinline{.exr}, I recommend using \href{https://github.com/wkjarosz/hdrview}{HDRView} or \href{https://github.com/Tom94/tev}{Tev}.
 
-Read \lstinline{main.cpp} and \lstinline{hw1.cpp} to understand the current code structure.
+Read \lstinline{main.cpp}, \lstinline{hw1.cpp}, \lstinline{vector.h}, and \lstinline{image.h} to understand the current code structure.
 
 \section{Sending rays from the camera}
 To do ray tracing, we need to first shoot rays from the camera. In this first step, we will generate camera rays for all the pixels. The goal of our first task is to visualize the camera ray direction (normalized to unit length per pixel).
 
 First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#rays,asimplecamera,andbackground}{Chapter 4.2} of the first RTOW book and understand its content.
 
-We will use a very simple perspective camera for now. The position is fixed at $(0, 0, 0)$, and the camera is facing towards $(0, 0, 1)$ with an up vector $(0, 1, 0)$ and focal length of $1$ (note that this is subtly different from RTOW). We will make the camera ``positionable'' later. For each pixel, we will shoot a ray from the center of the pixel (for a pixel $(x, y) \in [0, \text{width}] \times [0, \text{height}]$, we shoot a ray in $(x + 0.5, y + 0.5)$). Your task is to output the unit length ray direction per pixel.
+We will use a very simple perspective camera for now. The position is fixed at $(0, 0, 0)$, and the camera is facing towards $(0, 0, 1)$ with an up vector $(0, 1, 0)$, right vector $(1, 0, 0)$, and focal length of $1$ (note that this is subtly different from RTOW). We will make the camera ``positionable'' later. For each pixel, we will shoot a ray from the center of the pixel (for a pixel $(x, y) \in [0, \text{width}] \times [0, \text{height}]$, we shoot a ray in $(x + 0.5, y + 0.5)$). Your task is to output the \emph{unit length} ray direction per pixel. Some of the pixels will have negative color but that is fine. We provide the \lstinline{.exr} code for your comparison.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{imgs/hw_1_1_after.png}
+    \caption{Image output by the homework 1.1 code after your modification.}
+    \label{fig:hw_1_1_after}
+\end{figure}
+
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
