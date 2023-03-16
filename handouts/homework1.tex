@@ -1,0 +1,43 @@
+\input{preamble}
+
+\begin{document}
+
+\header{1}{Ray Tracing}
+\setcounter{section}{-1}
+
+In our first homework, we are going to implement a simple ray tracer (almost) from scratch.
+We will provide some utility code such as the vector class and parallel threading. 
+However, you will have to implement the rest yourself. Trust me, it will be fun!
+
+Our homeworks are mostly inspired by the book \href{https://raytracing.github.io/}{Ray Tracing in One Weekend} (click the link for free access of the e-book). You are expected to read the relevant chapters of the book before implementing your own version. The structure of the homeworks is also largely inspired by \href{https://cs87-dartmouth.github.io/Fall2022/assignments.html}{CS 87/287 at Dartmouth} designed by Wojciech Jarosz (a UCSD alumni!).
+
+\section{Building Torrey}
+We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, pcg, stb\_image, tinyexr, miniz, tinyply) in its repo and all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
+\begin{lstlisting}[language=bash]
+  git clone https://github.com/BachiLi/torrey_public
+  mkdir build
+  cd build
+  cmake ..
+  make -j
+\end{lstlisting}
+
+After building, you should see an executable \lstinline{torrey}. Try typing the following command:
+\begin{lstlisting}[language=bash]
+  torrey -hw 1_1
+\end{lstlisting}
+It will generate an image \lstinline{hw_1_1.exr} that looks like the following:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{imgs/hw_1_1_before.png}
+    \caption{Image output by the homework 1.1 code before your modification.}
+    \label{fig:hw_1_1_before}
+\end{figure}
+
+\lstinline{.exr} is an image format that is suitable for storing \emph{high-dynamic range} images. Basically, instead of storing 8-bit (0-255) per color channel, we store a floating point number per channel. To view \lstinline{.exr}, I recommend using \href{https://github.com/wkjarosz/hdrview}{HDRView} or \href{https://github.com/Tom94/tev}{Tev}.
+
+Read \lstinline{main.cpp} and \lstinline{hw1.cpp} to understand the current code structure.
+
+%\bibliographystyle{plain}
+%\bibliography{refs}
+
+\end{document}
