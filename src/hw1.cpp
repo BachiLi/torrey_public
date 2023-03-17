@@ -16,3 +16,12 @@ Image3 hw_1_1(const std::vector<std::string> &params) {
     }
     return img;
 }
+
+Image3 hw_1_2(const std::vector<std::string> &params) {
+    // Homework 1.2: modify this function to 
+    // intersect the rays and a unit sphere located at (0, 0, 2)
+
+    Image3 img(640 /* width */, 480 /* height */);
+
+    return img;
+}
