@@ -193,6 +193,10 @@ where $n$ is the normal of the surface, $l$ is the normalized vector between the
 
 Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_5}. As usual, use \lstinline{hw1_scenes[scene_id]} to access your scene. After you intersect the spheres, compute Equation~\eqref{eq:lighting} above.
 
+\paragraph{Shadow epsilon.} When doing the shadow ray test, you may find that due to the finite precision of float points, the test can accidentally mark the sphere on the shading point as occluding itself. Robustly resolving this problem is tricky, but there is an easy hack: we can set the \lstinline{tmin} and \lstinline{tmax} of our shadow ray to be $\epsilon$ and $\left(1 - \epsilon\right) d$ respectively, where $\epsilon$ is a small number. For now, let's set $\epsilon = 10^{-4}$ (ideally, $\epsilon$ should be proportional to the scale of the scene, but let's not worry about that right now).
+
+\paragraph{Front facing vs back facing normals.} Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces}{Chapter 6.4} of RTOW and have an understanding of the difference between front facing and back facing normals. For now, it does not matter for us since we apply \emph{two-sided shading} in Equation~\eqref{eq:lighting} (think about what will happen if we remove the absolute value operator $\left|\cdot\right|$?). For the bonus of rendering glasses of this homework and for the area light handling for the next homework (required!), the front and back facing will start to matter. I recommend you to distinguish between them in some way in your code.
+
 %\bibliographystyle{plain}
 %\bibliography{refs}
 
