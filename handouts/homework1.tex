@@ -11,6 +11,8 @@ However, you will have to implement the rest yourself. Trust me, it will be fun!
 
 Our homeworks are mostly inspired by the book \href{https://raytracing.github.io/}{Ray Tracing in One Weekend (RTOW)} (click the link for free access of the e-book). You are expected to read the relevant chapters of the book before implementing your own version. The structure of the homeworks is also largely inspired by \href{https://cs87-dartmouth.github.io/Fall2022/assignments.html}{CS 87/287 at Dartmouth} designed by Wojciech Jarosz (a UCSD alumni!).
 
+Before you started coding, we recommend you to go through the whole handout to have some ideas of what needs to be done.
+
 \paragraph{Links in this document.} Some of the links in this document contain hyperlinks with a \emph{named anchor} to a webpage (e.g., \url{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#overview}). On some PDF readers, I have found these links to not work very well (Adobe Acrobat Reader works well). If you encounter issues with the links, try replacing \lstinline{%23} with \lstinline{#} in the address bar of your browser.
 
 \section{Building Torrey}
@@ -46,6 +48,8 @@ First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
 We will use a very simple perspective camera for now. The position is fixed at $(0, 0, 0)$, and the camera is facing towards $(0, 0, 1)$ with an up vector $(0, 1, 0)$, right vector $(1, 0, 0)$, and focal length of $1$ (note that this is subtly different from RTOW). We will make the camera ``positionable'' later. For each pixel, we will shoot a ray from the center of the pixel (for a pixel $(x, y) \in [0, \text{width}] \times [0, \text{height}]$, we shoot a ray in $(x + 0.5, y + 0.5)$). Go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_1}. Your task is to modify the function to output the \emph{unit length} ray direction per pixel. Some of the pixels will have negative color but that is fine. We provide the \lstinline{.exr} image we generated from our code for your reference.
 
+Don't worry about the \lstinline{params} argument of the function. We will use it in the later part.
+
 To see your results, in terminal, type
 \begin{lstlisting}[language=bash]
   torrey -hw 1_1
@@ -73,6 +77,8 @@ First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
 Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_2}. Your task is to modify the function to output the surface normal of the sphere. The sphere has unit radius and is located at $(0, 0, 2)$. The camera pose is exactly the same as the previous part. To avoid negative number this time, let's map the normal to positive numbers: for a 3D vector $n$, we map it to the final color $c = \frac{n + 1}{2}$.
 
+You may find the struct \lstinline{SpherePrimitive} in \lstinline{hw1_scenes.h} to be helpful, but you are not required to use it.
+
 To see your results, in terminal, type
 \begin{lstlisting}[language=bash]
   torrey -hw 1_2
@@ -87,6 +93,23 @@ The results generated from our code looks like this:
 \end{figure}
 
 \section{Intersection with many spheres}
+Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be much easier than the previous one. 
+
+Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_3}. We will use the command line argument \lstinline{params} to access the scenes. Use \lstinline{hw1_scenes[scene_id]} to access your scene. The scene is contained in the struct \lstinline{HW1Scene}:
+\begin{lstlisting}[language=C++]
+struct HW1Scene {
+    std::vector<SpherePrimitive> primitives;
+    std::vector<PointLight> lights; 
+};
+\end{lstlisting}
+Ignore the lights for now. We will use the lights later.
+After you intersect the spheres, instead of outputting the normal, we will output the \lstinline{diffuse_color} of the sphere this time.
+
+To see your results, in terminal, type
+\begin{lstlisting}[language=bash]
+  torrey -hw 1_3 [scene_id]
+\end{lstlisting}
+where \lstinline{[scene_id]} is the scene you want to render (0-3).
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

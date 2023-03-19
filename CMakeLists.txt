@@ -26,6 +26,7 @@ set(SRCS src/3rdparty/miniz.h
          src/3rdparty/tinyexr.h
          src/3rdparty/tinyply.h
          src/hw1.h
+         src/hw1_scenes.h
          src/image.h
          src/vector.h
          src/hw1.cpp

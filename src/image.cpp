@@ -133,6 +133,10 @@ Image3 imread3(const fs::path &filename) {
 }
 
 void imwrite(const fs::path &filename, const Image3 &image) {
+    if (image.data.empty()) {
+        return;
+    }
+
 #ifdef _WINDOWS
     if (ends_with(filename.string(), ".pfm")) {
 #else
