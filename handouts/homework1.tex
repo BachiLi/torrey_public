@@ -227,7 +227,14 @@ Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_6}. As usual, 
 
 \paragraph{Random number generation.} Please do \emph{not} use the C \lstinline{rand()} function. It is really really really really bad: \lstinline{rand} usually have very short period as a random number generator (32768 in many systems), it uses a global variable to store the states of the random number generator, and this significantly hurts parallelization. Most implementations of \lstinline{rand} also use a bad random number generator (a very basic LCG). The modern C++ random number generator is much better, but not perfect. I personally prefer \href{https://www.pcg-random.org/}{PCG}. Highly recommend Melissa O'Neill's \href{https://www.youtube.com/watch?v=45Oet5qjlms}{talk} about PCG if you are interested in the topic of random number generation.
 
- 
+If you want to use the modern C++ random number generator, \emph{do not use} the \lstinline{random_double} function provided by the RTOW book. It effectively saves a global variables using a static member in the function. This makes the parallelization later we want to do much harder. Pass your generator around as you use it and don't declare it as a static member. For example, you can rewrite their \lstinline{random_double} function as follow:
+\begin{lstlisting}[language=C++]
+inline double random_double(std::mt19937 &rng) {
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    return dist(rng);
+}
+\end{lstlisting}
+
 %\bibliographystyle{plain}
 %\bibliography{refs}
 
