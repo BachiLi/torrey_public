@@ -184,10 +184,10 @@ Rendering with constant color is a bit boring. Let's add some variation to the c
 
 Here is where we slightly deviate from RTOW (RTOW doesn't introduce the notion of lights until the end of the second book, which I find to be a bit late). Given a list of lights and a point hit by our camera ray (we usually call it the \emph{shading point}), we will compute the following response:
 \begin{equation}
-    \sum_{\text{light}} \frac{\left|n \cdot l\right|}{\pi} \frac{I}{d^2} K_d,
+    \sum_{\text{light}} \frac{\left|n \cdot l\right|}{\pi} \cdot \frac{I}{d^2} \cdot K_d \cdot \text{visibility},
     \label{eq:lighting}
 \end{equation}
-where $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the intensity of the light, $d$ is the distance between the shading point and the light, ahd $K_d$ is the \lstinline{diffuse_color} of the surface (it is also called \emph{albedo} or \emph{diffuse reflectance}).
+where $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the intensity of the light, $d$ is the distance between the shading point and the light, $K_d$ is the \lstinline{diffuse_color} of the surface (it is also called \emph{albedo} or \emph{diffuse reflectance}), $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection function to compute $\text{visibility}$.
 
 \paragraph{Quiz:} explain the equation above -- Why is there a dot product? Why is there a distance square? Don't worry about the $\pi$ too much. It will make sense when we talk about BRDFs in the class.
 
