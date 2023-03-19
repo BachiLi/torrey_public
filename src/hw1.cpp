@@ -80,6 +80,23 @@ Image3 hw_1_3(const std::vector<std::string> &params) {
 
 Image3 hw_1_4(const std::vector<std::string> &params) {
     // Homework 1.4: render the scenes defined in hw1_scenes.h
+    // output their diffuse color directly.
+    if (params.size() == 0) {
+        return Image3(0, 0);
+    }
+
+    int scene_id = std::stoi(params[0]);
+    UNUSED(scene_id); // avoid unused warning
+    // Your scene is hw1_scenes[scene_id]
+
+    Image3 img(640 /* width */, 480 /* height */);
+
+    return img;
+}
+
+Image3 hw_1_5(const std::vector<std::string> &params) {
+    // Homework 1.5: render the scenes defined in hw1_scenes.h,
+    // light them using the point lights in the scene.
     if (params.size() == 0) {
         return Image3(0, 0);
     }
