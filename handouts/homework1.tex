@@ -187,7 +187,7 @@ Here is where we slightly deviate from RTOW (RTOW doesn't introduce the notion o
     \sum_{\text{light}} \frac{\max\left(n \cdot l, 0\right)}{\pi} \cdot \frac{I}{d^2} \cdot K_d \cdot \text{visibility},
     \label{eq:lighting}
 \end{equation}
-where $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the intensity of the light, $d$ is the distance between the shading point and the light, $K_d$ is the \lstinline{diffuse_color} of the surface (it is also called \emph{albedo} or \emph{diffuse reflectance}), $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection function to compute $\text{visibility}$.
+where $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the intensity of the light, $d$ is the distance between the shading point and the light, $K_d$ is the \lstinline{diffuse_color} of the surface (it is also called \emph{albedo} or \emph{diffuse reflectance}), $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection functions to compute $\text{visibility}$.
 
 \paragraph{Quiz:} explain the equation above -- Why is there a dot product? Why is there a distance square? Don't worry about the $\pi$ too much. It will make sense when we talk about BRDFs in the class.
 
@@ -195,7 +195,28 @@ Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_5}. As usual, 
 
 \paragraph{Shadow epsilon.} When doing the shadow ray test, you may find that due to the finite precision of float points, the test can accidentally mark the sphere on the shading point as occluding itself. Robustly resolving this problem is tricky, but there is an easy hack: we can set the \lstinline{tmin} and \lstinline{tmax} of our shadow ray to be $\epsilon$ and $\left(1 - \epsilon\right) d$ respectively, where $\epsilon$ is a small number. For now, let's set $\epsilon = 10^{-4}$ (ideally, $\epsilon$ should be proportional to the scale of the scene, but let's not worry about that right now).
 
-\paragraph{Front facing vs back facing normals.} Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces}{Chapter 6.4} of RTOW and have an understanding of the difference between front facing and back facing normals. In our rendering system, we assign two different materials to the front facing part of the surface and the back facing part. If your ray hit the front facing part, use \lstinline{diffuse_color}. On the other hand, if it hits the back facing part, use \lstinline{back_diffuse_color}.
+\paragraph{Front facing vs back facing normals.} Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces}{Chapter 6.4} of RTOW and have an understanding of the difference between front facing and back facing normals. In our rendering system, we assign two different materials to the front facing part of the surface and the back facing part. If your ray hit the front facing part, use \lstinline{diffuse_color}. On the other hand, if it hits the back facing part, use \lstinline{back_diffuse_color}. For the back facing normals, flip them during shading so that the dot product is not zero.
+
+As usual, to see your results, in terminal, type
+\begin{lstlisting}[language=bash]
+  torrey -hw 1_5 [scene_id]
+\end{lstlisting}
+where \lstinline{[scene_id]} is the scene you want to render (0-4).
+
+Figure~\ref{fig:hw_1_5} shows our renderings for the five scenes.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_5a.png}
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_5b.png}
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_5c.png}
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_5d.png}
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_5e.png}
+    \caption{References for Homework 1.5.}
+    \label{fig:hw_1_5}
+\end{figure}
+
+\paragraph{Quiz:} Read about \href{https://en.wikipedia.org/wiki/Three-point_lighting}{three-point lighting} on Wikipedia. In the second scene (\lstinline{scene_id=1}), which light is the key light? Which light is the fill light? Which light is the backlight? Do you think this is better than only having the key light? Why?
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

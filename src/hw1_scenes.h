@@ -41,7 +41,7 @@ Scene hw1_scene_0{
         {Vector3{ 0.0, -100.5,  3.0}, 100.0, Vector3{0.25, 0.25, 0.75}, Vector3{0, 0, 0}}
     },
     std::vector<PointLight>{
-        {Vector3{1, 1, 1}, Vector3{0, 0, 0}}
+        {Vector3{100, 100, 100}, Vector3{5, 5, -2}}
     }
 };
 
@@ -59,7 +59,9 @@ Scene hw1_scene_1{
         {Vector3{-1.0,    0.0, -3.0},   0.5, Vector3{0.25, 0.75, 0.75}, Vector3{0, 0, 0}}
     },
     std::vector<PointLight>{
-        {Vector3{1, 1, 1}, Vector3{0, 0, 0}}
+        {Vector3{100, 100, 100}, Vector3{ 5, 5,  2}},
+        {Vector3{ 10,  10,  10}, Vector3{-5, 5,  1}},
+        {Vector3{  2,   2,   2}, Vector3{ 0, 5, -5}}
     }
 };
 
@@ -76,7 +78,8 @@ Scene hw1_scene_2{
         {Vector3{   0.5, 0.0,  -3.0}, Real(0.25), Vector3{0.75, 0.25, 0.75}, Vector3{0, 0, 0}},
     },
     std::vector<PointLight>{
-        {Vector3{1, 1, 1}, Vector3{0, 0, 0}}
+        {Vector3{100, 50, 50}, Vector3{ 1, 0, 10}},
+        {Vector3{50, 50, 100}, Vector3{-1, 0, 10}},
     }
 };
 
@@ -88,7 +91,7 @@ Scene hw1_scene_3{
         45                 // vfov
     },
     std::vector<SpherePrimitive>{
-        {Vector3{   0.0,  0.0, 0.0}, Real(100)  , Vector3{ 0.0,  0.0, 0.0}, Vector3{0.5, 0.25, 0.25}},
+        {Vector3{   0.0,  0.0, 0.0}, Real(100)  , Vector3{0.5, 0.25, 0.25}, Vector3{0.5, 0.25, 0.25}},
         {Vector3{ -0.35, 0.35,-3.5}, Real(0.25) , Vector3{0.25,  0.5, 0.75}, Vector3{0, 0, 0}},
         {Vector3{  0.35, 0.35,-2.5}, Real(0.35) , Vector3{0.75,  0.5, 0.25}, Vector3{0, 0, 0}},
         {Vector3{  0.35,-0.35,-2.0}, Real(0.3)  , Vector3{0.25, 0.75, 0.5}, Vector3{0, 0, 0}},
@@ -99,7 +102,9 @@ Scene hw1_scene_3{
         {Vector3{ -10.0,  0.0,-3.0}, Real(0.5)  , Vector3{0.75, 0.75, 0.75}, Vector3{0, 0, 0}},
     },
     std::vector<PointLight>{
-        {Vector3{1, 1, 1}, Vector3{0, 0, 0}}
+        {Vector3{10, 10, 10}, Vector3{0, 0, 0}},
+        {Vector3{0.5, 0.5, 0.5}, Vector3{-0.4, 0.5, -3.0}},
+        {Vector3{10000, 10000, 10000}, Vector3{0, 0, 90}},
     }
 };
 
@@ -143,7 +148,8 @@ Scene hw1_scene_4{
         {Vector3{0.189,-0.262,-4.485}, 0.298, Vector3{0.036,0.548,0.363}, Vector3{0,0,0}}
     },
     std::vector<PointLight>{
-        {Vector3{1, 1, 1}, Vector3{0, 0, 0}}
+        {Vector3{10, 10, 10}, Vector3{0, 0, 0}},
+        {Vector3{50, 5, 5}, Vector3{5, 5, -5}},
     }
 };
 
