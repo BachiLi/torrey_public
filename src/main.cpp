@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
         Image3 img = hw_1_3(parameters);
         imwrite("hw_1_3.exr", img);
     } else if (hw_num == "1_4") {
-        Image3 img = hw_1_3(parameters);
-        imwrite("hw_1_3.exr", img);
+        Image3 img = hw_1_4(parameters);
+        imwrite("hw_1_4.exr", img);
     }
 
     return 0;
