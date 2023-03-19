@@ -31,8 +31,8 @@ After building, you should see an executable \lstinline{torrey}. Try typing the 
 \begin{lstlisting}[language=bash]
   torrey -hw 1_1
 \end{lstlisting}
-It will generate an image \lstinline{hw_1_1.exr} that looks like the following:
-\begin{figure}[h]
+It will generate an image \lstinline{hw_1_1.exr} that looks like Figure~\ref{fig:hw_1_1_before}:
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{imgs/hw_1_1_before.png}
     \caption{Image output by the homework 1.1 code before your modification.}
@@ -48,24 +48,26 @@ To do ray tracing, we need to first shoot rays from the camera. In this first st
 
 First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#rays,asimplecamera,andbackground}{Chapter 4.2} of the first RTOW book and understand its content.
 
-We will use a very simple perspective camera for now. The position is fixed at $(0, 0, 0)$, and the camera is facing towards $(0, 0, -1)$ with an up vector $(0, 1, 0)$, right vector $(1, 0, 0)$, and focal length of $1$. We will make the camera ``positionable'' later. For each pixel, we will shoot a ray from the center of the pixel (for a pixel $(x, y) \in [0, \text{width}] \times [0, \text{height}]$, we shoot a ray in $(x + 0.5, y + 0.5)$). Go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_1}. Your task is to modify the function to output the \emph{unit length} ray direction per pixel. Some of the pixels will have negative color but that is fine. We provide the \lstinline{.exr} image we generated from our code for your reference.
+We will use a very simple perspective camera for now. The position is fixed at $(0, 0, 0)$, and the camera is facing towards $(0, 0, -1)$ with an up vector $(0, 1, 0)$, right vector $(1, 0, 0)$, and focal length of $1$ (the same setting as the ROTW book). We will make the camera ``positionable'' later. For each pixel, we will shoot a ray from the center of the pixel (for a pixel $(x, y) \in [0, \text{width}] \times [0, \text{height}]$, we shoot a ray in $(x + 0.5, y + 0.5)$). Go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_1}. Your task is to modify the function to output the \emph{unit length} ray direction per pixel. Some of the pixels will have negative color but that is fine. See Figure~\ref{fig:hw_1_1_after} \lstinline{handouts/imgs/hw_1_1.exr} for references.
 
 Don't worry about the \lstinline{params} argument of the function. We will use it in the later part.
+
+You may find the \lstinline{normalize} function in \lstinline{vector.h} to be useful.
 
 To see your results, in terminal, type
 \begin{lstlisting}[language=bash]
   torrey -hw 1_1
 \end{lstlisting}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{imgs/hw_1_1_after.png}
     \caption{Image output by the homework 1.1 code after your modification.}
     \label{fig:hw_1_1_after}
 \end{figure}
 
-\paragraph{Quiz:} How do you modify your code to render using a camera with 360 degree field of view like the following image? (hint: see \href{https://en.wikipedia.org/wiki/Spherical_coordinate_system}{spherical coordinates}) Briefly describe your approach or attach your code.
-\begin{figure}[h]
+\paragraph{Quiz:} How do you modify your code to render using a camera with 360 degree field of view like Figure~\ref{fig:360_camera}? (hint: see \href{https://en.wikipedia.org/wiki/Spherical_coordinate_system}{spherical coordinates}) Briefly describe your approach (you can attach your code if you want).
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{imgs/360camera.png}
     \caption{360 camera rendering taken from the \href{https://www.pbr-book.org/3ed-2018/Camera_Models/Environment_Camera}{PBRT book}.}
@@ -77,44 +79,74 @@ After we have the rays from the camera, we'll trace these rays and intersect the
 
 First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#addingasphere}{Chapter 5} and \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#surfacenormalsandmultipleobjects}{Chapter 6} of RTOW and understand the content.
 
-Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_2}. Your task is to modify the function to output the surface normal of the sphere. The sphere has unit radius and is located at $(0, 0, 2)$. The camera pose is exactly the same as the previous part. To avoid negative number this time, let's map the normal to positive numbers: for a 3D vector $n$, we map it to the final color $c = \frac{n + 1}{2}$.
+Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_2}. Your task is to modify the function to output the surface normal of the sphere. The sphere has unit radius and is located at $(0, 0, 2)$. The camera pose is exactly the same as the previous part. To make prettier images this time, let's map the normal to positive numbers: for a 3D vector $n$, we map it to the final color $c = \frac{n + 1}{2}$. If our rays do not hit the sphere, return $(0.5, 0.5, 0.5)$.
 
-You may find the struct \lstinline{SpherePrimitive} in \lstinline{hw1_scenes.h} to be helpful, but you are not required to use it.
+You may find the struct \lstinline{hw1::SpherePrimitive} in \lstinline{hw1_scenes.h} to be helpful, but you are not required to use it.
+
+You may also find the \lstinline{infinity} function in \lstinline{torrey.h} to be useful.
 
 To see your results, in terminal, type
 \begin{lstlisting}[language=bash]
   torrey -hw 1_2
 \end{lstlisting}
 
-The results generated from our code looks like this:
-\begin{figure}[h]
+The results generated from our code looks like Figure~\ref{fig:hw_1_2}:
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{imgs/hw_1_2.png}
     \caption{Your homework 1.2 should output this image.}
     \label{fig:hw_1_2}
 \end{figure}
 
-\paragraph{Quiz:} If we were to add a linear transformation to the sphere (e.g., turn it into an ellipsoid), how would you do it?
+\paragraph{Quiz:} If we were to add a linear transformation to the sphere (e.g., turn it into an ellipsoid), how would you do it? Briefly describe your approach.
 
 \section{Adding camera control}
 We will next add pose and field of view control to the camera so that we can look at the sphere at different angles. We will adopt the LookAt transform since it's more intuitive. We will also follow RTOW and take a vertical field of view angle.
 
 First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#positionablecamera}{Chapter 11} of RTOW and understand the content.
 
-Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_3}. Given the inputs \lstinline{lookfrom}, \lstinline{lookat}, \lstinline{up}, \lstinline{vfov} (we have parsed it for you), transform your camera rays accordingly and render the same sphere in \lstinline{hw_1_2}.
+Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_3}. Given the inputs \lstinline{lookfrom}, \lstinline{lookat}, \lstinline{up}, \lstinline{vfov} (we have parsed it for you from the command line arguments \lstinline{params}), transform your camera rays accordingly and render the same sphere in \lstinline{hw_1_2}.
+
+You may find the \lstinline{radians} function in \lstinline{torrey.h} to be useful.
+
+To see your results, in terminal, type
+\begin{lstlisting}[language=bash]
+  torrey -hw 1_3 -lookfrom 1 0 -1 -lookat 0 0 -2 -vfov 60
+  torrey -hw 1_3 -lookfrom 0 0 -0.75 -lookat 0 0 -2 -vfov 90
+  torrey -hw 1_3 -lookfrom 1 -1 0 -lookat 1 -1 -2 -vfov 90
+  torrey -hw 1_3 -lookfrom 1 -1 1 -lookat 1 -1 -2 -vfov 45
+\end{lstlisting}
+or just any parameter you like! See Figure~\ref{fig:hw_1_3} for references.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.24\linewidth]{imgs/hw_1_3a.png}
+    \includegraphics[width=0.24\linewidth]{imgs/hw_1_3b.png}
+    \includegraphics[width=0.24\linewidth]{imgs/hw_1_3c.png}
+    \includegraphics[width=0.24\linewidth]{imgs/hw_1_3d.png}
+    \caption{References for Homework 1.3.}
+    \label{fig:hw_1_3}
+\end{figure}
+
+\paragraph{Quiz:} If we were to specify the \emph{horizontal} field of view angle instead of the vertical one, how should we rewrite the code?
+
+\paragraph{Quiz:} In the RTOW book, to compute the coordinate frame for the camera rays (\lstinline{w, u,} and \lstinline{v}), their code normalizes the cross product of the \lstinline{up} vector and the \lstinline{w} vector. However, when they do the cross product between \lstinline{w} and \lstinline{u}, the result did not need to be normalized. Why?
+
+\paragraph{Quiz:} Compare the third and fourth images in Figure~\ref{fig:hw_1_3}. Why is the sphere in the third image more \emph{distorted} compared to the fourth image? (Hint: you may want to read \href{https://en.wikipedia.org/wiki/Perspective_distortion}{this} Wikipedia article.)
 
 \section{Intersection with many spheres}
 Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be much easier than the previous one. 
 
-Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_3}. We will use the command line argument \lstinline{params} to access the scenes. Use \lstinline{hw1_scenes[scene_id]} to access your scene. The scene is contained in the struct \lstinline{HW1Scene}:
+Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_4}. We will use the command line argument \lstinline{params} to access the scenes. Use \lstinline{hw1_scenes[scene_id]} to access your scene. The scene is contained in the struct \lstinline{hw1::Scene}, defined in \lstinline{hw1_scenes.h}:
 \begin{lstlisting}[language=C++]
-struct HW1Scene {
+struct Scene {
+    Camera camera;
     std::vector<SpherePrimitive> primitives;
     std::vector<PointLight> lights; 
 };
 \end{lstlisting}
-Ignore the lights for now. We will use the lights later.
-After you intersect the spheres, instead of outputting the normal, we will output the \lstinline{diffuse_color} of the sphere this time.
+Ignore the lights for now. We will use them later.
+After you intersect the spheres, instead of outputting the normal, let's output the \lstinline{diffuse_color} of the sphere this time.
 
 To see your results, in terminal, type
 \begin{lstlisting}[language=bash]

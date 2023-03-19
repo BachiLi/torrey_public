@@ -12,6 +12,9 @@
 #include <limits>
 #include <algorithm>
 
+// for suppressing unused warnings
+#define UNUSED(x) (void)(x)
+
 // We use double for most of our computation.
 // Rendering is usually done in single precision Reals.
 // However, torrey is an educational renderer with does not

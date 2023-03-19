@@ -1,6 +1,8 @@
 #include "hw1.h"
 #include "hw1_scenes.h"
 
+using namespace hw1;
+
 Image3 hw_1_1(const std::vector<std::string> &/*params*/) {
     // Homework 1.1: generate camera rays and output the ray directions
     // The camera is positioned at (0, 0, 0), facing towards (0, 0, -1),
@@ -65,7 +67,11 @@ Image3 hw_1_3(const std::vector<std::string> &params) {
         }
     }
 
-    lookfrom; lookat; up; vfov; // avoid unused warnings
+    // avoid unused warnings
+    UNUSED(lookfrom);
+    UNUSED(lookat);
+    UNUSED(up);
+    UNUSED(vfov);
 
     Image3 img(640 /* width */, 480 /* height */);
 
@@ -80,7 +86,7 @@ Image3 hw_1_4(const std::vector<std::string> &params) {
     }
 
     int scene_id = std::stoi(params[0]);
-    scene_id; // avoid unused warning
+    UNUSED(scene_id); // avoid unused warning
     // Your scene is hw1_scenes[scene_id]
 
     Image3 img(640 /* width */, 480 /* height */);
