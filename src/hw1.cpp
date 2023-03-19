@@ -117,7 +117,7 @@ Image3 hw_1_6(const std::vector<std::string> &params) {
     }
 
     int scene_id = 0;
-    int spp = 16;
+    int spp = 64;
     for (int i = 0; i < (int)params.size(); i++) {
         if (params[i] == "-spp") {
             spp = std::stoi(params[++i]);
@@ -131,6 +131,31 @@ Image3 hw_1_6(const std::vector<std::string> &params) {
     // Your scene is hw1_scenes[scene_id]
 
     Image3 img(160 /* width */, 120 /* height */);
+
+    return img;
+}
+
+Image3 hw_1_7(const std::vector<std::string> &params) {
+    // Homework 1.7: add mirror materials to homework 1.6
+    if (params.size() == 0) {
+        return Image3(0, 0);
+    }
+
+    int scene_id = 0;
+    int spp = 64;
+    for (int i = 0; i < (int)params.size(); i++) {
+        if (params[i] == "-spp") {
+            spp = std::stoi(params[++i]);
+        } else {
+            scene_id = std::stoi(params[i]);
+        }
+    }
+
+    UNUSED(scene_id); // avoid unused warning
+    UNUSED(spp); // avoid unused warning
+    // Your scene is hw1_scenes[scene_id]
+
+    Image3 img(640 /* width */, 480 /* height */);
 
     return img;
 }

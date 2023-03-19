@@ -145,8 +145,8 @@ struct Scene {
     std::vector<PointLight> lights; 
 };
 \end{lstlisting}
-Ignore the lights for now. We will use them later. Also don't worry about \lstinline{back_diffuse_color} just now.
-After you intersect the spheres, instead of outputting the normal, let's output the \lstinline{diffuse_color} of the sphere this time. As usual, if our rays do not hit any sphere, return $(0.5, 0.5, 0.5)$.
+Ignore the lights for now. We will use them later. 
+After you intersect the spheres, instead of outputting the normal, let's output the \lstinline{color} of the sphere this time. As usual, if our rays do not hit any sphere, return $(0.5, 0.5, 0.5)$.
 
 To see your results, in terminal, type
 \begin{lstlisting}[language=bash]
@@ -175,8 +175,10 @@ center = 5 * np.random.rand(3, n) - 2.5
 center[2,:] -= 5
 radius = (np.random.rand(1, n) + 0.5) / 2
 color = np.random.rand(3, n)
+mtype = np.random.rand(1, n)
 for i in range(n):
-    print(f'{{Vector3{{{center[0,i]:.3f},{center[1,i]:.3f},{center[2,i]:.3f}}}, {radius[0, i]:.3f}, Vector3{{{color[0,i]:.3f},{color[1,i]:.3f},{color[2,i]:.3f}}}}},')
+    mt = 'Diffuse' if mtype[0, i] > 0.5 else 'Mirror'
+    print(f'{{Vector3{{{center[0,i]:.3f},{center[1,i]:.3f},{center[2,i]:.3f}}}, {radius[0, i]:.3f}, Vector3{{{color[0,i]:.3f},{color[1,i]:.3f},{color[2,i]:.3f}}}, MaterialType::{mt}}},')
 \end{lstlisting}
 
 \section{Lighting with point lights and Lambertian surfaces}
@@ -187,7 +189,7 @@ Here is where we slightly deviate from RTOW (RTOW doesn't introduce the notion o
     \sum_{\text{light}} \frac{\max\left(n \cdot l, 0\right)}{\pi} \cdot \frac{I}{d^2} \cdot K_d \cdot \text{visibility},
     \label{eq:lighting}
 \end{equation}
-where $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the intensity of the light, $d$ is the distance between the shading point and the light, $K_d$ is the \lstinline{diffuse_color} of the surface (it is also called \emph{albedo} or \emph{diffuse reflectance}), $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection functions to compute $\text{visibility}$.
+where $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the intensity of the light, $d$ is the distance between the shading point and the light, $K_d$ is the \lstinline{color} of the surface (it is also called \emph{albedo} or \emph{reflectance}), $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection functions to compute $\text{visibility}$. Ignore the \lstinline{material_type} of the primitive for now. We will use it later.
 
 \paragraph{Quiz:} explain the equation above -- Why is there a dot product? Why is there a distance square? Don't worry about the $\pi$ too much. It will make sense when we talk about BRDFs in the class.
 
@@ -195,7 +197,7 @@ Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_5}. As usual, 
 
 \paragraph{Shadow epsilon.} When doing the shadow ray test, you may find that due to the finite precision of float points, the test can accidentally mark the sphere on the shading point as occluding itself. Robustly resolving this problem is tricky, but there is an easy hack: we can set the \lstinline{tmin} and \lstinline{tmax} of our shadow ray to be $\epsilon$ and $\left(1 - \epsilon\right) d$ respectively, where $\epsilon$ is a small number. For now, let's set $\epsilon = 10^{-4}$ (ideally, $\epsilon$ should be proportional to the scale of the scene, but let's not worry about that right now).
 
-\paragraph{Front facing vs back facing normals.} Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces}{Chapter 6.4} of RTOW and have an understanding of the difference between front facing and back facing normals. In our rendering system, we assign two different materials to the front facing part of the surface and the back facing part. If your ray hit the front facing part, use \lstinline{diffuse_color}. On the other hand, if it hits the back facing part, use \lstinline{back_diffuse_color}. For the back facing normals, flip them during shading so that the dot product is not zero.
+\paragraph{Front facing vs back facing normals.} Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces}{Chapter 6.4} of RTOW and have an understanding of the difference between front facing and back facing normals. In our rendering systems, we shade the surfaces on \emph{both sides}. That is, even when the surface is back facing, we still compute its color and not assign black. Note that Equation~\eqref{eq:lighting} assumes front facing normal, so if you get a back facing normal, you want to flip it to be front facing. Distinguishing between front and back facing normals is going to be important for the bonus of this homework (rendering glasses) and next homework (for rendering area lights).
 
 As usual, to see your results, in terminal, type
 \begin{lstlisting}[language=bash]
@@ -251,6 +253,13 @@ Figure~\ref{fig:hw_1_6} shows the difference before and after applying antialias
     \caption{Without/with antialiasing.}
     \label{fig:hw_1_6}
 \end{figure}
+
+\section{Mirrors}
+Hold on to it, we are near the end (of this homework)! In this part, we will add mirrors to our scenes. If our rays hit a mirror, they should recursively query the color in the reflected direction (and multiply with the current surface color).
+
+Go read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal}{Chapter 9} of RTOW. Don't worry about the \emph{fuzzy reflection} part. We will implement something much better in Homework 3.
+
+
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
