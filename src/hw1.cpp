@@ -79,8 +79,7 @@ Image3 hw_1_3(const std::vector<std::string> &params) {
 }
 
 Image3 hw_1_4(const std::vector<std::string> &params) {
-    // Homework 1.3: modify this function to 
-    // intersect the rays and the spheres defined in hw1_scenes.h
+    // Homework 1.4: render the scenes defined in hw1_scenes.h
     if (params.size() == 0) {
         return Image3(0, 0);
     }
