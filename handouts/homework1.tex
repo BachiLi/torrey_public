@@ -11,6 +11,8 @@ However, you will have to implement the rest yourself. Trust me, it will be fun!
 
 Our homeworks are mostly inspired by the book \href{https://raytracing.github.io/}{Ray Tracing in One Weekend (RTOW)} (click the link for free access of the e-book). You are expected to read the relevant chapters of the book before implementing your own version. The structure of the homeworks is also largely inspired by \href{https://cs87-dartmouth.github.io/Fall2022/assignments.html}{CS 87/287 at Dartmouth} designed by Wojciech Jarosz (a UCSD alumni!).
 
+\paragraph{Links in this document.} Some of the links in this document contain hyperlinks with a \emph{named anchor} to a webpage (e.g., \url{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#overview}). On some PDF readers, I have found these links to not work very well (Adobe Acrobat Reader works well). If you encounter issues with the links, try replacing \lstinline{%23} with \lstinline{#} in the address bar of your browser.
+
 \section{Building Torrey}
 We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, pcg, stb\_image, tinyexr, miniz, tinyply) in its repo and all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
 \begin{lstlisting}[language=bash]
@@ -40,7 +42,7 @@ Read \lstinline{main.cpp}, \lstinline{hw1.cpp}, \lstinline{vector.h}, and \lstin
 \section{Sending rays from the camera}
 To do ray tracing, we need to first shoot rays from the camera. In this first step, we will generate camera rays for all the pixels. The goal of our first task is to visualize the camera ray direction (normalized to unit length per pixel).
 
-First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#rays,asimplecamera,andbackground}{Chapter 4.2} of the first RTOW book and understand its content.
+First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#rays,asimplecamera,andbackground}{Chapter 4.2} of the first RTOW book and understand its content.
 
 We will use a very simple perspective camera for now. The position is fixed at $(0, 0, 0)$, and the camera is facing towards $(0, 0, 1)$ with an up vector $(0, 1, 0)$, right vector $(1, 0, 0)$, and focal length of $1$ (note that this is subtly different from RTOW). We will make the camera ``positionable'' later. For each pixel, we will shoot a ray from the center of the pixel (for a pixel $(x, y) \in [0, \text{width}] \times [0, \text{height}]$, we shoot a ray in $(x + 0.5, y + 0.5)$). Go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_1}. Your task is to modify the function to output the \emph{unit length} ray direction per pixel. Some of the pixels will have negative color but that is fine. We provide the \lstinline{.exr} image we generated from our code for your reference.
 
@@ -67,7 +69,7 @@ To see your results, in terminal, type
 \section{Intersection with one sphere}
 After we have the rays from the camera, we'll trace these rays and intersect them with the scene. Here we choose the geometry to be a sphere (because it's easy and we can easily build interesting scenes using only spheres). For this part, let's try to handle only one sphere.
 
-First, read \href{Chapter 5}{https://raytracing.github.io/books/RayTracingInOneWeekend.html#addingasphere} of RTOW and understand the content.
+First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#addingasphere}{Chapter 5} and \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#surfacenormalsandmultipleobjects}{Chapter 6} of RTOW and understand the content.
 
 Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_2}. Your task is to modify the function to output the surface normal of the sphere. The sphere has unit radius and is located at $(0, 0, 2)$. The camera pose is exactly the same as the previous part. To avoid negative number this time, let's map the normal to positive numbers: for a 3D vector $n$, we map it to the final color $c = \frac{n + 1}{2}$.
 
@@ -75,6 +77,16 @@ To see your results, in terminal, type
 \begin{lstlisting}[language=bash]
   torrey -hw 1_2
 \end{lstlisting}
+
+The results generated from our code looks like this:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{imgs/hw_1_2.png}
+    \caption{Your homework 1.2 should output this image.}
+    \label{fig:hw_1_2}
+\end{figure}
+
+\section{Intersection with many spheres}
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
