@@ -236,6 +236,22 @@ inline double random_double(std::mt19937 &rng) {
 \end{lstlisting}
 If you want to use PCG, you can look at my code \href{https://github.com/BachiLi/lajolla_public/src/pcg.h}{here} (feel free to copy paste).
 
+As usual, to see your results, in terminal, type
+\begin{lstlisting}[language=bash]
+  torrey -hw 1_6 [scene_id] -spp [spp]
+\end{lstlisting}
+where \lstinline{[scene_id]} is the scene you want to render (0-4) and \lstinline{[spp]} is the number of samples per pixel (default is 64).
+
+Figure~\ref{fig:hw_1_6} shows the difference before and after applying antialiasing. Hopefully the difference is clear. Here we use 64 samples per pixel.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.4\linewidth]{imgs/hw_1_6_before.png}
+    \includegraphics[width=0.4\linewidth]{imgs/hw_1_6_after.png}
+    \caption{Without/with antialiasing.}
+    \label{fig:hw_1_6}
+\end{figure}
+
 %\bibliographystyle{plain}
 %\bibliography{refs}
 
