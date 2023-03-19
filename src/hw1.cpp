@@ -109,3 +109,28 @@ Image3 hw_1_5(const std::vector<std::string> &params) {
 
     return img;
 }
+
+Image3 hw_1_6(const std::vector<std::string> &params) {
+    // Homework 1.6: add antialiasing to homework 1.5
+    if (params.size() == 0) {
+        return Image3(0, 0);
+    }
+
+    int scene_id = 0;
+    int spp = 16;
+    for (int i = 0; i < (int)params.size(); i++) {
+        if (params[i] == "-spp") {
+            spp = std::stoi(params[++i]);
+        } else {
+            scene_id = std::stoi(params[i]);
+        }
+    }
+
+    UNUSED(scene_id); // avoid unused warning
+    UNUSED(spp); // avoid unused warning
+    // Your scene is hw1_scenes[scene_id]
+
+    Image3 img(160 /* width */, 120 /* height */);
+
+    return img;
+}

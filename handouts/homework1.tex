@@ -218,6 +218,16 @@ Figure~\ref{fig:hw_1_5} shows our renderings for the five scenes.
 
 \paragraph{Quiz:} Read about \href{https://en.wikipedia.org/wiki/Three-point_lighting}{three-point lighting} on Wikipedia. In the second scene (\lstinline{scene_id=1}), which light is the key light? Which light is the fill light? Which light is the backlight? Do you think this is better than only having the key light? Why?
 
+\section{Antialiasing}
+If you have been watching your images closely, you will find that they have some ugly jagged edges around object and shadow boundaries. The issue is that we always trace rays through the center of pixels. We can easily fix it by averaging the samples in the support of a pixel.
+
+Go read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#antialiasing}{Chapter 7} of RTOW.
+
+Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_6}. As usual, use \lstinline{hw1_scenes[scene_id]} to access your scene. This time, we additionally take an argument \lstinline{-spp [spp]} that indicates how many \emph{samples per pixel} we will be using. We have parsed it for you. You will notice that the image resolution this time is a lot lower. We want to use this to show the effect of antialiasing. Try to compare to the previous renderings at the same resolution.
+
+\paragraph{Random number generation.} Please do \emph{not} use the C \lstinline{rand()} function. It is really really really really bad: \lstinline{rand} usually have very short period as a random number generator (32768 in many systems), it uses a global variable to store the states of the random number generator, and this significantly hurts parallelization. Most implementations of \lstinline{rand} also use a bad random number generator (a very basic LCG). The modern C++ random number generator is much better, but not perfect. I personally prefer \href{https://www.pcg-random.org/}{PCG}. Highly recommend Melissa O'Neill's \href{https://www.youtube.com/watch?v=45Oet5qjlms}{talk} about PCG if you are interested in the topic of random number generation.
+
+ 
 %\bibliographystyle{plain}
 %\bibliography{refs}
 
