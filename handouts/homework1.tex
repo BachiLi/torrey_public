@@ -18,18 +18,26 @@
 
 In our first homework, we are going to implement a simple ray tracer (almost) from scratch.
 We will provide some utility code such as the vector class and parallel threading. 
-However, you will have to implement the rest yourself. Trust me, it will be fun!
+However, you will have to implement the rest yourself. Trust me, it will be fun! Figure~\ref{fig:teaser} shows the images your code is going to produce.
 
 Our homeworks are mostly inspired by the book \href{https://raytracing.github.io/}{Ray Tracing in One Weekend (RTOW)} (click the link for free access of the e-book). You are expected to read the relevant chapters of the book before implementing your own version. The structure of the homeworks is also largely inspired by \href{https://cs87-dartmouth.github.io/Fall2022/assignments.html}{CS 87/287 at Dartmouth} designed by Wojciech Jarosz (a UCSD alumni!).
 
 Before you started coding, we recommend you to go through the whole handout to have some ideas of what needs to be done.
 
+\paragraph{Submission.} Submit your code and the rendering of the scene you designed yourself (Section~\ref{sec:design_your_own}), along with a text file answering the questions below to Canvas.
+
+\paragraph{Grading.} We will run your code (using the commands below) and compare to our reference solutions. The points of the quizes are included in the total points on the section titles.
+
+\paragraph{Colloboration policy.} We expect you to write the code on your own. Feel free to discuss between the peers and ask us questions though!
+
 \paragraph{Coordinate systems conventions.} This is the most annoying part of any graphics systems as every single one of them use a different one. We will follow the conventions used in RTOW: Y axis is up, negative Z looks into the screen from the viewer, and we use a right-handed coordinate system.
+
+\paragraph{Refacotring your code.} If you have never written a ray tracer before, you may find that you will want to refactor your code as you progress in the homework. This is totally normal and is part of the learning process: you will learn what needs to be abstracted and what does not need to be abstracted along the way. Feel free to restructure your code at any time. Also feel free to change any part of torrey if it makes your life easier.
 
 \paragraph{Links in this document.} Some of the links in this document contain hyperlinks with a \emph{named anchor} to a webpage (e.g., \url{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#overview}). On some PDF readers, I have found these links to not work very well (Adobe Acrobat Reader works well). If you encounter issues with the links, try replacing \lstinline{%23} with \lstinline{#} in the address bar of your browser.
 
 \section{Building Torrey}
-We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, pcg, stb\_image, tinyexr, miniz, tinyply) in its repo and all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
+We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, stb\_image, tinyexr, miniz, tinyply) in its repo and all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
 \begin{lstlisting}[language=bash]
   git clone https://github.com/BachiLi/torrey_public
   mkdir build
@@ -54,12 +62,12 @@ It will generate an image \lstinline{hw_1_1.exr} that looks like Figure~\ref{fig
 
 Read \lstinline{main.cpp}, \lstinline{hw1.cpp}, \lstinline{vector.h}, and \lstinline{image.h} to understand the current code structure.
 
-\section{Sending rays from the camera}
+\section{Sending rays from the camera (14 pts)}
 To do ray tracing, we need to first shoot rays from the camera. In this first step, we will generate camera rays for all the pixels. The goal of our first task is to visualize the camera ray direction (normalized to unit length per pixel).
 
 First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#rays,asimplecamera,andbackground}{Chapter 4.2} of the first RTOW book and understand its content.
 
-We will use a very simple perspective camera for now. The position is fixed at $(0, 0, 0)$, and the camera is facing towards $(0, 0, -1)$ with an up vector $(0, 1, 0)$, right vector $(1, 0, 0)$, and focal length of $1$ (the same setting as the ROTW book). We will make the camera ``positionable'' later. For each pixel, we will shoot a ray from the center of the pixel (for a pixel $(x, y) \in [0, \text{width}] \times [0, \text{height}]$, we shoot a ray in $(x + 0.5, y + 0.5)$). Go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_1}. Your task is to modify the function to output the \emph{unit length} ray direction per pixel. Some of the pixels will have negative color but that is fine. See Figure~\ref{fig:hw_1_1_after} \lstinline{handouts/imgs/hw_1_1.exr} for references.
+We will use a very simple perspective camera for now. The position is fixed at $(0, 0, 0)$, and the camera is facing towards $(0, 0, -1)$ with an up vector $(0, 1, 0)$, right vector $(1, 0, 0)$, and focal length of $1$ (the same setting as the RTOW book). We will make the camera ``positionable'' later. For each pixel, we will shoot a ray from the center of the pixel (for a pixel $(x, y) \in [0, \text{width}] \times [0, \text{height}]$, we shoot a ray in $(x + 0.5, y + 0.5)$). Go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_1}. Your task is to modify the function to output the \emph{unit length} ray direction per pixel. Some pixels will have negative color but that is fine. See Figure~\ref{fig:hw_1_1_after} the file \lstinline{handouts/imgs/hw_1_1.exr} for references.
 
 Don't worry about the \lstinline{params} argument of the function. We will use it in the later part.
 
@@ -77,7 +85,7 @@ To see your results, in terminal, type
     \label{fig:hw_1_1_after}
 \end{figure}
 
-\paragraph{Quiz:} How do you modify your code to render using a camera with 360 degree field of view like Figure~\ref{fig:360_camera}? (hint: see \href{https://en.wikipedia.org/wiki/Spherical_coordinate_system}{spherical coordinates}) Briefly describe your approach (you can attach your code if you want).
+\paragraph{Quiz (4 pts):} How do you modify your code to render using a camera with 360 degree field of view like Figure~\ref{fig:360_camera}? (hint: see \href{https://en.wikipedia.org/wiki/Spherical_coordinate_system}{spherical coordinates}) Briefly describe your approach (you can attach your code if you want).
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.5\linewidth]{imgs/360camera.png}
@@ -85,7 +93,7 @@ To see your results, in terminal, type
     \label{fig:360_camera}
 \end{figure}
 
-\section{Intersection with one sphere}
+\section{Intersection with one sphere (14 pts)}
 After we have the rays from the camera, we'll trace these rays and intersect them with the scene. Here we choose the geometry to be a sphere (because it's easy and we can easily build interesting scenes using only spheres). For this part, let's try to handle only one sphere.
 
 First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#addingasphere}{Chapter 5} and \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#surfacenormalsandmultipleobjects}{Chapter 6} of RTOW and understand the content.
@@ -109,9 +117,9 @@ The results generated from our code looks like Figure~\ref{fig:hw_1_2}:
     \label{fig:hw_1_2}
 \end{figure}
 
-\paragraph{Quiz:} If we were to add a linear transformation to the sphere (e.g., turn it into an ellipsoid), how would you do it? Briefly describe your approach.
+\paragraph{Quiz (4 pts):} If we were to add a linear transformation to the sphere (e.g., turn it into an ellipsoid), how would you do it? Briefly describe your approach.
 
-\section{Adding camera control}
+\section{Adding camera control (12 pts)}
 We will next add pose and field of view control to the camera so that we can look at the sphere at different angles. We will adopt the LookAt transform since it's more intuitive. We will also follow RTOW and take a vertical field of view angle.
 
 First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#positionablecamera}{Chapter 11} of RTOW and understand the content.
@@ -139,13 +147,13 @@ or just any parameter you like! See Figure~\ref{fig:hw_1_3} for references.
     \label{fig:hw_1_3}
 \end{figure}
 
-\paragraph{Quiz:} If we were to specify the \emph{horizontal} field of view angle instead of the vertical one, how should we rewrite the code?
+\paragraph{Quiz (2 pts):} If we were to specify the \emph{horizontal} field of view angle instead of the vertical one, how should we rewrite the code?
 
-\paragraph{Quiz:} In the RTOW book, to compute the coordinate frame for the camera rays (\lstinline{w, u,} and \lstinline{v}), their code normalizes the cross product of the \lstinline{up} vector and the \lstinline{w} vector. However, when they do the cross product between \lstinline{w} and \lstinline{u}, the result did not need to be normalized. Why?
+\paragraph{Quiz (2 pts):} In the RTOW book, to compute the coordinate frame for the camera rays (\lstinline{w, u,} and \lstinline{v}), their code normalizes the cross product of the \lstinline{up} vector and the \lstinline{w} vector. However, when they do the cross product between \lstinline{w} and \lstinline{u}, the result did not need to be normalized. Why?
 
-\paragraph{Quiz:} Compare the third and fourth images in Figure~\ref{fig:hw_1_3}. Why is the sphere in the third image more \emph{distorted} compared to the fourth image? (Hint: you may want to read \href{https://en.wikipedia.org/wiki/Perspective_distortion}{this} Wikipedia article.)
+\paragraph{Quiz (2 pts):} Compare the third and fourth images in Figure~\ref{fig:hw_1_3}. Why is the sphere in the third image more \emph{distorted} compared to the fourth image? (Hint: you may want to read \href{https://en.wikipedia.org/wiki/Perspective_distortion}{this} Wikipedia article.)
 
-\section{Intersection with many spheres}
+\section{Intersection with many spheres (8 pts)}
 Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be much easier than the previous one. Don't worry about acceleration structures yet. That's the bonus for homework 2.
 
 Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_4}. We will use the command line argument \lstinline{params} to access the scenes. Use \lstinline{hw1_scenes[scene_id]} to access your scene. The scene is contained in the struct \lstinline{hw1::Scene}, defined in \lstinline{hw1_scenes.h}:
@@ -192,7 +200,7 @@ for i in range(n):
     print(f'{{Vector3{{{center[0,i]:.3f},{center[1,i]:.3f},{center[2,i]:.3f}}}, {radius[0, i]:.3f}, Vector3{{{color[0,i]:.3f},{color[1,i]:.3f},{color[2,i]:.3f}}}, MaterialType::{mt}}},')
 \end{lstlisting}
 
-\section{Lighting with point lights and Lambertian surfaces}
+\section{Lighting with point lights and Lambertian surfaces (14 pts)}
 Rendering with constant color is a bit boring. Let's add some variation to the color. For each scene, we have a list of point lights, and we are going to compute the influence of these lights to our spheres.
 
 Here is where we slightly deviate from RTOW (RTOW doesn't introduce the notion of lights until the end of the second book, which I find to be a bit late). Given a list of lights and a point hit by our camera ray (we usually call it the \emph{shading point}), we will compute the following response:
@@ -202,7 +210,9 @@ Here is where we slightly deviate from RTOW (RTOW doesn't introduce the notion o
 \end{equation}
 where $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the intensity of the light, $d$ is the distance between the shading point and the light, $K_d$ is the \lstinline{color} of the surface (it is also called \emph{albedo} or \emph{reflectance}), $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection functions to compute $\text{visibility}$. Ignore the \lstinline{material_type} of the primitive for now. We will use it later.
 
-\paragraph{Quiz:} explain the equation above -- Why is there a dot product? Why is there a distance square? Don't worry about the $\pi$ too much. It will make sense when we talk about BRDFs in the class.
+You may find the \lstinline{length, length_squared, distance, distance_squared} functions in \lstinline{vector.h} to be useful.
+
+\paragraph{Quiz (4 pts):} Briefly explain the equation above -- Why is there a dot product? Why is there a distance square? Don't worry about the $\pi$ too much. It will make sense when we talk about BRDFs in the class.
 
 Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_5}. As usual, use \lstinline{hw1_scenes[scene_id]} to access your scene. After you intersect the spheres, compute Equation~\eqref{eq:lighting} above.
 
@@ -229,9 +239,9 @@ Figure~\ref{fig:hw_1_5} shows our renderings for the five scenes.
     \label{fig:hw_1_5}
 \end{figure}
 
-\paragraph{Quiz:} Read about \href{https://en.wikipedia.org/wiki/Three-point_lighting}{three-point lighting} on Wikipedia. In the second scene (\lstinline{scene_id=1}), which light is the key light? Which light is the fill light? Which light is the backlight? Do you think this is better than only having the key light? Why?
+\paragraph{Quiz (2 pts):} Read about \href{https://en.wikipedia.org/wiki/Three-point_lighting}{three-point lighting} on Wikipedia. In the second scene (\lstinline{scene_id=1}), which light is the key light? Which light is the fill light? Which light is the backlight? Do you think this is better than only having the key light? Why?
 
-\section{Antialiasing}
+\section{Antialiasing (8 pts)}
 If you have been watching your images closely, you will find that they have some ugly jagged edges around object and shadow boundaries. The issue is that we always trace rays through the center of pixels. We can easily fix it by averaging the samples in the support of a pixel.
 
 Go read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#antialiasing}{Chapter 7} of RTOW.
@@ -265,16 +275,16 @@ Figure~\ref{fig:hw_1_6} shows the difference before and after applying antialias
     \label{fig:hw_1_6}
 \end{figure}
 
-\section{Mirrors}
+\section{Mirrors (12 pts)}
 Hold on to it, we are near the end (of this homework)! In this part, we will add mirrors to our scenes. If our rays hit a mirror, they should recursively query the color in the reflected direction (and multiply with the current surface color).
 
-Go read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal}{Chapter 9} of RTOW. Don't worry about the \emph{fuzzy reflection} part. We will implement something much better in Homework 3. I also find that it is not necessary to limit the maximum number of bounces in our scenes.
+Go read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal}{Chapter 9} of RTOW. Don't worry about the \emph{fuzzy reflection} part. We will implement something much better in Homework 3. I also find that it is not necessary to limit the maximum number of bounces in our scenes. As in the shadow ray case, it is important to set \lstinline{tmin} of your ray to be a small epsilon (see Chapter 8.4 of RTOW). I used $10^{-4}$. When the reflected ray hits nothing, we will return $(0.5, 0.5, 0.5)$ again.
 
 As usual, implement your code in the function \lstinline{hw_1_7}, to see your results, in terminal, type
 \begin{lstlisting}[language=bash]
   torrey -hw 1_7 [scene_id] -spp [spp]
 \end{lstlisting}
-where \lstinline{[scene_id]} is the scene you want to render (0-4) and \lstinline{[spp]} is the number of samples per pixel (default is 64). Figure~\ref{fig:hw_1_7} shows the references (the first scene is excluded since it does not contain mirrors). Take a minute to reflect (no pun intended) how far we have come from Figure~\ref{fig:hw_1_1_before}! We have a few tasks left though.
+where \lstinline{[scene_id]} is the scene you want to render (0-4) and \lstinline{[spp]} is the number of samples per pixel (default is 64). Figure~\ref{fig:hw_1_7} shows the references (the first scene is excluded since it does not contain mirrors). Take a minute to reflect (no pun intended) how far we have come from Figure~\ref{fig:hw_1_1_before}! We have a one task left (apart from the bonus) though.
 
 It might be useful to set spp to a lower number during debugging.
 
@@ -288,12 +298,12 @@ It might be useful to set spp to a lower number during debugging.
     \label{fig:hw_1_7}
 \end{figure}
 
-\section{Parallelization}
+\section{Parallelization (6 pts)}
 As you probably start to notice, rendering has started to take a while in the last part. A relatively easy way to speedup your rendering is to exploit the fact that your CPUs usually have multiple cores. We will split our images into tiles and render each tile using one parallel thread.
 
 Since this is not a course on parallel computing, we will just import some external parallelization code. I ported the parallelization code from \href{https://github.com/mmp/pbrt-v3/blob/master/src/core/parallel.h}{pbrt-v3} and include them in \lstinline{parallel.h} and \lstinline{parallel.cpp}.
 
-The main include is the \lstinline{parallel_for} function:
+The main addition is the \lstinline{parallel_for} function:
 \begin{lstlisting}[language=C++]
 void parallel_for(std::function<void(Vector2i)> func, const Vector2i count);
 \end{lstlisting}
@@ -318,11 +328,71 @@ To use it for rendering, you usually do something like this
     }, Vector2i(num_tiles_x, num_tiles_y));
 \end{lstlisting}
 
-Take a look at \href{https://github.com/BachiLi/lajolla_public/tree/main/src/render.cpp}{my code} for some ideas. As usual, feel free to copy paste. It also includes examples of how to use PCG.
+Take a look at \href{https://github.com/BachiLi/lajolla_public/tree/main/src/render.cpp}{my code} for some examples. As usual, feel free to copy paste. It also includes examples of how to use PCG.
 
-As usual, implement your code in the function \lstinline{hw_1_8}. This time the results should be almost the same (it will be slightly different because of the different RNG seeding).
+As usual, implement your code in the function \lstinline{hw_1_8}. This time the results should be almost the same (it will be slightly different because of the different RNG seeding). Use \lstinline{time ./torrey -hw 1_8 0} to measure how much time it takes.
 
 Parallelization can make debugging a bit annoying. Sometimes it is a good idea to temporarily disable multi-threading. To do this, we can add \lstinline{-t 1} to the torrey command line arguments -- this will limit the number of threads to 1.
+
+\section{Design your own scene (10 pts)}
+\label{sec:design_your_own}
+
+Sorry, I lied. There is one more task! Design a scene yourself and submit the rendering to us. Be creative! We will give extra bonus to people who impress us.
+
+And that's it. We're done! Now you can probably appreiciate how impressive it is that the following business card ray tracing code from \href{https://fabiensanglard.net/rayTracing_back_of_business_card/}{Andrew Kensler} (inspired by Paul Heckbert in 1984) basically has the same functionality as our code:
+\begin{lstlisting}[language=C]
+#include <stdlib.h>   // card > aek.ppm
+#include <stdio.h>
+#include <math.h>
+typedef int i;typedef float f;struct v{
+f x,y,z;v operator+(v r){return v(x+r.x
+,y+r.y,z+r.z);}v operator*(f r){return
+v(x*r,y*r,z*r);}f operator%(v r){return
+x*r.x+y*r.y+z*r.z;}v(){}v operator^(v r
+){return v(y*r.z-z*r.y,z*r.x-x*r.z,x*r.
+y-y*r.x);}v(f a,f b,f c){x=a;y=b;z=c;}v
+operator!(){return*this*(1/sqrt(*this%*
+this));}};i G[]={247570,280596,280600,
+249748,18578,18577,231184,16,16};f R(){
+return(f)rand()/RAND_MAX;}i T(v o,v d,f
+&t,v&n){t=1e9;i m=0;f p=-o.z/d.z;if(.01
+<p)t=p,n=v(0,0,1),m=1;for(i k=19;k--;)
+for(i j=9;j--;)if(G[j]&1<<k){v p=o+v(-k
+,0,-j-4);f b=p%d,c=p%p-1,q=b*b-c;if(q>0
+){f s=-b-sqrt(q);if(s<t&&s>.01)t=s,n=!(
+p+d*t),m=2;}}return m;}v S(v o,v d){f t
+;v n;i m=T(o,d,t,n);if(!m)return v(.7,
+.6,1)*pow(1-d.z,4);v h=o+d*t,l=!(v(9+R(
+),9+R(),16)+h*-1),r=d+n*(n%d*-2);f b=l%
+n;if(b<0||T(h,l,t,n))b=0;f p=pow(l%r*(b
+>0),99);if(m&1){h=h*.2;return((i)(ceil(
+h.x)+ceil(h.y))&1?v(3,1,1):v(3,3,3))*(b
+*.2+.1);}return v(p,p,p)+S(h,r)*.5;}i
+main(){printf("P6 512 512 255 ");v g=!v
+(-6,-16,0),a=!(v(0,0,1)^g)*.002,b=!(g^a
+)*.002,c=(a+b)*-256+g;for(i y=512;y--;)
+for(i x=512;x--;){v p(13,13,13);for(i r
+=64;r--;){v t=a*(R()-.5)*99+b*(R()-.5)*
+99;p=S(v(17,16,8)+t,!(t*-1+(a*(R()+x)+b
+*(y+R())+c)*16))*3.5+p;}printf("%c%c%c"
+,(i)p.x,(i)p.y,(i)p.z);}}
+\end{lstlisting}
+
+The code above will output the following picture:
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\linewidth]{imgs/minray.png}
+    \caption{Andrew Kensler's business card ray tracer.}
+    \label{fig:business_card}
+\end{figure}
+
+Well, at least our code is slightly more readable -- hopefully!
+
+\section{Bonus: rendering glasses (15 pts)}
+Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#dielectrics}{Chapter 10} of RTOW and implement dielectric materials in your renderer. You can modify the second scene (\lstinline{scene_id=1}) to make it your test scene.
+
+\section{Bonus: defocus blur (15 pts)}
+Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#defocusblur}{Chapter 12} of RTOW and implement defocus blur in your renderer.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
