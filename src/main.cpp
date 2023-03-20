@@ -2,17 +2,23 @@
 #include "image.h"
 #include <vector>
 #include <string>
+#include <thread>
 
 int main(int argc, char *argv[]) {
     std::vector<std::string> parameters;
     std::string hw_num;
+    int num_threads = std::thread::hardware_concurrency();
     for (int i = 1; i < argc; ++i) {
-        if (std::string(argv[i]) == "-hw") {
+        if (std::string(argv[i]) == "-t") {
+            num_threads = std::stoi(std::string(argv[++i]));
+        } else if (std::string(argv[i]) == "-hw") {
             hw_num = std::string(argv[++i]);
         } else {
             parameters.push_back(std::string(argv[i]));
         }
     }
+
+    parallel_init(num_threads);
 
     if (hw_num == "1_1") {
         Image3 img = hw_1_1(parameters);
@@ -35,7 +41,12 @@ int main(int argc, char *argv[]) {
     } else if (hw_num == "1_7") {
         Image3 img = hw_1_7(parameters);
         imwrite("hw_1_7.exr", img);
+    } else if (hw_num == "1_8") {
+        Image3 img = hw_1_8(parameters);
+        imwrite("hw_1_8.exr", img);
     }
+
+    parallel_cleanup();
 
     return 0;
 }

@@ -76,9 +76,9 @@ Scene hw1_scene_2{
         45                 // vfov
     },
     std::vector<SpherePrimitive>{
-        {Vector3{ -0.75, 0.0,  -4.0}, Real(1)   , Vector3{0.75, 0.75, 0.25}, MaterialType::Diffuse},
+        {Vector3{ -0.75, 0.0,  -4.0}, Real(1)   , Vector3{0.75, 0.75, 0.25}, MaterialType::Mirror},
         {Vector3{   1.0, 0.0, -13.0}, Real(7.5) , Vector3{0.25, 0.75, 0.75}, MaterialType::Diffuse},
-        {Vector3{   0.5, 0.0,  -3.0}, Real(0.25), Vector3{0.75, 0.25, 0.75}, MaterialType::Mirror},
+        {Vector3{   0.5, 0.0,  -3.0}, Real(0.25), Vector3{0.75, 0.25, 0.75}, MaterialType::Diffuse},
     },
     std::vector<PointLight>{
         {Vector3{100, 50, 50}, Vector3{ 1, 0, 10}},

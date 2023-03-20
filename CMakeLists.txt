@@ -29,11 +29,13 @@ set(SRCS src/3rdparty/miniz.h
          src/hw1.h
          src/hw1_scenes.h
          src/image.h
+         src/parallel.h
          src/torrey.h
          src/vector.h
          src/hw1.cpp
          src/image.cpp
-         src/main.cpp)
+         src/main.cpp
+         src/parallel.cpp)
 
 add_library(torrey_lib STATIC ${SRCS})
 add_executable(torrey src/main.cpp)

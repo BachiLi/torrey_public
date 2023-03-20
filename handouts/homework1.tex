@@ -5,6 +5,17 @@
 \header{1}{Ray Tracing}
 \setcounter{section}{-1}
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_7a.png}
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_7b.png}
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_7c.png}
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_7d.png}
+    \includegraphics[width=0.19\linewidth]{imgs/hw_1_7e.png}
+    \caption{Final images we will render in this homework}
+    \label{fig:teaser}
+\end{figure}
+
 In our first homework, we are going to implement a simple ray tracer (almost) from scratch.
 We will provide some utility code such as the vector class and parallel threading. 
 However, you will have to implement the rest yourself. Trust me, it will be fun!
@@ -135,7 +146,7 @@ or just any parameter you like! See Figure~\ref{fig:hw_1_3} for references.
 \paragraph{Quiz:} Compare the third and fourth images in Figure~\ref{fig:hw_1_3}. Why is the sphere in the third image more \emph{distorted} compared to the fourth image? (Hint: you may want to read \href{https://en.wikipedia.org/wiki/Perspective_distortion}{this} Wikipedia article.)
 
 \section{Intersection with many spheres}
-Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be much easier than the previous one. 
+Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be much easier than the previous one. Don't worry about acceleration structures yet. That's the bonus for homework 2.
 
 Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_4}. We will use the command line argument \lstinline{params} to access the scenes. Use \lstinline{hw1_scenes[scene_id]} to access your scene. The scene is contained in the struct \lstinline{hw1::Scene}, defined in \lstinline{hw1_scenes.h}:
 \begin{lstlisting}[language=C++]
@@ -257,9 +268,61 @@ Figure~\ref{fig:hw_1_6} shows the difference before and after applying antialias
 \section{Mirrors}
 Hold on to it, we are near the end (of this homework)! In this part, we will add mirrors to our scenes. If our rays hit a mirror, they should recursively query the color in the reflected direction (and multiply with the current surface color).
 
-Go read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal}{Chapter 9} of RTOW. Don't worry about the \emph{fuzzy reflection} part. We will implement something much better in Homework 3.
+Go read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal}{Chapter 9} of RTOW. Don't worry about the \emph{fuzzy reflection} part. We will implement something much better in Homework 3. I also find that it is not necessary to limit the maximum number of bounces in our scenes.
 
+As usual, implement your code in the function \lstinline{hw_1_7}, to see your results, in terminal, type
+\begin{lstlisting}[language=bash]
+  torrey -hw 1_7 [scene_id] -spp [spp]
+\end{lstlisting}
+where \lstinline{[scene_id]} is the scene you want to render (0-4) and \lstinline{[spp]} is the number of samples per pixel (default is 64). Figure~\ref{fig:hw_1_7} shows the references (the first scene is excluded since it does not contain mirrors). Take a minute to reflect (no pun intended) how far we have come from Figure~\ref{fig:hw_1_1_before}! We have a few tasks left though.
 
+It might be useful to set spp to a lower number during debugging.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.24\linewidth]{imgs/hw_1_7b.png}
+    \includegraphics[width=0.24\linewidth]{imgs/hw_1_7c.png}
+    \includegraphics[width=0.24\linewidth]{imgs/hw_1_7d.png}
+    \includegraphics[width=0.24\linewidth]{imgs/hw_1_7e.png}
+    \caption{References for Homework 1.7.}
+    \label{fig:hw_1_7}
+\end{figure}
+
+\section{Parallelization}
+As you probably start to notice, rendering has started to take a while in the last part. A relatively easy way to speedup your rendering is to exploit the fact that your CPUs usually have multiple cores. We will split our images into tiles and render each tile using one parallel thread.
+
+Since this is not a course on parallel computing, we will just import some external parallelization code. I ported the parallelization code from \href{https://github.com/mmp/pbrt-v3/blob/master/src/core/parallel.h}{pbrt-v3} and include them in \lstinline{parallel.h} and \lstinline{parallel.cpp}.
+
+The main include is the \lstinline{parallel_for} function:
+\begin{lstlisting}[language=C++]
+void parallel_for(std::function<void(Vector2i)> func, const Vector2i count);
+\end{lstlisting}
+
+To use it for rendering, you usually do something like this
+\begin{lstlisting}[language=C++]
+    constexpr int tile_size = 16;
+    int num_tiles_x = (w + tile_size - 1) / tile_size;
+    int num_tiles_y = (h + tile_size - 1) / tile_size;
+
+    parallel_for([&](const Vector2i &tile) {
+        RNG rng = init_rng(tile[1] * num_tiles_x + tile[0] /* seed */);
+        int x0 = tile[0] * tile_size;
+        int x1 = min(x0 + tile_size, w);
+        int y0 = tile[1] * tile_size;
+        int y1 = min(y0 + tile_size, h);
+        for (int y = y0; y < y1; y++) {
+            for (int x = x0; x < x1; x++) {
+                // render pixel (x, y)
+            }
+        }
+    }, Vector2i(num_tiles_x, num_tiles_y));
+\end{lstlisting}
+
+Take a look at \href{https://github.com/BachiLi/lajolla_public/tree/main/src/render.cpp}{my code} for some ideas. As usual, feel free to copy paste. It also includes examples of how to use PCG.
+
+As usual, implement your code in the function \lstinline{hw_1_8}. This time the results should be almost the same (it will be slightly different because of the different RNG seeding).
+
+Parallelization can make debugging a bit annoying. Sometimes it is a good idea to temporarily disable multi-threading. To do this, we can add \lstinline{-t 1} to the torrey command line arguments -- this will limit the number of threads to 1.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
