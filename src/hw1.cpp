@@ -159,3 +159,28 @@ Image3 hw_1_7(const std::vector<std::string> &params) {
 
     return img;
 }
+
+Image3 hw_1_8(const std::vector<std::string> &params) {
+    // Homework 1.8: parallelize HW 1.7
+    if (params.size() == 0) {
+        return Image3(0, 0);
+    }
+
+    int scene_id = 0;
+    int spp = 64;
+    for (int i = 0; i < (int)params.size(); i++) {
+        if (params[i] == "-spp") {
+            spp = std::stoi(params[++i]);
+        } else {
+            scene_id = std::stoi(params[i]);
+        }
+    }
+
+    UNUSED(scene_id); // avoid unused warning
+    UNUSED(spp); // avoid unused warning
+    // Your scene is hw1_scenes[scene_id]
+
+    Image3 img(1280 /* width */, 960 /* height */);
+
+    return img;
+}
