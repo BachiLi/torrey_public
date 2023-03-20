@@ -96,7 +96,7 @@ To see your results, in terminal, type
 \section{Intersection with one sphere (14 pts)}
 After we have the rays from the camera, we'll trace these rays and intersect them with the scene. Here we choose the geometry to be a sphere (because it's easy and we can easily build interesting scenes using only spheres). For this part, let's try to handle only one sphere.
 
-First, read \href{Chapter 5}{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#addingasphere} and \href{Chapter 6}{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#surfacenormalsandmultipleobjects} of RTOW and understand the content.
+First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#addingasphere}{Chapter 5} and \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#surfacenormalsandmultipleobjects}{Chapter 6} of RTOW and understand the content.
 
 Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_2}. Your task is to modify the function to output the surface normal of the sphere. The sphere has unit radius and is located at $(0, 0, 2)$. The camera pose is exactly the same as the previous part. To make prettier images this time, let's map the normal to positive numbers: for a 3D vector $n$, we map it to the final color $c = \frac{n + 1}{2}$. If our rays do not hit the sphere, return $(0.5, 0.5, 0.5)$.
 
