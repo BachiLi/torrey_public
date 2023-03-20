@@ -96,7 +96,7 @@ To see your results, in terminal, type
 \section{Intersection with one sphere (14 pts)}
 After we have the rays from the camera, we'll trace these rays and intersect them with the scene. Here we choose the geometry to be a sphere (because it's easy and we can easily build interesting scenes using only spheres). For this part, let's try to handle only one sphere.
 
-First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#addingasphere}{Chapter 5} and \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#surfacenormalsandmultipleobjects}{Chapter 6} of RTOW and understand the content.
+First, read \href{Chapter 5}{https://raytracing.github.io/books/RayTracingInOneWeekend.html#addingasphere} and \href{Chapter 6}{https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects} of RTOW and understand the content.
 
 Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_2}. Your task is to modify the function to output the surface normal of the sphere. The sphere has unit radius and is located at $(0, 0, 2)$. The camera pose is exactly the same as the previous part. To make prettier images this time, let's map the normal to positive numbers: for a 3D vector $n$, we map it to the final color $c = \frac{n + 1}{2}$. If our rays do not hit the sphere, return $(0.5, 0.5, 0.5)$.
 
@@ -250,7 +250,7 @@ Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_6}. As usual, 
 
 \paragraph{Random number generation.} Please do \emph{not} use the C \lstinline{rand()} function. It is really really really really bad: \lstinline{rand} usually have very short period as a random number generator (32768 in many systems), it uses a global variable to store the states of the random number generator, and this significantly hurts parallelization. Most implementations of \lstinline{rand} also use a bad random number generator (a very basic LCG). The modern C++ random number generator is much better, but not perfect. I personally prefer \href{https://www.pcg-random.org/}{PCG}. Highly recommend Melissa O'Neill's \href{https://www.youtube.com/watch?v=45Oet5qjlms}{talk} about PCG if you are interested in the topic of random number generation.
 
-If you want to use the modern C++ random number generator, \emph{do not use} the \lstinline{random_double} function provided by the RTOW book. It effectively saves a global variables using a static member in the function. This makes the parallelization later we want to do much harder. Pass your generator around as you use it and don't declare it as a static member. For example, you can rewrite their \lstinline{random_double} function as follow:
+If you want to use the modern C++ random number generator, \emph{do not use} the \lstinline{random_double} function provided by the RTOW book. It effectively uses global variables through static members in the function. This makes the parallelization later we want to do much harder. Pass your generator around as you use it and don't declare it as a static member. For example, you can rewrite their \lstinline{random_double} function as follow:
 \begin{lstlisting}[language=C++]
 inline double random_double(std::mt19937 &rng) {
     std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -284,7 +284,7 @@ As usual, implement your code in the function \lstinline{hw_1_7}, to see your re
 \begin{lstlisting}[language=bash]
   torrey -hw 1_7 [scene_id] -spp [spp]
 \end{lstlisting}
-where \lstinline{[scene_id]} is the scene you want to render (0-4) and \lstinline{[spp]} is the number of samples per pixel (default is 64). Figure~\ref{fig:hw_1_7} shows the references (the first scene is excluded since it does not contain mirrors). Take a minute to reflect (no pun intended) how far we have come from Figure~\ref{fig:hw_1_1_before}! We have a one task left (apart from the bonus) though.
+where \lstinline{[scene_id]} is the scene you want to render (0-4) and \lstinline{[spp]} is the number of samples per pixel (default is 64). Figure~\ref{fig:hw_1_7} shows the references (the first scene is excluded since it does not contain mirrors). Take a minute to reflect (no pun intended) how far we have come from Figure~\ref{fig:hw_1_1_before}! We have one task left (apart from the bonus) though.
 
 It might be useful to set spp to a lower number during debugging.
 
@@ -337,9 +337,9 @@ Parallelization can make debugging a bit annoying. Sometimes it is a good idea t
 \section{Design your own scene (10 pts)}
 \label{sec:design_your_own}
 
-Sorry, I lied. There is one more task! Design a scene yourself and submit the rendering to us. Be creative! We will give extra bonus to people who impress us.
+Sorry, I lied. There is one more task! Design a scene yourself and submit the rendering to us. Be creative! We will give extra credits to people who impress us.
 
-And that's it. We're done! Now you can probably appreiciate how impressive it is that the following business card ray tracing code from \href{https://fabiensanglard.net/rayTracing_back_of_business_card/}{Andrew Kensler} (inspired by Paul Heckbert in 1984) basically has the same functionality as our code:
+And that's it. We're done! Now you can probably appreiciate how impressive it is that the following \href{https://fabiensanglard.net/rayTracing_back_of_business_card/}{business card ray tracing code} from Andrew Kensler (inspired by Paul Heckbert in 1984) basically has the same functionality as our code:
 \begin{lstlisting}[language=C]
 #include <stdlib.h>   // card > aek.ppm
 #include <stdio.h>
