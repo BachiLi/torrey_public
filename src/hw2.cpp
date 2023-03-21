@@ -26,9 +26,9 @@ Image3 hw_2_1(const std::vector<std::string> &params) {
         return Image3(0, 0);
     }
 
-    Vector3 v0{tri_params[0], tri_params[1], tri_params[2]};
-    Vector3 v1{tri_params[3], tri_params[4], tri_params[5]};
-    Vector3 v2{tri_params[6], tri_params[7], tri_params[8]};
+    Vector3 p0{tri_params[0], tri_params[1], tri_params[2]};
+    Vector3 p1{tri_params[3], tri_params[4], tri_params[5]};
+    Vector3 p2{tri_params[6], tri_params[7], tri_params[8]};
 
     Image3 img(640 /* width */, 480 /* height */);
 
