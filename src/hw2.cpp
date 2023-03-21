@@ -11,21 +11,24 @@ Image3 hw_2_1(const std::vector<std::string> &params) {
     // and we will parse the triangle vertices from params
     // The three vertices are stored in v0, v1, and v2 below.
 
-    if (params.size() < 9) {
+    std::vector<float> tri_params;
+    int spp = 16;
+    for (int i = 0; i < (int)params.size(); i++) {
+        if (params[i] == "-spp") {
+            spp = std::stoi(params[++i]);
+        } else {
+            tri_params.push_back(std::stof(params[i]));
+        }
+    }
+
+    if (tri_params.size() < 9) {
         // Not enough parameters to parse the triangle vertices.
         return Image3(0, 0);
     }
 
-    Vector3 v0, v1, v2;
-    v0.x = std::stof(params[i++]);
-    v0.y = std::stof(params[i++]);
-    v0.z = std::stof(params[i++]);
-    v1.x = std::stof(params[i++]);
-    v1.y = std::stof(params[i++]);
-    v1.z = std::stof(params[i++]);
-    v2.x = std::stof(params[i++]);
-    v2.y = std::stof(params[i++]);
-    v2.z = std::stof(params[i++]);
+    Vector3 v0{tri_params[0], tri_params[1], tri_params[2]};
+    Vector3 v1{tri_params[3], tri_params[4], tri_params[5]};
+    Vector3 v2{tri_params[6], tri_params[7], tri_params[8]};
 
     Image3 img(640 /* width */, 480 /* height */);
 
