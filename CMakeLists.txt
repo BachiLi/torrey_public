@@ -28,11 +28,13 @@ set(SRCS src/3rdparty/miniz.h
          src/flexception.h
          src/hw1.h
          src/hw1_scenes.h
+         src/hw2.h
          src/image.h
          src/parallel.h
          src/torrey.h
          src/vector.h
          src/hw1.cpp
+         src/hw2.cpp
          src/image.cpp
          src/main.cpp
          src/parallel.cpp)

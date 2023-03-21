@@ -154,7 +154,7 @@ or just any parameter you like! See Figure~\ref{fig:hw_1_3} for references.
 \paragraph{Quiz (2 pts):} Compare the third and fourth images in Figure~\ref{fig:hw_1_3}. Why is the sphere in the third image more \emph{distorted} compared to the fourth image? (Hint: you may want to read \href{https://en.wikipedia.org/wiki/Perspective_distortion}{this} Wikipedia article.)
 
 \section{Intersection with many spheres (8 pts)}
-Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be much easier than the previous one. Don't worry about acceleration structures yet. That's the bonus for homework 2.
+Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be much easier than the previous one. Don't worry about acceleration structures yet. That's for homework 2.
 
 Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_4}. We will use the command line argument \lstinline{params} to access the scenes. Use \lstinline{hw1_scenes[scene_id]} to access your scene. The scene is contained in the struct \lstinline{hw1::Scene}, defined in \lstinline{hw1_scenes.h}:
 \begin{lstlisting}[language=C++]
@@ -378,8 +378,8 @@ for(i x=512;x--;){v p(13,13,13);for(i r
 ,(i)p.x,(i)p.y,(i)p.z);}}
 \end{lstlisting}
 
-The code above will output the following picture:
-\begin{figure}
+The code above will output a picture like Figure~\ref{fig:business_card}:
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.4\linewidth]{imgs/minray.png}
     \caption{Andrew Kensler's business card ray tracer.}
