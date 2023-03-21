@@ -14,7 +14,7 @@ Like our previous homework, let's start with rendering a single triangle. There 
 Or you can just google ray-triangle intersection.
 Feel free to copy paste any code.
 
-Go to \lstinline{hw2.cpp} and look at the function \lstinline{hw_2_1}. Using the camera parameters provided (\lstinline{lookfrom = (0, 0, 0), lookat = (0, 0, -1), up = (0, 1, 0), vfov = 45}), render a triangle read from the command line arguments (we have parsed them for you). If your ray hits a triangle, outputs its barycentric coordinates (for a triangle $p_0, p_1, p_2$, a point inside the triangle can be represented as $p = w p_0 + u p_1 + v p_2$, where $(w, u, v)$ is the barycentric coordinate and $w = 1 - u - v$). Otherwise, if the ray does not hit anything, return $(0.5, 0.5, 0.5)$.
+Go to \lstinline{hw2.cpp} and look at the function \lstinline{hw_2_1}. Using the camera parameters provided (\lstinline{lookfrom = (0, 0, 0), lookat = (0, 0, -1), up = (0, 1, 0), vfov = 45}), render a triangle read from the command line arguments (we have parsed them for you). If your ray hits a triangle, outputs its barycentric coordinates (for a triangle $p_0, p_1, p_2$, a point inside the triangle can be represented as $p = w p_0 + u p_1 + v p_2$, where $(w, u, v)$ is the barycentric coordinate and $w = 1 - u - v$). Otherwise, if the ray does not hit anything, return $(0.5, 0.5, 0.5)$. To have consistency with our homework 1 code, let's do antialiasing. We have parsed the $\lstinline{-spp}$ argument for you too.
 
 To see your results, type the following in the terminal:
 \begin{lstlisting}[language=bash]
