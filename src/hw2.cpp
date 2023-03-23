@@ -45,8 +45,11 @@ Image3 hw_2_2(const std::vector<std::string> &params) {
     // up       = (0, 1,  0)
     // vfov     = 45
     // and we will use a fixed triangle mesh: a tetrahedron!
-    if (params.size() < 1) {
-        return Image3(0, 0);
+    int spp = 16;
+    for (int i = 0; i < (int)params.size(); i++) {
+        if (params[i] == "-spp") {
+            spp = std::stoi(params[++i]);
+        }
     }
 
     std::vector<Vector3> positions = {
