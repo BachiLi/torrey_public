@@ -195,9 +195,15 @@ center[2,:] -= 5
 radius = (np.random.rand(1, n) + 0.5) / 2
 color = np.random.rand(3, n)
 mtype = np.random.rand(1, n)
+print('std::vector<Sphere>{')
+for i in range(n):
+    print(f'{{Vector3{{{center[0,i]:.3f},{center[1,i]:.3f},{center[2,i]:.3f}}}, {radius[0, i]:.3f}, {i}}},')
+print('}')
+print('std::vector<Material>{')
 for i in range(n):
     mt = 'Diffuse' if mtype[0, i] > 0.5 else 'Mirror'
-    print(f'{{Vector3{{{center[0,i]:.3f},{center[1,i]:.3f},{center[2,i]:.3f}}}, {radius[0, i]:.3f}, Vector3{{{color[0,i]:.3f},{color[1,i]:.3f},{color[2,i]:.3f}}}, MaterialType::{mt}}},')
+    print(f'{{MaterialType::{mt}, Vector3{{{color[0,i]:.3f},{color[1,i]:.3f},{color[2,i]:.3f}}}}},')
+print('}')
 \end{lstlisting}
 
 \section{Lighting with point lights and Lambertian surfaces (14 pts)}
