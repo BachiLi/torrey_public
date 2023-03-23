@@ -53,14 +53,14 @@ Image3 hw_2_2(const std::vector<std::string> &params) {
     }
 
     std::vector<Vector3> positions = {
-        Vector3{ 0.0, 1.0, -2.0},
-        Vector3{ 0.0, 0.0, -1.0},
-        Vector3{ 1.0, 0.0, -3.0},
-        Vector3{-1.0, 0.0, -3.0}
+        Vector3{ 0.0,  0.5, -2.0},
+        Vector3{ 0.0, -0.3, -1.0},
+        Vector3{ 1.0, -0.5, -3.0},
+        Vector3{-1.0, -0.5, -3.0}
     };
     std::vector<Vector3i> indices = {
         Vector3i{0, 1, 2},
-        Vector3i{0, 1, 3},
+        Vector3i{0, 3, 1},
         Vector3i{0, 2, 3},
         Vector3i{1, 2, 3}
     };
