@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<scene version="0.6.0">
+	<sensor type="perspective">
+		<string name="fovAxis" value="y"/>
+		<transform name="toWorld">
+			<lookAt origin="0, 0, 0" target="0, 0, -1" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="45"/>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="64"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="640"/>
+			<integer name="height" value="480"/>
+		</film>
+	</sensor>
+
+	<emitter type="point">
+        <rgb name="intensity" value="10, 10, 10"/>
+        <point name="position" x="0" y="0" z="0"/>
+	</emitter>
+
+	<emitter type="point">
+        <rgb name="intensity" value="50, 5, 5"/>
+        <point name="position" x="5" y="5" z="-5"/>
+	</emitter>
+
+	<emitter type="point">
+        <rgb name="intensity" value="10000, 10000, 10000"/>
+        <point name="position" x="0" y="0" z="90"/>
+	</emitter>
+
+	<shape type="sphere">
+	    <point name="center" x="0.781" y="2.293" z="-4.602"/>
+	    <float name="radius" value="0.659"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.02, 0.660, 0.021"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.975" y="-1.115" z="-5.906"/>
+	    <float name="radius" value="0.632"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.471, 0.540, 0.414"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.9" y="-0.518" z="-4.741"/>
+	    <float name="radius" value="0.632"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.25, 0.5, 0.75"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-2.281" y="0.9" z="-4.271"/>
+	    <float name="radius" value="0.392"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.997, 0.048, 0.431"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.309" y="2.047" z="-6.365"/>
+	    <float name="radius" value="0.550"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.253, 0.089, 0.712"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.281" y="2.314" z="-4.383"/>
+	    <float name="radius" value="0.415"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.664, 0.884, 0.069"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.229" y="-0.093" z="-3.15"/>
+	    <float name="radius" value="0.331"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.399, 0.475, 0.090"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.4" y="1.793" z="-3.364"/>
+	    <float name="radius" value="0.322"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.360, 0.298, 0.956"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.795" y="-2.459" z="-6.424"/>
+	    <float name="radius" value="0.563"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.147, 0.115, 0.440"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.045" y="-1.886" z="-4.895"/>
+	    <float name="radius" value="0.418"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.881, 0.312, 0.609"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="2.369" y="-0.402" z="-5.811"/>
+	    <float name="radius" value="0.510"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.946, 0.094, 0.617"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.514" y="2.270" z="-2.799"/>
+	    <float name="radius" value="0.635"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.649, 0.847, 0.018"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.669" y="1.321" z="-7.112"/>
+	    <float name="radius" value="0.3"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.994, 0.240, 0.637"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.227" y="1.167" z="-5.870"/>
+	    <float name="radius" value="0.299"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.228, 0.861, 0.613"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.320" y="0.086" z="-7.343"/>
+	    <float name="radius" value="0.510"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.442, 0.546, 0.580"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.410" y="-1.046" z="-2.946"/>
+	    <float name="radius" value="0.280"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.122, 0.874, 0.081"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.742" y="-1.488" z="-6.187"/>
+	    <float name="radius" value="0.517"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.954, 0.575, 0.910"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.867" y="0.315" z="-4.901"/>
+	    <float name="radius" value="0.747"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.601, 0.420, 0.757"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.269" y="0.208" z="-4.738"/>
+	    <float name="radius" value="0.431"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.340, 0.136, 0.233"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.966" y="0.860" z="-5.417"/>
+	    <float name="radius" value="0.290"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.227, 0.570, 0.241"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-2.345" y="1.133" z="-5.147"/>
+	    <float name="radius" value="0.298"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.906, 0.774, 0.042"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.924" y="1.527" z="-6.724"/>
+	    <float name="radius" value="0.510"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.287, 0.709, 0.301"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.418" y="-1.651" z="-2.595"/>
+	    <float name="radius" value="0.594"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.895, 0.686, 0.824"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-2.344" y="-0.415" z="-3.685"/>
+	    <float name="radius" value="0.617"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.011, 0.395, 0.117"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.238" y="0.990" z="-3.018"/>
+	    <float name="radius" value="0.306"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.781, 0.390, 0.375"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.016" y="-2.252" z="-2.555"/>
+	    <float name="radius" value="0.392"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.155, 0.873, 0.695"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.761" y="1.176" z="-5.583"/>
+	    <float name="radius" value="0.407"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.276, 0.751, 0.104"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.995" y="2.143" z="-2.525"/>
+	    <float name="radius" value="0.296"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.503, 0.465, 0.232"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.645" y="-1.920" z="-3.988"/>
+	    <float name="radius" value="0.361"/>
+
+		<bsdf type="diffuse">
+			<rgb name="reflectance" value="0.264, 0.794, 0.280"/>
+		</bsdf>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.189" y="-0.262" z="-4.485"/>
+	    <float name="radius" value="0.298"/>
+
+		<bsdf type="mirror">
+			<rgb name="reflectance" value="0.036, 0.548, 0.363"/>
+		</bsdf>
+	</shape>
+</scene>
