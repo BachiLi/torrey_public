@@ -137,7 +137,7 @@ A typical Mitsuba scene is an XML file that looks like the following:
 </scene>
 \end{lstlisting}
 
-The whole scene is contained in a \lstlisting{scene} tag. 
+The whole scene is contained in a \lstinline{<scene>} tag. 
 The scene is consists of \lstinline{sensor} (camera), \lstinline{bsdf} (materials), \lstinline{emitter} (lights), and \lstinline{shape} (geometry). 
 
 The camera is specified as follows:
@@ -313,9 +313,10 @@ struct Foo {
 \end{lstlisting}
 Read more about it \href{https://www.cppstories.com/2020/04/variant-virtual-polymorphism.html/}{here}.
 
-You do not need to worry about area lights yet (we will implement it in homework 3).
-You do not need to worry about \lstinline{normals} and \lstinline{uvs} in \lstinline{ParsedTriangleMesh} (we will use them in homework 3).
-You do not need to worry about \lstinline{ParsedImageTexture} (we will use it in homework 3).
+You do not need to worry about area lights.
+You do not need to worry about \lstinline{normals} and \lstinline{uvs} in \lstinline{ParsedTriangleMesh}.
+You do not need to worry about \lstinline{ParsedImageTexture}.
+We will implement all of these in Homework 3.
 
 What you need to do is to render the scenes we provide using your renderer in the function \lstinline{hw_2_3}. This should mostly just be converting the parsed data structure into your own data structures. 
 We have provided scenes that reproduce the ones you rendered in homework 1. 
