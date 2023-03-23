@@ -32,6 +32,25 @@ To see your results, type the following in the terminal:
     \label{fig:hw_2_1}
 \end{figure}
 
+\section{Intersection with a triangle mesh}
+Let's extend the previous code to handle multiple triangles now. In computer graphics, we usually organize triangles in a \href{https://en.wikipedia.org/wiki/Triangle_mesh}{triangle mesh}. A triangle mesh consists of a list of \emph{vertices} which is just a bunch of 3D points, and a list of \emph{indices}, which connect the vertices into triangles. For example, following code represents a tetrahedron:
+\begin{lstlisting}[language=C++]
+    std::vector<Vector3> positions = {
+        Vector3{ 0.0, 1.0, -2.0},
+        Vector3{ 0.0, 0.0, -1.0},
+        Vector3{ 1.0, 0.0, -3.0},
+        Vector3{-1.0, 0.0, -3.0}
+    };
+    std::vector<Vector3i> indices = {
+        Vector3i{0, 1, 2},
+        Vector3i{0, 1, 3},
+        Vector3i{0, 2, 3},
+        Vector3i{1, 2, 3}
+    };
+\end{lstlisting}
+
+Go to function \lstinline{hw_2_2} and extend your previous code to render the tetrahedron above. We will use the same camera pose, and we will again output the barycentric coordinates of the triangles.
+
 %\bibliographystyle{plain}
 %\bibliography{refs}
 

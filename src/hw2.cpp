@@ -38,13 +38,43 @@ Image3 hw_2_1(const std::vector<std::string> &params) {
 }
 
 Image3 hw_2_2(const std::vector<std::string> &params) {
-    // Homework 2.2: render a scene file provided by our parser.
+    // Homework 2.2: render a triangle mesh.
+    // We will use the same camera parameter:
+    // lookfrom = (0, 0,  0)
+    // lookat   = (0, 0, -1)
+    // up       = (0, 1,  0)
+    // vfov     = 45
+    // and we will use a fixed triangle mesh: a tetrahedron!
+    if (params.size() < 1) {
+        return Image3(0, 0);
+    }
+
+    std::vector<Vector3> positions = {
+        Vector3{ 0.0, 1.0, -2.0},
+        Vector3{ 0.0, 0.0, -1.0},
+        Vector3{ 1.0, 0.0, -3.0},
+        Vector3{-1.0, 0.0, -3.0}
+    };
+    std::vector<Vector3i> indices = {
+        Vector3i{0, 1, 2},
+        Vector3i{0, 1, 3},
+        Vector3i{0, 2, 3},
+        Vector3i{1, 2, 3}
+    };
+
+    Image3 img(640 /* width */, 480 /* height */);
+    
+    return img;
+}
+
+Image3 hw_2_3(const std::vector<std::string> &params) {
+    // Homework 2.3: render a scene file provided by our parser.
     if (params.size() < 1) {
         return Image3(0, 0);
     }
 
     ParsedScene scene = parse_scene(params[0]);
-    std::cerr << scene << std::endl;
+    std::cout << scene << std::endl;
 
     return Image3(0, 0);
 }
