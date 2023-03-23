@@ -25,19 +25,32 @@ set(SRCS src/3rdparty/miniz.h
          src/3rdparty/stb_image.h
          src/3rdparty/tinyexr.h
          src/3rdparty/tinyply.h
+         src/compute_normals.h
          src/flexception.h
          src/hw1.h
          src/hw1_scenes.h
          src/hw2.h
          src/image.h
+         src/matrix.h
          src/parallel.h
+         src/parse_obj.h
+         src/parse_ply.h
+         src/parse_scene.h
+         src/print_scene.h
          src/torrey.h
+         src/transform.h
          src/vector.h
+         src/compute_normals.cpp
          src/hw1.cpp
          src/hw2.cpp
          src/image.cpp
          src/main.cpp
-         src/parallel.cpp)
+         src/parallel.cpp
+         src/parse_obj.cpp
+         src/parse_ply.cpp
+         src/parse_scene.cpp
+         src/print_scene.cpp
+         src/transform.cpp)
 
 add_library(torrey_lib STATIC ${SRCS})
 add_executable(torrey src/main.cpp)

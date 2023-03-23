@@ -1,4 +1,6 @@
 #include "hw2.h"
+#include "parse_scene.h"
+#include "print_scene.h"
 
 Image3 hw_2_1(const std::vector<std::string> &params) {
     // Homework 2.1: render a single triangle and outputs
@@ -33,4 +35,16 @@ Image3 hw_2_1(const std::vector<std::string> &params) {
     Image3 img(640 /* width */, 480 /* height */);
 
     return img;
+}
+
+Image3 hw_2_2(const std::vector<std::string> &params) {
+    // Homework 2.2: render a scene file provided by our parser.
+    if (params.size() < 1) {
+        return Image3(0, 0);
+    }
+
+    ParsedScene scene = parse_scene(params[0]);
+    std::cerr << scene << std::endl;
+
+    return Image3(0, 0);
 }
