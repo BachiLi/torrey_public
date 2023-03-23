@@ -49,7 +49,277 @@ Let's extend the previous code to handle multiple triangles now. In computer gra
     };
 \end{lstlisting}
 
-Go to function \lstinline{hw_2_2} and extend your previous code to render the tetrahedron above. We will use the same camera pose, and we will again output the barycentric coordinates of the triangles.
+Go to function \lstinline{hw_2_2} and extend your previous code to render the tetrahedron above. We will use the same camera pose, and we will again output the barycentric coordinates of the triangles. The \lstinline{-spp} argument is still there, but we don't need to touch it.
+
+To see your results, type the following in the terminal:
+\begin{lstlisting}[language=bash]
+  ./torrey -hw 2_2
+\end{lstlisting}
+
+You should render something like Figure~\ref{fig:hw_2_2}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.4\linewidth]{imgs/hw_2_2.png}
+    \caption{References for homework 2.2.}
+    \label{fig:hw_2_2}
+\end{figure}
+
+\section{Parsing and rendering a scene.}
+So far, we specify the scenes by either hardcoding them in code or we input a bunch of numbers in the command line. 
+This is inconvienent. Usually, the input to a 3D rendering software is a text file describing a scene. It specifies the camera pose, lights, the materials of the objects, the geometry, and the rendering settings. There are many existing scene formats. For example see the \href{https://en.wikipedia.org/wiki/RenderMan_Interface_Specification}{RenderMan interface} and Pixar's \href{https://en.wikipedia.org/wiki/Universal_Scene_Description}{Universal Scene Description}. Here, we adopt the scene format from the \href{https://mitsuba.readthedocs.io/}{Mitsuba renderer}, simply because the scene file format is quite readable and there is an existing \href{https://github.com/mitsuba-renderer/mitsuba-blender}{Blender exporter}. We have provided the scene file parser for you, and you just need to convert the parsed information into your own data structure.
+
+A typical Mitsuba scene is an XML file that looks like the following:
+\begin{lstlisting}[language=xml]
+<?xml version="1.0" encoding="utf-8"?>
+<scene version="0.6.0">
+  <sensor type="perspective">
+    <string name="fovAxis" value="y"/>
+    <transform name="toWorld">
+      <lookAt origin="278, 273, -800" target="278, 273, -799" up="0, 1, 0"/>
+    </transform>
+    <float name="fov" value="39.3077"/>
+    <sampler type="independent">
+      <integer name="sampleCount" value="16"/>
+    </sampler>
+    <film type="hdrfilm">
+      <integer name="width" value="512"/>
+      <integer name="height" value="512"/>
+    </film>
+  </sensor>
+  <!-- materials -->
+  <bsdf type="diffuse" id="box">
+    <rgb name="reflectance" value="0.884774, 0.699933, 0.666224"/>
+  </bsdf>
+  <bsdf type="diffuse" id="white">
+    <rgb name="reflectance" value="0.884774, 0.699933, 0.666224"/>
+  </bsdf>
+  <bsdf type="diffuse" id="red">
+    <rgb name="reflectance" value="0.56581, 0.0447145, 0.0441583"/>
+  </bsdf>
+  <bsdf type="diffuse" id="green">
+    <rgb name="reflectance" value="0.105092, 0.378697, 0.0762035"/>
+  </bsdf>
+  <!-- lights -->
+  <emitter type="point">
+        <rgb name="intensity" value="1, 1, 1"/>
+        <point name="position" x="278" y="548.8" z="279.5"/>
+  </emitter>
+  <!-- shapes -->
+  <shape type="obj">
+    <string name="filename" value="meshes/cbox_floor.obj"/>
+    <ref id="white"/>
+  </shape>
+  <shape type="obj">
+    <string name="filename" value="meshes/cbox_ceiling.obj"/>
+    <ref id="white"/>
+  </shape>
+  <shape type="obj">
+    <string name="filename" value="meshes/cbox_back.obj"/>
+    <ref id="white"/>
+  </shape>
+  <shape type="obj">
+    <string name="filename" value="meshes/cbox_greenwall.obj"/>
+    <ref id="green"/>
+  </shape>
+  <shape type="obj">
+    <string name="filename" value="meshes/cbox_redwall.obj"/>
+    <ref id="red"/>
+  </shape>
+  <shape type="obj">
+    <string name="filename" value="meshes/cbox_smallbox.obj"/>
+    <ref id="box"/>
+  </shape>
+  <shape type="obj">
+    <string name="filename" value="meshes/cbox_largebox.obj"/>
+    <ref id="box"/>
+  </shape>
+</scene>
+\end{lstlisting}
+
+The whole scene is contained in a \lstlisting{scene} tag. 
+The scene is consists of \lstinline{sensor} (camera), \lstinline{bsdf} (materials), \lstinline{emitter} (lights), and \lstinline{shape} (geometry). 
+
+The camera is specified as follows:
+\begin{lstlisting}[language=xml]
+  <sensor type="perspective">
+    <string name="fovAxis" value="y"/>
+    <transform name="toWorld">
+      <lookAt origin="278, 273, -800" target="278, 273, -799" up="0, 1, 0"/>
+    </transform>
+    <float name="fov" value="39.3077"/>
+    <sampler type="independent">
+      <integer name="sampleCount" value="16"/>
+    </sampler>
+    <film type="hdrfilm">
+      <integer name="width" value="512"/>
+      <integer name="height" value="512"/>
+    </film>
+  </sensor>
+\end{lstlisting}
+We only support perspective cameras, and the \lstinline{transform} inside a sensor can only be a \lstinline{lookAt} transform. We only support \emph{independent} samplers, and inside it we specify the number of samples per pixel. We only support \lstinline{hdrfilm} which outputs an exr image with the specified width and height.
+
+We can declare a list of materials and assign them to objects. A declaration looks like this:
+\begin{lstlisting}[language=xml]
+  <bsdf type="diffuse" id="box">
+    <rgb name="reflectance" value="0.884774, 0.699933, 0.666224"/>
+  </bsdf>
+\end{lstlisting}
+For this homework, you only need to support \lstinline{diffuse} and \lstinline{mirror} materials (just like the previous homework). In the future homeworks we will need to support more.
+
+We can also declare a list of lights:
+\begin{lstlisting}[language=xml]
+  <emitter type="point">
+        <rgb name="intensity" value="1, 1, 1"/>
+        <point name="position" x="278" y="548.8" z="279.5"/>
+  </emitter>
+\end{lstlisting}
+For this homework, you only need to support \lstinline{point} lights. In the future we will implement more lights.
+
+Finally, we declare a list of shapes:
+\begin{lstlisting}[language=xml]
+  <shape type="obj">
+    <string name="filename" value="meshes/cbox_floor.obj"/>
+    <ref id="white"/>
+  </shape>
+\end{lstlisting}
+A shape can be an \lstinline{obj} file, a \lstinline{ply} file, or a sphere. An \href{https://en.wikipedia.org/wiki/Wavefront_.obj_file}{obj file} specifies a triangle mesh and looks like this:
+\begin{lstlisting}
+v 0 0 559.20001
+v 0 0 0
+v 0 548.79999 0
+v 0 548.79999 559.20001
+f 1 2 3 4
+\end{lstlisting}
+It specifies the 3D positions of vertices and the indices.
+
+A \lstinline{ply} file is similar but stores the information in binary formats, making it more compact and efficient. Read the \href{https://en.wikipedia.org/wiki/PLY_(file_format)}{Wikipedia page} for more information.
+
+A shape can also be a sphere:
+\begin{lstlisting}[language=xml]
+  <shape type="sphere">
+    <point name="center" x="1" y="2" z="3"/>
+    <float name="radius" value="10"/>
+    <ref id="white"/>
+  </shape>
+\end{lstlisting}
+
+The \lstinline{<ref>} tag references the materials we declared earlier and assign it to the shape. We can also declare the material inline as the following:
+\begin{lstlisting}[language=xml]
+  <shape type="sphere">
+    <point name="center" x="1" y="2" z="3"/>
+    <float name="radius" value="10"/>
+    <bsdf type="diffuse">
+      <rgb name="reflectance" value="0.5, 0.5, 0.5"/>
+    </bsdf>
+  </shape>
+\end{lstlisting}
+
+Finally, we can apply \emph{transformations} to shapes. The transformations supported are \lstinline{scale}, \lstinline{translate}, \lstinline{rotate}, \lstinline{lookat}, and \lstinline{matrix}. You specify it inside the shape:
+\begin{lstlisting}[language=xml]
+  <shape type="obj">
+    <transform name="toWorld">
+      <scale x="2" y="2" z="2"/>
+      <translate x="5" y="6" z="7"/>
+      <rotate angle="60" x="1" y="0" z="0"/>
+      <matrix value="0 -0.53 0 -1.79 0.92 0 0 8.03 0 0 0.53 0 0 0 0 1"/>
+    </transform>
+    <string name="filename" value="meshes/cbox_floor.obj"/>
+    <ref id="white"/>
+  </shape>
+\end{lstlisting}
+We will apply the transformations in order. The matrix transform specifies the transformation in row-major order.
+The transformation is only supported with \lstinline{obj} and \lstinline{ply}. You can't transform a sphere (we just want to make things simpler -- it is actually easy to implement transformed spheres).
+
+After passing the xml file into our parser (using the \lstinline{parse_scene} function defined in \lstinline{parse_scene.h} and \lstinline{parse_scene.cpp}), it returns a \lstinline{ParsedScene}:
+\begin{lstlisting}[language=C++]
+struct ParsedScene {
+    ParsedCamera camera;
+    std::vector<ParsedMaterial> materials;
+    std::vector<ParsedLight> lights;
+    std::vector<ParsedShape> shapes;
+    int samples_per_pixel;
+};
+\end{lstlisting}
+where \lstinline{ParsedCamera} is defined as:
+\begin{lstlisting}[language=C++]
+struct ParsedCamera {
+    Vector3 lookfrom;
+    Vector3 lookat;
+    Vector3 up;
+    Real vfov;
+    int width, height;
+};
+\end{lstlisting}
+\lstinline{ParsedMaterial} is defined as:
+\begin{lstlisting}[language=C++]
+struct ParsedDiffuse {
+    ParsedColor reflectance;
+};
+struct ParsedMirror {
+    ParsedColor reflectance;
+};
+using ParsedMaterial = std::variant<ParsedDiffuse, ParsedMirror>;
+\end{lstlisting}
+\lstinline{ParsedLight} is defined as:
+\begin{lstlisting}[language=C++]
+struct ParsedPointLight {
+    Vector3 position;
+    Vector3 intensity;
+};
+// ...
+using ParsedLight = std::variant<ParsedPointLight, ParsedDiffuseAreaLight>;
+\end{lstlisting}
+\lstinline{ParsedShape} is defined as:
+\begin{lstlisting}[language=C++]
+struct ParsedShapeBase {
+    int material_id = -1;
+    int area_light_id = -1;
+};
+struct ParsedSphere : public ParsedShapeBase {
+    Vector3 position;
+    Real radius;
+};
+struct ParsedTriangleMesh : public ParsedShapeBase {
+    std::vector<Vector3> positions;
+    std::vector<Vector3i> indices;
+    std::vector<Vector3> normals;
+    std::vector<Vector2> uvs;
+};
+using ParsedShape = std::variant<ParsedSphere, ParsedTriangleMesh>;
+\end{lstlisting}
+and \lstinline{ParsedColor} is defined as:
+\begin{lstlisting}[language=C++]
+struct ParsedImageTexture {
+    fs::path filename;
+    Real uscale = 1, vscale = 1;
+    Real uoffset = 0, voffset = 0;
+};
+using ParsedColor = std::variant<Vector3 /* RGB */, ParsedImageTexture>;
+\end{lstlisting}
+
+There is a bit of information to unpack. \lstinline{ParsedCamera} should be straightforward.
+\lstinline{ParsedMaterial}, \lstinline{ParsedLight}, and \lstinline{ParsedShape} are defined using 
+C++17 feature \lstinline{std::variant}. It's basically a \emph{tagged union} that encapsulates:
+\begin{lstlisting}
+struct Foo {
+  int type;
+  union {
+    Type0 t0;
+    Type1 t1;
+    // ...
+  }
+};
+\end{lstlisting}
+Read more about it \href{https://www.cppstories.com/2020/04/variant-virtual-polymorphism.html/}{here}.
+
+You do not need to worry about area lights yet (we will implement it in homework 3).
+You do not need to worry about \lstinline{normals} and \lstinline{uvs} in \lstinline{ParsedTriangleMesh} (we will use them in homework 3).
+You do not need to worry about \lstinline{ParsedImageTexture} (we will use it in homework 3).
+
+What you need to do is to render the scenes we provide using your renderer in the function \lstinline{hw_2_3}. This should mostly just be converting the parsed data structure into your own data structures. 
+We have provided scenes that reproduce the ones you rendered in homework 1. 
+We also provided a few new ones that can contains triangle meshes.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
