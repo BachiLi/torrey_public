@@ -93,3 +93,15 @@ Image3 hw_2_4(const std::vector<std::string> &params) {
 
     return Image3(0, 0);
 }
+
+Image3 hw_2_5(const std::vector<std::string> &params) {
+    // Homework 2.5: rendering with BVHs
+    if (params.size() < 1) {
+        return Image3(0, 0);
+    }
+
+    ParsedScene scene = parse_scene(params[0]);
+    UNUSED(scene);
+
+    return Image3(0, 0);
+}
