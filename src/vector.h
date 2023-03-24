@@ -267,6 +267,11 @@ inline T max(const TVector3<T> &v) {
 }
 
 template <typename T>
+inline TVector3<T> min(const TVector3<T> &v0, const TVector3<T> &v1) {
+    return TVector3<T>{min(v0.x, v1.x), min(v0.y, v1.y), min(v0.z, v1.z)};
+}
+
+template <typename T>
 inline TVector3<T> max(const TVector3<T> &v0, const TVector3<T> &v1) {
     return TVector3<T>{max(v0.x, v1.x), max(v0.y, v1.y), max(v0.z, v1.z)};
 }
