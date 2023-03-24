@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<scene version="0.6.0">
+	<sensor type="perspective">
+		<string name="fovAxis" value="y"/>
+		<transform name="toWorld">
+			<lookAt origin="10, 10, 10" target="0, 1, 0" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="45"/>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="64"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="640"/>
+			<integer name="height" value="480"/>
+		</film>
+	</sensor>
+
+	<emitter type="point">
+        <rgb name="intensity" value="500, 500, 500"/>
+        <point name="position" x="10" y="10" z="10"/>
+	</emitter>
+
+	<bsdf type="diffuse" id="red">
+		<rgb name="reflectance" value="0.75, 0.5, 0.5"/>
+	</bsdf>
+
+	<shape type="sphere">
+	    <point name="center" x="0.781" y="2.293" z="-4.602"/>
+	    <float name="radius" value="0.659"/>
+
+	    <ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.975" y="-1.115" z="-5.906"/>
+	    <float name="radius" value="0.591"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.9" y="-0.518" z="-4.741"/>
+	    <float name="radius" value="0.632"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-2.281" y="0.9" z="-4.271"/>
+	    <float name="radius" value="0.392"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.309" y="2.047" z="-6.365"/>
+	    <float name="radius" value="0.550"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.281" y="2.314" z="-4.383"/>
+	    <float name="radius" value="0.415"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.229" y="-0.093" z="-3.15"/>
+	    <float name="radius" value="0.331"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.4" y="1.793" z="-3.364"/>
+	    <float name="radius" value="0.322"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.795" y="-2.459" z="-6.424"/>
+	    <float name="radius" value="0.563"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.045" y="-1.886" z="-4.895"/>
+	    <float name="radius" value="0.418"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="2.369" y="-0.402" z="-5.811"/>
+	    <float name="radius" value="0.510"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.514" y="2.270" z="-2.799"/>
+	    <float name="radius" value="0.635"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.669" y="1.321" z="-7.112"/>
+	    <float name="radius" value="0.3"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.227" y="1.167" z="-5.870"/>
+	    <float name="radius" value="0.299"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.320" y="0.086" z="-7.343"/>
+	    <float name="radius" value="0.510"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.410" y="-1.046" z="-2.946"/>
+	    <float name="radius" value="0.280"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.742" y="-1.488" z="-6.187"/>
+	    <float name="radius" value="0.517"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.867" y="0.315" z="-4.901"/>
+	    <float name="radius" value="0.747"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.269" y="0.208" z="-4.738"/>
+	    <float name="radius" value="0.431"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.966" y="0.860" z="-5.417"/>
+	    <float name="radius" value="0.290"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-2.345" y="1.133" z="-5.147"/>
+	    <float name="radius" value="0.298"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.924" y="1.527" z="-6.724"/>
+	    <float name="radius" value="0.510"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-0.418" y="-1.651" z="-2.595"/>
+	    <float name="radius" value="0.594"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-2.344" y="-0.415" z="-3.685"/>
+	    <float name="radius" value="0.617"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.238" y="0.990" z="-3.018"/>
+	    <float name="radius" value="0.306"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="-1.016" y="-2.252" z="-2.555"/>
+	    <float name="radius" value="0.392"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.761" y="1.176" z="-5.583"/>
+	    <float name="radius" value="0.407"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.995" y="2.143" z="-2.525"/>
+	    <float name="radius" value="0.296"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="1.645" y="-1.920" z="-3.988"/>
+	    <float name="radius" value="0.361"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+	    <point name="center" x="0.189" y="-0.262" z="-4.485"/>
+	    <float name="radius" value="0.298"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="triangles.obj"/>
+
+		<ref id="red"/>
+	</shape>
+</scene>
