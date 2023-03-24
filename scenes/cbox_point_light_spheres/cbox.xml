@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<scene version="0.6.0">
+	<sensor type="perspective">
+		<string name="fovAxis" value="y"/>
+		<transform name="toWorld">
+			<lookAt origin="278, 273, -800" target="278, 273, -799" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="39.3077"/>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="16"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="512"/>
+			<integer name="height" value="512"/>
+		</film>
+	</sensor>
+
+	<bsdf type="mirror" id="box">
+		<rgb name="reflectance" value="1, 1, 1"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="white">
+		<rgb name="reflectance" value="0.884774, 0.699933, 0.666224"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="red">
+		<rgb name="reflectance" value="0.56581, 0.0447145, 0.0441583"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="green">
+		<rgb name="reflectance" value="0.105092, 0.378697, 0.0762035"/>
+	</bsdf>
+
+	<emitter type="point">
+        <rgb name="intensity" value="206260, 109088, 27630"/>
+        <point name="position" x="278" y="548" z="279.5"/>
+	</emitter>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_floor.obj"/>
+
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_ceiling.obj"/>
+
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_back.obj"/>
+
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_greenwall.obj"/>
+
+		<ref id="green"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_redwall.obj"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="150" y="100" z="200"/>
+		<float name="radius" value="100"/>
+		<ref id="box"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="380" y="120" z="300"/>
+		<float name="radius" value="120"/>
+		<ref id="box"/>
+	</shape>
+</scene>
