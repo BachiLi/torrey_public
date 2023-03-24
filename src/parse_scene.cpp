@@ -489,6 +489,16 @@ std::tuple<std::string /* ID */, ParsedMaterial> parse_bsdf(
             }
         }
         return std::make_tuple(id, ParsedDiffuse{reflectance});
+    } else if (type == "mirror") {
+        ParsedColor reflectance(Vector3{1, 1, 1});
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "reflectance") {
+                reflectance = parse_color(
+                    child, texture_map, default_map);
+            }
+        }
+        return std::make_tuple(id, ParsedMirror{reflectance});
     } else {
         Error(std::string("Unknown BSDF: ") + type);
     }
