@@ -444,6 +444,10 @@ If you use your homework 2.3 code to render it, it will look like the left on Fi
     \label{fig:hw_2_4}
 \end{figure}
 
+\section{Bounding volume hierarchies}
+We're going to implement the real deal now. This will finally allow us to render more complex scenes. As mentioned in the RTNW book, the idea is to build a tree of the axis-aligned bounding boxes, traverse the tree with a given ray, and skip a whole branch of tree if the ray does not intersect with the box. 
+
+Read through \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/creatingboundingboxesoflistsofobjects}{Chapter 3.7 to 3.7} of RTNW. Go to \lstinline{hw_2_5} and implement your BVH renderer (use the same shading as homework 2.3). It should not change the results of all your previous renderings.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
