@@ -301,7 +301,7 @@ using ParsedColor = std::variant<Vector3 /* RGB */, ParsedImageTexture>;
 There is a bit of information to unpack. \lstinline{ParsedCamera} should be straightforward.
 \lstinline{ParsedMaterial}, \lstinline{ParsedLight}, and \lstinline{ParsedShape} are defined using 
 C++17 feature \lstinline{std::variant}. It's basically a \emph{tagged union} that encapsulates:
-\begin{lstlisting}
+\begin{lstlisting}[language=C++]
 struct Foo {
   int type;
   union {
@@ -320,7 +320,104 @@ We will implement all of these in Homework 3.
 
 What you need to do is to render the scenes we provide using your renderer in the function \lstinline{hw_2_3}. This should mostly just be converting the parsed data structure into your own data structures. 
 We have provided scenes that reproduce the ones you rendered in homework 1. 
-We also provided a few new ones that can contains triangle meshes.
+We also provided a few new ones that contains triangle meshes.
+
+This part of the homework is a bit tedious and slightly involved. We provide here the constructor of our own scene data structure that converts a \lstinline{ParsedScene} into our scene. You do not have to follow this:
+\begin{lstlisting}[language=C++]
+struct Scene {
+    Scene(const ParsedScene &scene);
+
+    Camera camera;
+    int width, height;
+    std::vector<Shape> shapes;
+    std::vector<Material> materials;
+    std::vector<Light> lights;
+
+    int samples_per_pixel;
+    // For the Triangle in the shapes to reference to.
+    std::vector<TriangleMesh> meshes;
+};
+
+Scene::Scene(const ParsedScene &scene) :
+        camera(from_parsed_camera(scene.camera)),
+        width(scene.camera.width),
+        height(scene.camera.height),
+        samples_per_pixel(scene.samples_per_pixel) {
+    // Extract triangle meshes from the parsed scene.
+    int tri_mesh_count = 0;
+    for (const ParsedShape &parsed_shape : scene.shapes) {
+        if (std::get_if<ParsedTriangleMesh>(&parsed_shape)) {
+            tri_mesh_count++;
+        }
+    }
+    meshes.resize(tri_mesh_count);
+
+    // Extract the shapes
+    tri_mesh_count = 0;
+    for (int i = 0; i < (int)scene.shapes.size(); i++) {
+        const ParsedShape &parsed_shape = scene.shapes[i];
+        if (auto *sph = std::get_if<ParsedSphere>(&parsed_shape)) {
+            shapes.push_back(
+                Sphere{{sph->material_id, sph->area_light_id},
+                    sph->position, sph->radius});
+        } else if (auto *parsed_mesh = std::get_if<ParsedTriangleMesh>(&parsed_shape)) {
+            meshes[tri_mesh_count] = TriangleMesh{
+                {parsed_mesh->material_id, parsed_mesh->area_light_id},
+                parsed_mesh->positions, parsed_mesh->indices,
+                parsed_mesh->normals, parsed_mesh->uvs};
+            // Extract all the individual triangles
+            for (int face_index = 0; face_index < (int)parsed_mesh->indices.size(); face_index++) {
+                shapes.push_back(Triangle{face_index, &meshes[tri_mesh_count]});
+            }
+            tri_mesh_count++;
+        } else {
+            assert(false);
+        }
+    }
+
+    // Copy the materials
+    for (const ParsedMaterial &parsed_mat : scene.materials) {
+        if (auto *diffuse = std::get_if<ParsedDiffuse>(&parsed_mat)) {
+            // We assume the reflectance is always RGB for now.
+            materials.push_back(Diffuse{std::get<Vector3>(diffuse->reflectance)});
+        } else if (auto *mirror = std::get_if<ParsedMirror>(&parsed_mat)) {
+            // We assume the reflectance is always RGB for now.
+            materials.push_back(Mirror{std::get<Vector3>(mirror->reflectance)});
+        }
+    }
+
+    // Copy the lights
+    for (const ParsedLight &parsed_light : scene.lights) {
+        // We assume the light is point light for now.
+        ParsedPointLight point_light = std::get<ParsedPointLight>(parsed_light);
+        lights.push_back(PointLight{point_light.intensity, point_light.position});
+    }
+}
+\end{lstlisting}
+Note that we convert a triangle mesh into many triangle primitives. This will make the later part of the homework much easier and we recommend you to do so too:
+\begin{lstlisting}[language=C++]
+struct Triangle {
+    int face_index;
+    const TriangleMesh *mesh;
+};
+\end{lstlisting}
+
+To see your results, type the following in the command line:
+\begin{lstlisting}[language=bash]
+./torrey -hw 2_3 [scene_filename]
+\end{lstlisting}
+For example, if you are in the build directory, \lstinline{./torrey -hw 2_3 ../scenes/hw1_spheres/scene0.xml} would render a scene from Homework 1.
+
+Test your code in the following scenes: \lstinline{scenes/hw1_spheres/scene0.xml} to \lstinline{scenes/hw1_spheres/scene4.xml} are the scenes from the previous homework, and you should get the exact same results. \lstinline{scenes/hw2_triangles/single_triangle.xml} and \lstinline{scenes/hw2_triangles/tetrahedron.xml} are the two scenes above. \lstinline{scenes/cbox_point_light/cbox.xml} and \lstinline{scenes/cbox_point_light_spheres/cbox.xml} renders into images in Figure~\ref{fig:hw_2_3}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.3\linewidth]{imgs/hw_2_3a.png}
+    \includegraphics[width=0.3\linewidth]{imgs/hw_2_3b.png}
+    \caption{References for homework 2.3.}
+    \label{fig:hw_2_3}
+\end{figure}
+
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
