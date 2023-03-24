@@ -36,7 +36,7 @@
 
 	<emitter type="point">
         <rgb name="intensity" value="1, 1, 1"/>
-        <point name="position" x="278" y="548.8" z="279.5"/>
+        <point name="position" x="278" y="548" z="279.5"/>
 	</emitter>
 
 	<shape type="obj">
