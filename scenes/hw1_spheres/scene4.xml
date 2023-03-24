@@ -28,11 +28,6 @@
         <point name="position" x="5" y="5" z="-5"/>
 	</emitter>
 
-	<emitter type="point">
-        <rgb name="intensity" value="10000, 10000, 10000"/>
-        <point name="position" x="0" y="0" z="90"/>
-	</emitter>
-
 	<shape type="sphere">
 	    <point name="center" x="0.781" y="2.293" z="-4.602"/>
 	    <float name="radius" value="0.659"/>
@@ -44,10 +39,10 @@
 
 	<shape type="sphere">
 	    <point name="center" x="-1.975" y="-1.115" z="-5.906"/>
-	    <float name="radius" value="0.632"/>
+	    <float name="radius" value="0.591"/>
 
 		<bsdf type="diffuse">
-			<rgb name="reflectance" value="0.471, 0.540, 0.414"/>
+			<rgb name="reflectance" value="0.823, 0.830, 0.703"/>
 		</bsdf>
 	</shape>
 
@@ -56,7 +51,7 @@
 	    <float name="radius" value="0.632"/>
 
 		<bsdf type="diffuse">
-			<rgb name="reflectance" value="0.25, 0.5, 0.75"/>
+			<rgb name="reflectance" value="0.471, 0.540, 0.414"/>
 		</bsdf>
 	</shape>
 
