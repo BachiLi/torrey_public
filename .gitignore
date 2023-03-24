@@ -39,3 +39,6 @@ build/
 # Vscode related
 .vscode
 __pycache__/
+
+# white list the .obj files in scenes
+!scenes/**/*.obj
