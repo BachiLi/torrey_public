@@ -430,6 +430,17 @@ In this part, we will implement the intersection routine between a ray and an ax
 
 Next, go to function \lstinline{hw_2_4} and modify the code. Your code should take a scene as an input just like in homework 2.3. You will construct an axis-aligned bounding box for each sphere and each triangle. You will next intersect the camera rays against these boxes. If the ray hits any of the boxes, outputs the color $(1, 1, 1)$, otherwise outputs the color $(0.5, 0.5, 0.5)$.
 
+Use the scene \lstinline{scenes/aabb_test/aabb_test.xml} to test your rendering. If you use your homework 2.3 code to render it, it will look like the left on Figure~\ref{fig:hw_2_4}. If you use your homework 2.4 code to render it, it will look like the right.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.3\linewidth]{imgs/hw_2_4a.png}
+    \includegraphics[width=0.3\linewidth]{imgs/hw_2_4b.png}
+    \caption{References for homework 2.4.}
+    \label{fig:hw_2_4}
+\end{figure}
+
+
 %\bibliographystyle{plain}
 %\bibliography{refs}
 
