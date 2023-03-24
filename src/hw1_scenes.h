@@ -98,7 +98,7 @@ Scene hw1_scene_2{
     std::vector<Material>{
         {MaterialType::Mirror , Vector3{0.75, 0.75, 0.25}},
         {MaterialType::Diffuse, Vector3{0.25, 0.75, 0.75}},
-        {MaterialType::Diffuse, Vector3{0.75, 0.25, 0.75}}
+        {MaterialType::Mirror, Vector3{0.75, 0.25, 0.75}}
     },
     std::vector<PointLight>{
         {Vector3{100, 50, 50}, Vector3{ 1, 0, 10}},

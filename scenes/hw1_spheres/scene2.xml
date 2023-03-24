@@ -26,7 +26,7 @@
 		<rgb name="reflectance" value="0.25, 0.75, 0.75"/>
 	</bsdf>
 
-	<bsdf type="mirror" id="purple">
+	<bsdf type="diffuse" id="purple">
 		<rgb name="reflectance" value="0.75, 0.25, 0.75"/>
 	</bsdf>
 
