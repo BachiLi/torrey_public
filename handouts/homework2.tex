@@ -4,7 +4,18 @@
 
 \header{2}{Triangles and acceleration structures}
 
-In this homework, we are going to make your renderer capable of rendering more complex scenes.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.20\linewidth]{imgs/hw_2_5a.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_2_5b.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_2_5c.png}
+    \includegraphics[width=0.15\linewidth]{imgs/hw_2_5d.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_2_5e.png}
+    \caption{The images we will render in this homework.}
+    \label{fig:teaser}
+\end{figure}
+
+In this homework, we are going to make your renderer capable of rendering more complex scenes (Figure~\ref{fig:teaser}).
 The most commonly used primitive in computer graphics is a triangle. We will extend your renderer to handle objects that are made of \emph{triangle meshes}. Looping over each triangle is very slow. A scene can easily contain millions or billions of triangles (for example, in the movie Moana, \href{https://www.disneyanimation.com/resources/moana-island-scene/}{a scene of its island} contains more than 15 billion primitives). We will need something better.
 
 For this homework, we will move to the second book of the Ray Tracing in One Weekend series: \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)}. As usual, we take huge inspirations from Wojciech Jarosz's \href{https://cs87-dartmouth.github.io/Fall2022/assignments.html}{CS 87/287 at Dartmouth}.
@@ -201,6 +212,13 @@ A shape can also be a sphere:
     <point name="center" x="1" y="2" z="3"/>
     <float name="radius" value="10"/>
     <ref id="white"/>
+  </shape>
+\end{lstlisting}
+or a rectangle (converted to a triangle mesh with two triangles):
+\begin{lstlisting}[language=xml]
+  <shape type="rectangle">
+    <!-- by default it is a rectangle spanning (-1, -1, 0) to (1, 1, 0) -->
+    <ref id="gray"/>
   </shape>
 \end{lstlisting}
 
@@ -430,6 +448,26 @@ In this part, we will implement the intersection routine between a ray and an ax
 
 Next, go to function \lstinline{hw_2_4} and modify the code. Your code should take a scene as an input just like in homework 2.3. You will construct an axis-aligned bounding box for each sphere and each triangle. You will next intersect the camera rays against these boxes. If the ray hits any of the boxes, outputs the color $(1, 1, 1)$, otherwise outputs the color $(0.5, 0.5, 0.5)$.
 
+\paragraph{Degenerated axis-aligned bounding boxes.}
+The ray-AABB intersection code provided in the RTNW book has a slight issue which will cause problem when rendering axis-aligned bounding boxes that have exactly zero length in one dimension. The code looks like this:
+\begin{lstlisting}[language=C++]
+inline bool aabb::hit(const ray& r, double t_min, double t_max) const {
+    for (int a = 0; a < 3; a++) {
+        auto invD = 1.0f / r.direction()[a];
+        auto t0 = (min()[a] - r.origin()[a]) * invD;
+        auto t1 = (max()[a] - r.origin()[a]) * invD;
+        if (invD < 0.0f)
+            std::swap(t0, t1);
+        t_min = t0 > t_min ? t0 : t_min;
+        t_max = t1 < t_max ? t1 : t_max;
+        if (t_max <= t_min)
+            return false;
+    }
+    return true;
+}
+\end{lstlisting}
+The problem is in the line \lstinline{if (t_max <= t_min)}: if a bounding box has the same \lstinline{min()[a]} and \lstinline{max()[a]}, it would result in \lstinline{t_min == t_max} and a ray would never intersect with the box. The solution is simple: just change it to \lstinline{if (t_max < t_min)}.
+
 Use the scene \lstinline{scenes/aabb_test/aabb_test.xml} to test your rendering. As usual, type the following:
 \begin{lstlisting}[language=bash]
 ./torrey -hw 2_4 [scene_filename]
@@ -448,6 +486,53 @@ If you use your homework 2.3 code to render it, it will look like the left on Fi
 We're going to implement the real deal now. This will finally allow us to render more complex scenes. As mentioned in the RTNW book, the idea is to build a tree of the axis-aligned bounding boxes, traverse the tree with a given ray, and skip a whole branch of tree if the ray does not intersect with the box. 
 
 Read through \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/creatingboundingboxesoflistsofobjects}{Chapter 3.7 to 3.7} of RTNW. Go to \lstinline{hw_2_5} and implement your BVH renderer (use the same shading as homework 2.3). It should not change the results of all your previous renderings.
+
+We provide a few more scenes for you to test your algorithms. The models are from the \href{https://graphics.stanford.edu/data/3Dscanrep/}{Stanford 3D Scanning Repository} and from \href{https://casual-effects.com/data/}{Morgan Mcguire's Computer Graphics Archive}. The \lstinline{teapot} has 15704 triangles, the \lstinline{bunny} has 144046 triangles, the \lstinline{buddha} has 1087474 triangles, the \lstinline{dragon} has 871306 triangles, and the \lstinline{armadillo} has 212574 triangles. Imagine how long it would take to render these scenes if you don't have a BVH!
+
+\paragraph{Quiz: choosing the axis to divide in BVH construction.} The book recommended to split the BVH by randomly choosing an axis. Another popular strategy is to choose the axis with the largest extent. Experiment both and let us know which one is faster for you.
+
+\paragraph{ProgressReporter and Timer.} From now on, the scenes in the homeworks can take longer to render. To assist you to judge how long it takes to render a scene, we provide two classes for showing the rendering progress and the rendering time. The \lstinline{ProgressReporter} prints out the percentage of completion of a task and the \lstinline{Timer} is a wrapper around the modern C++ \lstinline{std::chrono} library. See the comments for how to use them in \lstinline{progress_reporter.h} and \lstinline{timer.h}.
+
+To test your rendering on these scenes, type (assuming you are in \lstinline{torrey/build} directory):
+\begin{lstlisting}[language=bash]
+./torrey -hw 2_5 ../scenes/teapot/teapot_constant.xml
+./torrey -hw 2_5 ../scenes/bunny/bunny.xml
+./torrey -hw 2_5 ../scenes/buddha/buddha.xml
+./torrey -hw 2_5 ../scenes/dragon/dragon.xml
+./torrey -hw 2_5 ../scenes/party/party.xml
+\end{lstlisting}
+
+You should render images like the ones in Figure~\ref{fig:hw_2_5}. On my 2019 MacBook Pro (with a 2.6 GHz 6-Core Intel Core i7), the BVH took around 1-5 seconds to build for these scenes, and the rendering itself takes a couple seconds.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.20\linewidth]{imgs/hw_2_5a.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_2_5b.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_2_5c.png}
+    \includegraphics[width=0.15\linewidth]{imgs/hw_2_5d.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_2_5e.png}
+    \caption{References for homework 2.5.}
+    \label{fig:hw_2_5}
+\end{figure}
+
+\section{Design your own scene}
+We've come to the usual fun part of the homework! Design a scene yourself and render it. Feel free to download models on the internet (we recommend converting them to \lstinline{.ply} instead of \lstinline{.obj} since our obj parser is very slow). 
+
+You can either manually author a \lstinline{.xml} scene (maybe start by modifying an existing one), or use the \href{https://github.com/mitsuba-renderer/mitsuba-blender}{Mitsuba Blender add-on} to convert a scene in Blender to the Mitsuba scene format. Note that the converter does not support all Blender features, and we do not support all features in the Mitsuba scene format, so you likely still need some manual editing before and after the conversion.
+
+\section{Bonus: speedup your BVH code (30 pts)}
+The basic BVH we implemented above would not be the most efficient BVH out there. In this optional part, you would explore ways to make your BVH code faster. Here are a few ideas for you:
+\begin{itemize}
+  \item Implement the \href{https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies#TheSurfaceAreaHeuristic}{surface area heuristic} for building a better BVH.
+  \item Parallelizing the BVH construction.
+  \item Compactifying the BVH node data structure (e.g., do we need to store three integers?).
+  \item During the BVH traversal, visit the closer bounding volume first (see the \href{https://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies#Traversal}{PBRT} book for an explanation).
+  \item Instead of a binary tree, build a n-ary tree and make use of SIMD instructions (see \href{http://www.cs.cmu.edu/afs/cs/academic/class/15869-f11/www/readings/wald08_widebvh.pdf}{Wald et al.'s paper} for more information).
+  \item Use \lstinline{std::nth_element} instead of \lstinline{std::sort} when building the BVH.
+\end{itemize}
+
+In a report, let us know what have you tried and benchmark your speedup (measure both BVH construction and rendering, exclude parsing).
+Let the total speedup ratio be $c$, your score for the bonus would be $\min(c \cdot 10, 30)$.
+To make it fair for people with different kinds of machines, please measure your speedup using 2 threads by adding \lstinline{-t 2} in command line.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
