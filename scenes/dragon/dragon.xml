@@ -87,14 +87,4 @@
 
 		<ref id="red"/>
 	</shape>
-
-<!-- 	<shape type="obj">
-		<string name="filename" value="../cbox_point_light/meshes/cbox_smallbox.obj"/>
-		<ref id="box"/>
-	</shape>
-
-	<shape type="obj">
-		<string name="filename" value="../cbox_point_light/meshes/cbox_largebox.obj"/>
-		<ref id="box"/>
-	</shape> -->
 </scene>
