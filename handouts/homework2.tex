@@ -20,7 +20,7 @@ The most commonly used primitive in computer graphics is a triangle. We will ext
 
 For this homework, we will move to the second book of the Ray Tracing in One Weekend series: \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)}. As usual, we take huge inspirations from Wojciech Jarosz's \href{https://cs87-dartmouth.github.io/Fall2022/assignments.html}{CS 87/287 at Dartmouth}.
 
-\section{Intersection with a single triangle}
+\section{Intersection with a single triangle (10 pts)}
 Like our previous homework, let's start with rendering a single triangle. There are many ways to do it with different degrees of efficiency. The RTNW book did not provide information about triangles, but you can easily find some online. The \href{https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm}{Moller-Trumbore intersection algorithm} described in the Wikipedia page is useful. The \href{https://www.pbr-book.org/3ed-2018/Shapes/Triangle_Meshes#TriangleIntersection}{PBRT book} contains more details.
 Or you can just google ray-triangle intersection.
 Feel free to copy paste any code.
@@ -43,7 +43,7 @@ To see your results, type the following in the terminal:
     \label{fig:hw_2_1}
 \end{figure}
 
-\section{Intersection with a triangle mesh}
+\section{Intersection with a triangle mesh (10 pts)}
 Let's extend the previous code to handle multiple triangles now. In computer graphics, we usually organize triangles in a \href{https://en.wikipedia.org/wiki/Triangle_mesh}{triangle mesh}. A triangle mesh consists of a list of \emph{vertices} which is just a bunch of 3D points, and a list of \emph{indices}, which connect the vertices into triangles. For example, following code represents a tetrahedron:
 \begin{lstlisting}[language=C++]
     std::vector<Vector3> positions = {
@@ -76,7 +76,7 @@ You should render something like Figure~\ref{fig:hw_2_2}.
     \label{fig:hw_2_2}
 \end{figure}
 
-\section{Parsing and rendering a scene.}
+\section{Parsing and rendering a scene. (30 pts)}
 So far, we specify the scenes by either hardcoding them in code or we input a bunch of numbers in the command line. 
 This is inconvienent. Usually, the input to a 3D rendering software is a text file describing a scene. It specifies the camera pose, lights, the materials of the objects, the geometry, and the rendering settings. There are many existing scene formats. For example see the \href{https://en.wikipedia.org/wiki/RenderMan_Interface_Specification}{RenderMan interface} and Pixar's \href{https://en.wikipedia.org/wiki/Universal_Scene_Description}{Universal Scene Description}. Here, we adopt the scene format from the \href{https://mitsuba.readthedocs.io/}{Mitsuba renderer}, simply because the scene file format is quite readable and there is an existing \href{https://github.com/mitsuba-renderer/mitsuba-blender}{Blender exporter}. We have provided the scene file parser for you, and you just need to convert the parsed information into your own data structure.
 
@@ -441,7 +441,7 @@ Test your code in the following scenes:
     \label{fig:hw_2_3}
 \end{figure}
 
-\section{Intersection with axis-aligned bounding boxes}
+\section{Intersection with axis-aligned bounding boxes (10 pts)}
 So far we have only rendered scenes with relatively small amount of primitives. It would be cool if we can render more complex scenes, but our current way to handle ray-scene intersection would not scale to a high number of primitives. To improve this, we will implement an \emph{acceleration data structure}. The one we will implement in this homework is the \emph{bounding volume hierarchy} -- it's the most popular one in  modern ray tracers. We will use axis-aligned bounding boxes as our bounding volumes -- they are shown to be very fast to intersect with and provide a relatively tight bounds for our primitives. Thus, a crucial component of a typical bounding volume hierarchy is the intersection between rays and axis aligned bounding boxes. 
 
 In this part, we will implement the intersection routine between a ray and an axis-aligned bounding box. First, read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies}{Chapters 3.1 to 3.6} of RTNW and understand the content.
@@ -482,7 +482,7 @@ If you use your homework 2.3 code to render it, it will look like the left on Fi
     \label{fig:hw_2_4}
 \end{figure}
 
-\section{Bounding volume hierarchies}
+\section{Bounding volume hierarchies (30 pts)}
 We're going to implement the real deal now. This will finally allow us to render more complex scenes. As mentioned in the RTNW book, the idea is to build a tree of the axis-aligned bounding boxes, traverse the tree with a given ray, and skip a whole branch of tree if the ray does not intersect with the box. 
 
 Read through \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/creatingboundingboxesoflistsofobjects}{Chapter 3.7 to 3.7} of RTNW. Go to \lstinline{hw_2_5} and implement your BVH renderer (use the same shading as homework 2.3). It should not change the results of all your previous renderings.
@@ -514,7 +514,7 @@ You should render images like the ones in Figure~\ref{fig:hw_2_5}. On my 2019 Ma
     \label{fig:hw_2_5}
 \end{figure}
 
-\section{Design your own scene}
+\section{Design your own scene (10 pts)}
 We've come to the usual fun part of the homework! Design a scene yourself and render it. Feel free to download models on the internet (we recommend converting them to \lstinline{.ply} instead of \lstinline{.obj} since our obj parser is very slow). 
 
 You can either manually author a \lstinline{.xml} scene (maybe start by modifying an existing one), or use the \href{https://github.com/mitsuba-renderer/mitsuba-blender}{Mitsuba Blender add-on} to convert a scene in Blender to the Mitsuba scene format. Note that the converter does not support all Blender features, and we do not support all features in the Mitsuba scene format, so you likely still need some manual editing before and after the conversion.
@@ -530,8 +530,8 @@ The basic BVH we implemented above would not be the most efficient BVH out there
   \item Use \lstinline{std::nth_element} instead of \lstinline{std::sort} when building the BVH.
 \end{itemize}
 
-In a report, let us know what have you tried and benchmark your speedup (measure both BVH construction and rendering, exclude parsing).
-Let the total speedup ratio be $c$, your score for the bonus would be $\min(c \cdot 10, 30)$.
+In a report, document what have you tried and benchmark your speedup (measure both BVH construction and rendering, exclude parsing).
+Let the total speedup ratio be $c$, your score for the bonus would be $\min(c \cdot 10, 30)$ (i.e., if you achieve a 3x speedup, you get the full bonus points).
 To make it fair for people with different kinds of machines, please measure your speedup using 2 threads by adding \lstinline{-t 2} in command line.
 
 %\bibliographystyle{plain}

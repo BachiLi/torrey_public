@@ -18,3 +18,16 @@ inline Real tick(Timer &timer) {
     timer.last = now;
     return ret;
 }
+
+/*
+Example usage:
+
+Timer timer;
+tick(timer);
+std::cout << "Parsing and constructing scene " << filename << "." << std::endl;
+Scene scene = parse_scene(filename, embree_device);
+std::cout << "Done. Took " << tick(timer) << " seconds." << std::endl;
+std::cout << "Rendering..." << std::endl;
+Image3 img = render(scene);
+std::cout << "Done. Took " << tick(timer) << " seconds." << std::endl;
+*/

@@ -36,3 +36,23 @@ private:
     uint64_t work_done;
     std::mutex mutex;
 };
+
+/*
+Example usage:
+ProgressReporter reporter(num_tiles_x * num_tiles_y);
+parallel_for([&](const Vector2i &tile) {
+    // Use a different rng stream for each thread.
+    pcg32_state rng = init_pcg32(tile[1] * num_tiles_x + tile[0]);
+    int x0 = tile[0] * tile_size;
+    int x1 = min(x0 + tile_size, w);
+    int y0 = tile[1] * tile_size;
+    int y1 = min(y0 + tile_size, h);
+    for (int y = y0; y < y1; y++) {
+        for (int x = x0; x < x1; x++) {
+            ...
+        }
+    }
+    reporter.update(1);
+}, Vector2i(num_tiles_x, num_tiles_y));
+reporter.done();
+*/
