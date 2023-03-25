@@ -97,7 +97,7 @@ size_t get_vertex_id(const ObjVertex &vertex,
     if (vertex.vn > 0) {
         nor.push_back(xform_normal(
             inverse(to_world), nor_pool[vertex.vn - 1]));
-    } else {
+    } else if (vertex.vn < 0) {
         int vn = nor_pool.size() + vertex.vn;
         nor.push_back(xform_normal(
             inverse(to_world), nor_pool[vn]));
