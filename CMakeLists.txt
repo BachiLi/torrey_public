@@ -30,6 +30,7 @@ set(SRCS src/3rdparty/miniz.h
          src/hw1.h
          src/hw1_scenes.h
          src/hw2.h
+         src/hw3.h
          src/image.h
          src/matrix.h
          src/parallel.h
@@ -43,6 +44,7 @@ set(SRCS src/3rdparty/miniz.h
          src/compute_normals.cpp
          src/hw1.cpp
          src/hw2.cpp
+         src/hw3.cpp
          src/image.cpp
          src/main.cpp
          src/parallel.cpp
