@@ -25,7 +25,7 @@ Like our previous homework, let's start with rendering a single triangle. There 
 Or you can just google ray-triangle intersection.
 Feel free to copy paste any code.
 
-Go to \lstinline{hw2.cpp} and look at the function \lstinline{hw_2_1}. Using the camera parameters provided (\lstinline{lookfrom = (0, 0, 0), lookat = (0, 0, -1), up = (0, 1, 0), vfov = 45}), render a triangle read from the command line arguments (we have parsed them for you). If your ray hits a triangle, outputs its barycentric coordinates (for a triangle $p_0, p_1, p_2$, a point inside the triangle can be represented as $p = w p_0 + u p_1 + v p_2$, where $(w, u, v)$ is the barycentric coordinate and $w = 1 - u - v$). Otherwise, if the ray does not hit anything, return $(0.5, 0.5, 0.5)$. To have consistency with our homework 1 code, let's do antialiasing. We have parsed the \lstinline{-spp} argument for you too.
+Go to \lstinline{hw2.cpp} and look at the function \lstinline{hw_2_1}. Using the camera parameters provided (\lstinline{lookfrom = (0, 0, 0), lookat = (0, 0, -1), up = (0, 1, 0), vfov = 45}), render a triangle read from the command line arguments (we have parsed them for you). If your ray hits a triangle, outputs its barycentric coordinates (for a triangle $p_0, p_1, p_2$, a point inside the triangle can be represented as $p = w p_0 + u p_1 + v p_2$, where $(w, u, v)$ is the barycentric coordinate and $w = 1 - u - v$). Otherwise, if the ray does not hit anything, return $(0.5, 0.5, 0.5)$. To have consistency with our Homework 1 code, let's do antialiasing. We have parsed the \lstinline{-spp} argument for you too.
 
 To see your results, type the following in the terminal:
 \begin{lstlisting}[language=bash]
@@ -39,7 +39,7 @@ To see your results, type the following in the terminal:
     \includegraphics[width=0.3\linewidth]{imgs/hw_2_1a.png}
     \includegraphics[width=0.3\linewidth]{imgs/hw_2_1b.png}
     \includegraphics[width=0.3\linewidth]{imgs/hw_2_1c.png}
-    \caption{References for homework 2.1.}
+    \caption{References for Homework 2.1.}
     \label{fig:hw_2_1}
 \end{figure}
 
@@ -72,7 +72,7 @@ You should render something like Figure~\ref{fig:hw_2_2}.
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.4\linewidth]{imgs/hw_2_2.png}
-    \caption{References for homework 2.2.}
+    \caption{References for Homework 2.2.}
     \label{fig:hw_2_2}
 \end{figure}
 
@@ -337,7 +337,7 @@ You do not need to worry about \lstinline{ParsedImageTexture}.
 We will implement all of these in Homework 3.
 
 What you need to do is to render the scenes we provide using your renderer in the function \lstinline{hw_2_3}. This should mostly just be converting the parsed data structure into your own data structures. 
-We have provided scenes that reproduce the ones you rendered in homework 1. 
+We have provided scenes that reproduce the ones you rendered in Homework 1. 
 We also provided a few new ones that contains triangle meshes.
 
 This part of the homework is a bit tedious and slightly involved. We provide here the constructor of our own scene data structure that converts a \lstinline{ParsedScene} into our scene. You do not have to follow this:
@@ -437,7 +437,7 @@ Test your code in the following scenes:
     \centering
     \includegraphics[width=0.3\linewidth]{imgs/hw_2_3a.png}
     \includegraphics[width=0.3\linewidth]{imgs/hw_2_3b.png}
-    \caption{References for homework 2.3.}
+    \caption{References for Homework 2.3.}
     \label{fig:hw_2_3}
 \end{figure}
 
@@ -446,7 +446,7 @@ So far we have only rendered scenes with relatively small amount of primitives. 
 
 In this part, we will implement the intersection routine between a ray and an axis-aligned bounding box. First, read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies}{Chapters 3.1 to 3.6} of RTNW and understand the content.
 
-Next, go to function \lstinline{hw_2_4} and modify the code. Your code should take a scene as an input just like in homework 2.3. You will construct an axis-aligned bounding box for each sphere and each triangle. You will next intersect the camera rays against these boxes. If the ray hits any of the boxes, outputs the color $(1, 1, 1)$, otherwise outputs the color $(0.5, 0.5, 0.5)$.
+Next, go to function \lstinline{hw_2_4} and modify the code. Your code should take a scene as an input just like in Homework 2.3. You will construct an axis-aligned bounding box for each sphere and each triangle. You will next intersect the camera rays against these boxes. If the ray hits any of the boxes, outputs the color $(1, 1, 1)$, otherwise outputs the color $(0.5, 0.5, 0.5)$.
 
 \paragraph{Degenerated axis-aligned bounding boxes.}
 The ray-AABB intersection code provided in the RTNW book has a slight issue which will cause problem when rendering axis-aligned bounding boxes that have exactly zero length in one dimension. The code looks like this:
@@ -472,20 +472,20 @@ Use the scene \lstinline{scenes/aabb_test/aabb_test.xml} to test your rendering.
 \begin{lstlisting}[language=bash]
 ./torrey -hw 2_4 [scene_filename]
 \end{lstlisting}
-If you use your homework 2.3 code to render it, it will look like the left on Figure~\ref{fig:hw_2_4}. If you use your homework 2.4 code to render it, it will look like the right.
+If you use your Homework 2.3 code to render it, it will look like the left on Figure~\ref{fig:hw_2_4}. If you use your Homework 2.4 code to render it, it will look like the right.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.3\linewidth]{imgs/hw_2_4a.png}
     \includegraphics[width=0.3\linewidth]{imgs/hw_2_4b.png}
-    \caption{References for homework 2.4.}
+    \caption{References for Homework 2.4.}
     \label{fig:hw_2_4}
 \end{figure}
 
 \section{Bounding volume hierarchies (30 pts)}
 We're going to implement the real deal now. This will finally allow us to render more complex scenes. As mentioned in the RTNW book, the idea is to build a tree of the axis-aligned bounding boxes, traverse the tree with a given ray, and skip a whole branch of tree if the ray does not intersect with the box. 
 
-Read through \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/creatingboundingboxesoflistsofobjects}{Chapter 3.7 to 3.7} of RTNW. Go to \lstinline{hw_2_5} and implement your BVH renderer (use the same shading as homework 2.3). It should not change the results of all your previous renderings.
+Read through \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/creatingboundingboxesoflistsofobjects}{Chapter 3.7 to 3.7} of RTNW. Go to \lstinline{hw_2_5} and implement your BVH renderer (use the same shading as Homework 2.3). It should not change the results of all your previous renderings.
 
 We provide a few more scenes for you to test your algorithms. The models are from the \href{https://graphics.stanford.edu/data/3Dscanrep/}{Stanford 3D Scanning Repository} and from \href{https://casual-effects.com/data/}{Morgan Mcguire's Computer Graphics Archive}. The \lstinline{teapot} has 15704 triangles, the \lstinline{bunny} has 144046 triangles, the \lstinline{buddha} has 1087474 triangles, the \lstinline{dragon} has 871306 triangles, and the \lstinline{armadillo} has 212574 triangles. Imagine how long it would take to render these scenes if you don't have a BVH!
 
@@ -510,7 +510,7 @@ You should render images like the ones in Figure~\ref{fig:hw_2_5}. On my 2019 Ma
     \includegraphics[width=0.20\linewidth]{imgs/hw_2_5c.png}
     \includegraphics[width=0.15\linewidth]{imgs/hw_2_5d.png}
     \includegraphics[width=0.20\linewidth]{imgs/hw_2_5e.png}
-    \caption{References for homework 2.5.}
+    \caption{References for Homework 2.5.}
     \label{fig:hw_2_5}
 \end{figure}
 
