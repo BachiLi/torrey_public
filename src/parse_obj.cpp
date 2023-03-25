@@ -46,7 +46,7 @@ static std::vector<int> split_face_str(const std::string &s) {
 }
 
 struct ObjVertex {
-    ObjVertex(const std::vector<int> &id) : v(id[0] - 1), vt(id[1] - 1), vn(id[2] - 1) {}
+    ObjVertex(const std::vector<int> &id) : v(id[0]), vt(id[1]), vn(id[2]) {}
 
     bool operator<(const ObjVertex &vertex) const {
         if (v != vertex.v) {
@@ -78,11 +78,29 @@ size_t get_vertex_id(const ObjVertex &vertex,
         return it->second;
     }
     size_t id = pos.size();
-    pos.push_back(xform_point(to_world, pos_pool[vertex.v]));
-    if (vertex.vt != -1)
-        st.push_back(st_pool[vertex.vt]);
-    if (vertex.vn != -1) {
-        nor.push_back(xform_normal(inverse(to_world), nor_pool[vertex.vn]));
+    if (vertex.v > 0) {
+        // 1-based indexing to 0-based
+        pos.push_back(xform_point(to_world, pos_pool[vertex.v - 1]));
+    } else {
+        // From Wikipedia (https://en.wikipedia.org/wiki/Wavefront_.obj_file):
+        // "If an index is negative then it relatively refers to the end of the vertex list, -1 referring to the last element."
+        int v = pos_pool.size() + vertex.v;
+        pos.push_back(xform_point(to_world, pos_pool[v]));
+    }
+    
+    if (vertex.vt > 0) {
+        st.push_back(st_pool[vertex.vt - 1]);
+    } else if (vertex.vt < 0) {
+        int vt = st_pool.size() + vertex.vt;
+        st.push_back(st_pool[vt - 1]);
+    }
+    if (vertex.vn > 0) {
+        nor.push_back(xform_normal(
+            inverse(to_world), nor_pool[vertex.vn - 1]));
+    } else {
+        int vn = nor_pool.size() + vertex.vn;
+        nor.push_back(xform_normal(
+            inverse(to_world), nor_pool[vn]));
     }
     vertex_map[vertex] = id;
     return id;
