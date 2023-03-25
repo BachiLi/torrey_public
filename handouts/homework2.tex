@@ -534,6 +534,9 @@ In a report, document what have you tried and benchmark your speedup (measure bo
 Let the total speedup ratio be $c$, your score for the bonus would be $\min(c \cdot 10, 30)$ (i.e., if you achieve a 3x speedup, you get the full bonus points).
 To make it fair for people with different kinds of machines, please measure your speedup using 2 threads by adding \lstinline{-t 2} in command line.
 
+\section{Bonus: motion blur (15 pts)}
+Read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#motionblur}{Chapter 2} of RTNW and implement motion blur in your renderer. You may need to hack into the scene parser to parse scenes with different geometric transforms at different time instances.
+
 %\bibliographystyle{plain}
 %\bibliography{refs}
 
