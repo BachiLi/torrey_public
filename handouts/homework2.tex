@@ -485,7 +485,7 @@ If you use your Homework 2.3 code to render it, it will look like the left on Fi
 \section{Bounding volume hierarchies (30 pts)}
 We're going to implement the real deal now. This will finally allow us to render more complex scenes. As mentioned in the RTNW book, the idea is to build a tree of the axis-aligned bounding boxes, traverse the tree with a given ray, and skip a whole branch of tree if the ray does not intersect with the box. 
 
-Read through \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/creatingboundingboxesoflistsofobjects}{Chapter 3.7 to 3.7} of RTNW. Go to \lstinline{hw_2_5} and implement your BVH renderer (use the same shading as Homework 2.3). It should not change the results of all your previous renderings.
+Read through \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies/creatingboundingboxesoflistsofobjects}{Chapter 3.7 to 3.10} of RTNW. Go to \lstinline{hw_2_5} and implement your BVH renderer (use the same shading as Homework 2.3). It should not change the results of all your previous renderings.
 
 We provide a few more scenes for you to test your algorithms. The models are from the \href{https://graphics.stanford.edu/data/3Dscanrep/}{Stanford 3D Scanning Repository} and from \href{https://casual-effects.com/data/}{Morgan Mcguire's Computer Graphics Archive}. The \lstinline{teapot} has 15704 triangles, the \lstinline{bunny} has 144046 triangles, the \lstinline{buddha} has 1087474 triangles, the \lstinline{dragon} has 871306 triangles, and the \lstinline{armadillo} has 212574 triangles. Imagine how long it would take to render these scenes if you don't have a BVH!
 
