@@ -1,5 +1,6 @@
 #include "hw1.h"
 #include "hw2.h"
+#include "hw3.h"
 #include "image.h"
 #include "parallel.h"
 #include <vector>
