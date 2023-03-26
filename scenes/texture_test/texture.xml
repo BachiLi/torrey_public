@@ -29,13 +29,19 @@
 
 	<bsdf type="diffuse" id="grid_material">
 		<ref name="reflectance" id="grid"/>
-		<!-- <rgb name="reflectance" value="0.5, 0.5, 0.5"/> -->
 	</bsdf>
 
 	<shape type="rectangle">
 		<transform name="toWorld">
-			<scale x="1" y="-1" z="1"/>
+			<translate x="-1"/>
+			<scale x="0.75" y="-0.75" z="1"/>
 		</transform>
+		<ref id="grid_material"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="0.8" y="0" z="0"/>
+		<float name="radius" value="0.6"/>
 		<ref id="grid_material"/>
 	</shape>
 </scene>
