@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<scene version="0.6.0">
+	<sensor type="perspective">
+		<string name="fovAxis" value="y"/>
+		<transform name="toWorld">
+			<lookAt origin="100, 170, 250" target="0, 30, 0" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="45"/>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="64"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="640"/>
+			<integer name="height" value="480"/>
+		</film>
+	</sensor>
+
+	<bsdf type="diffuse" id="checkerboard">
+		<texture type="bitmap" name="reflectance">
+			<string name="filename" value="default.png"/>
+		</texture>
+	</bsdf>
+
+	<bsdf type="mirror" id="gray">
+		<rgb name="reflectance" value="1, 1, 1"/>
+	</bsdf>
+
+	<emitter type="point">
+        <rgb name="intensity" value="5000000, 4000000, 3000000"/>
+        <point name="position" x="500" y="1000" z="0"/>
+	</emitter>
+
+	<emitter type="point">
+        <rgb name="intensity" value="10000, 30000, 10000"/>
+        <point name="position" x="-300" y="100" z="100"/>
+	</emitter>
+
+	<emitter type="point">
+        <rgb name="intensity" value="10000, 30000, 10000"/>
+        <point name="position" x="300" y="100" z="100"/>
+	</emitter>
+
+	<shape type="obj">
+	    <string name="filename" value="teapot.obj"/>
+		<ref id="checkerboard"/>
+	</shape>
+
+	<shape type="rectangle">
+		<transform name="toWorld">
+			<rotate angle="90" x="1"/>
+			<scale x="2000" y="2000" z="2000"/>
+		</transform>
+		<ref id="gray"/>
+	</shape>
+</scene>
