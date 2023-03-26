@@ -751,6 +751,12 @@ ParsedScene parse_scene(pugi::xml_node node) {
                             lights,
                             shapes,
                             default_map));
+        } else if (name == "texture") {
+            std::string id = child.attribute("id").value();
+            if (texture_map.find(id) != texture_map.end()) {
+                Error(std::string("Duplicated texture ID:") + id);
+            }
+            texture_map[id] = parse_texture(child, default_map);
         }
     }
     return ParsedScene{camera, materials, lights, shapes, sample_count};
