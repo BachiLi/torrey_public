@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<scene version="0.5.0">
+	<sensor type="perspective">
+		<string name="fovAxis" value="y"/>
+		<transform name="toWorld">
+			<lookAt origin="0, 0, 3" target="0, 0, 0" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="45"/>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="512"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="640"/>
+			<integer name="height" value="480"/>
+		</film>
+	</sensor>
+
+	<emitter type="point">
+        <rgb name="intensity" value="25, 25, 25"/>
+        <point name="position" x="0" y="0" z="3"/>
+	</emitter>
+
+	<texture type="bitmap" id="grid">
+		<string name="filename" value="grid.exr"/>
+		<float name="uscale" value="4"/>
+		<float name="vscale" value="4"/>
+		<float name="uoffset" value="0.2"/>
+		<float name="voffset" value="0.3"/>
+	</texture>
+
+	<bsdf type="diffuse" id="grid_material">
+		<ref name="reflectance" id="grid"/>
+	</bsdf>
+
+	<shape type="rectangle">
+		<transform name="toWorld">
+			<translate x="-1"/>
+			<scale x="0.75" y="-0.75" z="1"/>
+		</transform>
+		<ref id="grid_material"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="0.8" y="0" z="0"/>
+		<float name="radius" value="0.6"/>
+		<ref id="grid_material"/>
+	</shape>
+</scene>
