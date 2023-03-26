@@ -37,8 +37,10 @@ Before you started coding, we recommend you to go through the whole handout to h
 \paragraph{Links in this document.} Some of the links in this document contain hyperlinks with a \emph{named anchor} to a webpage (e.g., \url{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#overview}). On some PDF readers, I have found these links to not work very well (Adobe Acrobat Reader works well). If you encounter issues with the links, try replacing \lstinline{%23} with \lstinline{#} in the address bar of your browser.
 
 \section{Building Torrey}
-We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, stb\_image, tinyexr, miniz, tinyply) in its repo and all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
+We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, stb\_image, tinyexr, miniz, tinyply) in its repo.
+We also include many 3D scenes we will render in the repo using \href{https://git-lfs.com/}{git-lfs}. Please install git-lfs in your system by downloading it in the linked webpage. Next, all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
 \begin{lstlisting}[language=bash]
+  git lfs install
   git clone https://github.com/BachiLi/torrey_public
   mkdir build
   cd build
