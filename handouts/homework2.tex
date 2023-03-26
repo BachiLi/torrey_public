@@ -194,7 +194,7 @@ Finally, we declare a list of shapes:
     <ref id="white"/>
   </shape>
 \end{lstlisting}
-A shape can be an \lstinline{obj} file, a \lstinline{ply} file, or a sphere. An \href{https://en.wikipedia.org/wiki/Wavefront_.obj_file}{obj file} specifies a triangle mesh and looks like this:
+A shape can be an \lstinline{obj} file, a \lstinline{ply} file, a \lstinline{serialized} file, a \lstinline{sphere}, or a \lstinline{rectangle}. An \href{https://en.wikipedia.org/wiki/Wavefront_.obj_file}{obj file} specifies a triangle mesh and looks like this:
 \begin{lstlisting}
 v 0 0 559.20001
 v 0 0 0
@@ -205,6 +205,21 @@ f 1 2 3 4
 It specifies the 3D positions of vertices and the indices.
 
 A \lstinline{ply} file is similar but stores the information in binary formats, making it more compact and efficient. Read the \href{https://en.wikipedia.org/wiki/PLY_(file_format)}{Wikipedia page} for more information.
+\begin{lstlisting}[language=xml]
+  <shape type="ply">
+    <string name="filename" value="dragon.ply"/>
+    <ref id="gold"/>
+  </shape>
+\end{lstlisting}
+
+A \lstinline{serialized} file is Mitsuba's binary format.
+\begin{lstlisting}[language=xml]
+  <shape type="serialized">
+    <string name="filename" value="sponza.serialized"/>
+    <integer name="shapeIndex" value="29"/>
+    <ref name="bsdf" id="sp_01_luk_a"/>
+  </shape>
+\end{lstlisting}
 
 A shape can also be a sphere:
 \begin{lstlisting}[language=xml]
