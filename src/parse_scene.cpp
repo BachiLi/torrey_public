@@ -4,6 +4,7 @@
 #include "flexception.h"
 #include "parse_obj.h"
 #include "parse_ply.h"
+#include "parse_serialized.h"
 #include "transform.h"
 #include <map>
 #include <regex>
@@ -622,6 +623,35 @@ ParsedShape parse_shape(pugi::xml_node node,
             }
         }
         shape = parse_ply(filename, to_world);
+        ParsedTriangleMesh &mesh = std::get<ParsedTriangleMesh>(shape);
+        if (face_normals) {
+            mesh.normals = std::vector<Vector3>{};
+        } else {
+            if (mesh.normals.size() == 0) {
+                mesh.normals = compute_normals(mesh.positions, mesh.indices);
+            }
+        }
+    } else if (type == "serialized") {
+        std::string filename;
+        int shape_index = 0;
+        Matrix4x4 to_world = Matrix4x4::identity();
+        bool face_normals = false;
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "filename") {
+                filename = parse_string(child.attribute("value").value(), default_map);
+            } else if (name == "toWorld" || name == "to_world") {
+                if (std::string(child.name()) == "transform") {
+                    to_world = parse_transform(child, default_map);
+                }
+            } else if (name == "shapeIndex" || name == "shape_index") {
+                shape_index = parse_integer(child.attribute("value").value(), default_map);
+            } else if (name == "faceNormals" || name == "face_normals") {
+                face_normals = parse_boolean(
+                    child.attribute("value").value(), default_map);
+            }
+        }
+        shape = parse_serialized(filename, shape_index, to_world);
         ParsedTriangleMesh &mesh = std::get<ParsedTriangleMesh>(shape);
         if (face_normals) {
             mesh.normals = std::vector<Vector3>{};

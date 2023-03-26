@@ -37,6 +37,7 @@ set(SRCS src/3rdparty/miniz.h
          src/parse_obj.h
          src/parse_ply.h
          src/parse_scene.h
+         src/parse_serialized.h
          src/print_scene.h
          src/torrey.h
          src/transform.h
@@ -51,6 +52,7 @@ set(SRCS src/3rdparty/miniz.h
          src/parse_obj.cpp
          src/parse_ply.cpp
          src/parse_scene.cpp
+         src/parse_serialized.cpp
          src/print_scene.cpp
          src/transform.cpp)
 
