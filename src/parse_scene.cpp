@@ -419,7 +419,7 @@ ParsedColor parse_texture(pugi::xml_node node,
         if (path.is_relative()) {
             path = fs::current_path() / path;
         }
-        return ParsedImageTexture{fs::path(filename),
+        return ParsedImageTexture{path,
             uscale, vscale, uoffset, voffset};
     }
     Error(std::string("Unknown texture type: ") + type);
