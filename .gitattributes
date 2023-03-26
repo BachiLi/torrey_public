@@ -1,4 +1,8 @@
 scenes/teapot filter=lfs diff=lfs merge=lfs -text
+buddha filter=lfs diff=lfs merge=lfs -text
+bunny filter=lfs diff=lfs merge=lfs -text
+dragon filter=lfs diff=lfs merge=lfs -text
+party filter=lfs diff=lfs merge=lfs -text
 *.ply filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.jpeg filter=lfs diff=lfs merge=lfs -text
