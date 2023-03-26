@@ -415,6 +415,10 @@ ParsedColor parse_texture(pugi::xml_node node,
                     child.attribute("value").value(), default_map);
             }
         }
+        fs::path path(filename);
+        if (path.is_relative()) {
+            path = fs::current_path() / path;
+        }
         return ParsedImageTexture{fs::path(filename),
             uscale, vscale, uoffset, voffset};
     }
