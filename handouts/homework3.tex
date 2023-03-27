@@ -3,7 +3,7 @@
 
 \begin{document}
 
-\header{3}{Textures, shading normals, area lights, and BRDFs}
+\header{3}{Textures, shading normals, BRDFs, and area lights}
 
 In the previous homework, we mostly focused on increasing the \emph{geometric complexity} of our renderer and scenes. In this homework, we're going to implement a bunch of small features for our renderer to increase the \emph{material} and \emph{lighting complexity} of our scenes. We will still stay in the \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)} book for this homework.
 
@@ -90,6 +90,28 @@ You should render images like the ones in Figure~\ref{fig:hw_3_2}.
 \end{figure}
 
 \paragraph{Quiz:} Why is the shadow boundary for the teapot still looks jaggy? Propose a way to fix it. (Hint: you may want to read Hanika's article on \href{https://jo.dreggn.org/home/2021_terminator.pdf}{Hacking the shadow terminator}.)
+
+\section{BRDFs}
+The materials we have currently are simplistic: real world materials spend a large spectrum between purely diffuse and purely specular. Let's implement a few more of them.
+
+\subsection{Fresnel reflection}
+Real world metals and mirrors do not reflect light equally at all angles. A prominent effect is predicted by French physicst \href{https://en.wikipedia.org/wiki/Augustin-Jean_Fresnel}{Fresnel} using the wave theory of light. For example, metals become more white when you look at it from a \emph{grazing angle}. Many materials also get more mirror-like when we look at them from grazing angles.
+
+In graphics, we use an approximation proposed by \href{https://en.wikipedia.org/wiki/Schlick%27s_approximation}{Christophe Schlick}:
+\begin{equation}
+F = F_0 + (1 - F_0) \left(1 - n \cdot l\right)^5,
+\label{eq:fresnel}
+\end{equation}
+where $n$ is the normal and $l$ is the unit direction towards the light source. $F_0$ is the reflection when light comes in perpendicularly to the surface. For glasses and dielectric materials, $F_0$ can be well approximated by the index of refraction ($F_0 = \left(\frac{\eta_i - \eta_o}{\eta_i + \eta_o}\right)^2$ where $\eta_i$ and $\eta_o$ are the index of refraction of the two sides of the surfaces). For metals or \emph{conductors}, the actual Fresnel equation requires the index of refraction number to be described using complex numbers, and the index of refraction differs a lot depends on the wavelength of light.\footnote{\href{https://www.feynmanlectures.caltech.edu/I_31.html}{Feynman's lectures of physics} has some good introduction to this, but you might need to start reading from earlier chapters to understand the chapter I linked.} Manipulating the complex number index of refraction is not intuitive, and we do not have textured data for them either. Therefore, a common solution that gives intuitive control to metal Fresnel is to directly specify $F_0$ in RGB.\footnote{I highly recommend watching \href{https://www.youtube.com/watch?v=kEcDbl7eS0w}{Natty Hoffman's presentation} on the topic of Fresnel equation.}
+
+Let's first add the Fresnel term to our \lstinline{mirror} material. Instead of directly multiplying the color with the reflectance, we multiply it with the Schlick Fresnel (Equation~\eqref{eq:fresnel}). 
+
+\paragraph{Quiz:} Change the direction $l$ to point towards the incoming ray direction in your code -- does it make a difference? Why?
+
+\section{Area lights}
+So far all our scenes are rendered with point lights. Point lights are nice for situations where you want your shadow to have hard boundaries, but sometimes we want softer lighting. We achieve this by turning our geometric objects themselves into lights. You can think of them as an infinite collection of small point lights (but each of them only emit light towards the direction the surface is facing, instead of emitting light to all directions).
+
+
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
