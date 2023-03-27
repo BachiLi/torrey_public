@@ -513,7 +513,7 @@ std::tuple<std::string /* ID */, ParsedMaterial> parse_bsdf(
                 reflectance = parse_color(
                     child, texture_map, default_map);
             } else if (name == "ior" || name == "eta") {
-                eta = parse_float(child, default_map);
+                eta = parse_float(child.attribute("value").value(), default_map);
             }
         }
         return std::make_tuple(id, ParsedPlastic{eta, reflectance});
