@@ -56,6 +56,7 @@ To see your results, type the following in the terminal (assuming you are in the
 ./torrey -hw 3_1 ../scenes/sponza/sponza.xml
 ./torrey -hw 3_1 ../scenes/head/head.xml
 \end{lstlisting}
+We provide the references in Figure~\ref{fig:hw_3_1}.
 
 \begin{figure}[ht]
     \centering
@@ -72,6 +73,23 @@ To see your results, type the following in the terminal (assuming you are in the
 You have probably noticed that some of the 3D models we rendered look ``polygonal'', while we ideally want them to be smooth. One way to improve this is to increase the polygon count, but this approach seems expensive. \href{https://en.wikipedia.org/wiki/Phong_shading}{Phong} has come up with a genius way to make polygonal surfaces look smooth. The idea is to define a \emph{shading normal} per triangle vertex, and interpolate the normal within the triangle to have smooth normals. We will implement shading normals in this part.
 
 Our \lstinline{ParsedTriangleMesh} can come with a field \lstinline{normals} which is its shading normals defined per-vertex (if \lstinline{ParsedTriangleMesh::normals.size() == 0}, then the mesh does not have shading normals). Once you hit a triangle, if it has a shading normal, interpolate the normals using the barycentric coordinates (just like how you interpolate the UV coordinates). Then, during shading, replace the normal you used with the interpolated shading normal.
+
+As usual, type the following in the terminal to see your results:
+\begin{lstlisting}[language=C++]
+./torrey -hw 3_2 ../scenes/teapot/teapot_textured.xml
+./torrey -hw 3_2 ../scenes/head/head.xml
+\end{lstlisting}
+You should render images like the ones in Figure~\ref{fig:hw_3_2}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.3\linewidth]{imgs/hw_3_2a.png}
+    \includegraphics[width=0.3\linewidth]{imgs/hw_3_2b.png}
+    \caption{Reference images for Homework 3.2.}
+    \label{fig:hw_3_2}
+\end{figure}
+
+\paragraph{Quiz:} Why is the shadow boundary for the teapot still looks jaggy? Propose a way to fix it. (Hint: you may want to read Hanika's article on \href{https://jo.dreggn.org/home/2021_terminator.pdf}{Hacking the shadow terminator}.)
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
