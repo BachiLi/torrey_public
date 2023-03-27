@@ -31,7 +31,12 @@ struct ParsedMirror {
     ParsedColor reflectance;
 };
 
-using ParsedMaterial = std::variant<ParsedDiffuse, ParsedMirror>;
+struct ParsedPlastic {
+    Real eta; // index of refraction
+    ParsedColor reflectance;
+};
+
+using ParsedMaterial = std::variant<ParsedDiffuse, ParsedMirror, ParsedPlastic>;
 
 struct ParsedPointLight {
     Vector3 position;

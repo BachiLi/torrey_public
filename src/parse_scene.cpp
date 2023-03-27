@@ -504,6 +504,19 @@ std::tuple<std::string /* ID */, ParsedMaterial> parse_bsdf(
             }
         }
         return std::make_tuple(id, ParsedMirror{reflectance});
+    } else if (type == "plastic") {
+        ParsedColor reflectance(Vector3{1, 1, 1});
+        Real eta = 1.5;
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "reflectance") {
+                reflectance = parse_color(
+                    child, texture_map, default_map);
+            } else if (name == "ior" || name == "eta") {
+                eta = parse_float(child, default_map);
+            }
+        }
+        return std::make_tuple(id, ParsedPlastic{eta, reflectance});
     } else {
         Error(std::string("Unknown BSDF: ") + type);
     }

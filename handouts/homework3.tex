@@ -72,7 +72,7 @@ We provide the references in Figure~\ref{fig:hw_3_1}.
 \section{Shading normals}
 You have probably noticed that some of the 3D models we rendered look ``polygonal'', while we ideally want them to be smooth. One way to improve this is to increase the polygon count, but this approach seems expensive. \href{https://en.wikipedia.org/wiki/Phong_shading}{Phong} has come up with a genius way to make polygonal surfaces look smooth. The idea is to define a \emph{shading normal} per triangle vertex, and interpolate the normal within the triangle to have smooth normals. We will implement shading normals in this part.
 
-Our \lstinline{ParsedTriangleMesh} can come with a field \lstinline{normals} which is its shading normals defined per-vertex (if \lstinline{ParsedTriangleMesh::normals.size() == 0}, then the mesh does not have shading normals). Once you hit a triangle, if it has a shading normal, interpolate the normals using the barycentric coordinates (just like how you interpolate the UV coordinates). Then, during shading, replace the normal you used with the interpolated shading normal.
+Our \lstinline{ParsedTriangleMesh} can come with a field \lstinline{normals} which is its shading normals defined per-vertex (if \lstinline{ParsedTriangleMesh::normals.size() == 0}, then the mesh does not have shading normals). Once you hit a triangle, if it has a shading normal, interpolate the normals using the barycentric coordinates (just like how you interpolate the UV coordinates, but remember to \lstinline{normalize} after interpolation). Then, during shading, replace the normal you used with the interpolated shading normal.
 
 As usual, type the following in the terminal to see your results:
 \begin{lstlisting}[language=C++]
@@ -106,7 +106,38 @@ where $n$ is the normal and $l$ is the unit direction towards the light source. 
 
 Let's first add the Fresnel term to our \lstinline{mirror} material. Instead of directly multiplying the color with the reflectance, we multiply it with the Schlick Fresnel (Equation~\eqref{eq:fresnel}). 
 
+Let's use a scene from Homework 1 to test your result:
+\begin{lstlisting}[language=bash]
+./torrey -hw 3_3 ../scenes/hw1_spheres/scene1.xml
+\end{lstlisting}
+
+You should see something like Figure~\ref{fig:hw_3_3_fresnel}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.4\linewidth]{imgs/hw_3_3a.png}
+    \caption{Adding Fresnel reflection to the mirror spheres.}
+    \label{fig:hw_3_3_fresnel}
+\end{figure}
+
 \paragraph{Quiz:} Change the direction $l$ to point towards the incoming ray direction in your code -- does it make a difference? Why?
+
+Another good use of Fresnel equation is to blend between diffuse and specular materials. The physics work like this: many materials have multiple \emph{layers}. Many materials can be modeled using two layers: a dieletric \emph{coating} on top of a diffuse layer. For example, plastic, woods, and car paint usually are like this: they have an overall diffusive appearance, but also have the shiny smooth coating on top of the surface. When a light hits the dielectric layer, $F$ amount of light will reflect, and $1 - F$ amount of light will \emph{refract} into the diffuse layer. Thus we can often blend diffuse and specular layers using the Fresnel equation:
+\begin{equation}
+\text{specular} + (1 - F) \text{diffuse},
+\end{equation}
+where the specular term already includes the Fresnel equation. Figure~\ref{fig:real_world_fresnel} shows a real photograph demonstrating this effect: when we look at the table from the grazing angle, it becomes more specular, and when we look at the table from the top, it becomes more diffusive.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.3\linewidth]{imgs/fresnel_1.jpeg}
+    \includegraphics[width=0.3\linewidth]{imgs/fresnel_2.jpeg}
+    \includegraphics[width=0.3\linewidth]{imgs/fresnel_3.jpeg}
+    \caption{Real world pictures showing the effect of Fresnel reflection on coated materials (look at the table).}
+    \label{fig:real_world_fresnel}
+\end{figure}
+Since in this situation, the specular layer is usually dieletric, and these dielectric materials are usually monochromatic (i.e., the index of refraction is the same for all visible wavelength), we will use a single index of refraction parameter to control $F_0$. Assuming the index of refraction of air is $1$, we set $F_0 = \frac{\eta - 1}{\eta + 1}$ for all RGB. A common choice of $\eta$ is $1.5$.
+
+Implement this Fresnel-based blending in the \lstinline{plastic} material (the information is stored in \lstinline{ParsedPlastic} in the scene).
 
 \section{Area lights}
 So far all our scenes are rendered with point lights. Point lights are nice for situations where you want your shadow to have hard boundaries, but sometimes we want softer lighting. We achieve this by turning our geometric objects themselves into lights. You can think of them as an infinite collection of small point lights (but each of them only emit light towards the direction the surface is facing, instead of emitting light to all directions).
