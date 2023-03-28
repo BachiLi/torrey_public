@@ -3,9 +3,9 @@
 
 \begin{document}
 
-\header{3}{Textures, shading normals, BRDFs, and area lights}
+\header{3}{Textures, shading normals, Fresnel, and area lights}
 
-In the previous homework, we mostly focused on increasing the \emph{geometric complexity} of our renderer and scenes. In this homework, we're going to implement a bunch of small features for our renderer to increase the \emph{material} and \emph{lighting complexity} of our scenes. We will still stay in the \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)} book for this homework.
+In the previous homework, we mostly focused on increasing the \emph{geometric complexity} of our renderer and scenes. In this homework, we're going to implement a bunch of small features for our renderer to increase the \emph{material} and \emph{lighting complexity} of our scenes. We will use both the \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)} book and the last book of the RTOW series \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html}{Ray Tracing - The Rest of Your Life (RTRYL)} for this homework.
 
 \section{Textures}
 So far, we assume constant color per object. This is kind of boring and real world objects are {\color{red}c}{\color{orange}o}{\color{green}l}{\color{blue}o}{\color{cyan}r}f{\color{magenta}u}{\color{violet}l}. The way computer graphics deal with colors on objects is through \href{https://en.wikipedia.org/wiki/Texture_mapping}{textures} (invented by Edwin Catmull in the 70s!): basically we wrap an image around a surface and define color on that image. There are two common ways to specify a texture: you can specify it \emph{procedurally} through a program, or you can use a raster image to represent the texture. We will implement the raster image texture, and the procedural texture will be bonus.
@@ -91,10 +91,7 @@ You should render images like the ones in Figure~\ref{fig:hw_3_2}.
 
 \paragraph{Quiz:} Why is the shadow boundary for the teapot still looks jaggy? Propose a way to fix it. (Hint: you may want to read Hanika's article on \href{https://jo.dreggn.org/home/2021_terminator.pdf}{Hacking the shadow terminator}.)
 
-\section{BRDFs}
-The materials we have currently are simplistic: real world materials spend a large spectrum between purely diffuse and purely specular. Let's implement a few more of them.
-
-\subsection{Fresnel reflection}
+\section{Fresnel reflection}
 Real world metals and mirrors do not reflect light equally at all angles. A prominent effect is predicted by French physicst \href{https://en.wikipedia.org/wiki/Augustin-Jean_Fresnel}{Fresnel} using the wave theory of light. For example, metals become more white when you look at it from a \emph{grazing angle}. Many materials also get more mirror-like when we look at them from grazing angles.
 
 In graphics, we use an approximation proposed by \href{https://en.wikipedia.org/wiki/Schlick%27s_approximation}{Christophe Schlick}:
@@ -137,12 +134,111 @@ where the specular term already includes the Fresnel equation. Figure~\ref{fig:r
 \end{figure}
 Since in this situation, the specular layer is usually dieletric, and these dielectric materials are usually monochromatic (i.e., the index of refraction is the same for all visible wavelength), we will use a single index of refraction parameter to control $F_0$. Assuming the index of refraction of air is $1$, we set $F_0 = \frac{\eta - 1}{\eta + 1}$ for all RGB. A common choice of $\eta$ is $1.5$.
 
-Implement this Fresnel-based blending in the \lstinline{plastic} material (the information is stored in \lstinline{ParsedPlastic} in the scene).
+Implement this Fresnel-based blending in the \lstinline{plastic} material (the information is stored in \lstinline{ParsedPlastic} in the scene). Use the following scenes to test your method:
+\begin{lstlisting}[language=bash]
+./torrey -hw 3_3 ../scenes/bunny/bunny_plastic_floor_view_low.xml
+./torrey -hw 3_3 ../scenes/bunny/bunny_plastic_floor_view_mid.xml
+./torrey -hw 3_3 ../scenes/bunny/bunny_plastic_floor_view_high.xml
+\end{lstlisting}
+You should see images like the ones in Figure~\ref{fig:bunny_fresnel}.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.3\linewidth]{imgs/hw_3_3b.png}
+    \includegraphics[width=0.3\linewidth]{imgs/hw_3_3c.png}
+    \includegraphics[width=0.3\linewidth]{imgs/hw_3_3d.png}
+    \caption{Our simulation of Figure~\ref{fig:real_world_fresnel}.}
+    \label{fig:bunny_fresnel}
+\end{figure}
 
 \section{Area lights}
+This part is a bit more mathematically involved (the concept is very simple, but I am trying to prepare you for the more involved concepts in the later homework and in the future), but the implementation should be relatively easy.
+
 So far all our scenes are rendered with point lights. Point lights are nice for situations where you want your shadow to have hard boundaries, but sometimes we want softer lighting. We achieve this by turning our geometric objects themselves into lights. You can think of them as an infinite collection of small point lights (but each of them only emit light towards the direction the surface is facing, instead of emitting light to all directions).
 
+Evaluating area lights is then easy: \textbf{we randomly choose a point on the area light, and average over their contributions}! But you will see that working out what exactly do we mean by \emph{randomly choosing a point} and what exactly do we mean by \emph{contributions} can be a bit subtle. You can try to tweak the numbers until it looks right, but whatever you come up with may not work in a different scene. To make everything physically correct and consistent, we need to borrow the power of calculus -- the mathematics about infinitesimal points.
 
+The contribution of an area light is defined by an integral over all points $x$ on the surface $S$ of a light source:
+\begin{equation}
+	\int_{x \in S} f(x) \mathrm{d}A(x)
+	\label{eq:area_light_integral}
+\end{equation}
+where $\mathrm{d}A(x)$ means \emph{an infinitesimal area around x on the surface}\footnote{This notation is a bit different from the usual \emph{Riemannian integral} people learn in calculus 101. If you love math, check out \href{https://www.youtube.com/watch?v=LDNDTOVnKJk}{this video} for a cool introduction to Lesbeque integration and measure theory. You don't need to understand any of these to understand this class though.}, and $f(x)$ is similar to the contribution of a single point light located at $x$:
+\begin{equation}
+    f(x) = \frac{\max\left(n_s \cdot l, 0\right)}{\pi} \cdot \frac{I \max\left(-n_x \cdot l, 0\right)}{d^2} \cdot K_d \cdot \text{visibility},
+    \label{eq:area_light_integrand}
+\end{equation}
+where $n_s$ is the normal at the shading point, $l$ is the unit vector pointing from the shading point towards $x$, $n_x$ is the normal at point $x$ on the light source, $d$ is the distance between the shading point and $x$, and $K_d$ is the diffuse reflectance.
+
+\paragraph{Quiz:} Compare Equation~\eqref{eq:area_light_integrand} to the point light contribution we introduced in Homework 1: why do we need an extra cosine term?
+
+How do we evaluate the integral (Equation~\eqref{eq:area_light_integral})? In colleage calculus, we often attempt to derive a closed-form solution for the integral, but that is usually hard because of the visibility term and the arbitrary shape the area light can take. Thus, we approximate the integral using a discrete sum, and such approach is called Monte Carlo integration. Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#asimplemontecarloprogram}{Chapter 2-4} of RTRYL to understand the basics of Monte Carlo integration. It is also useful to read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#samplinglightsdirectly}{Chapter 9}.
+
+Let's be a bit more concrete. We want to sample points on the surface to do Monte Carlo integration.
+We also have the ability to generate uniformly distributed random numbers between $[0, 1]$. Our goal is to connect between the uniform random numbers and the random points on the surface.
+Our surface $S$ can either be a triangle or a sphere. Let's start with a sphere. In this case, given a sphere centered at $c$ with radius $r$, we can rewrite Equation~\eqref{eq:area_light_integral} in to a \href{https://en.wikipedia.org/wiki/Spherical_coordinate_system}{spherical coordinate system}:
+\begin{equation}
+	\int_{x \in S} f(x) \mathrm{d}A(x) = \int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi,
+	\label{eq:area_light_spherical}
+\end{equation}
+where
+\begin{equation}
+	x(\theta, \phi) = c + r \left(\sin\theta \cos\phi, \sin\theta \sin\phi, \cos\theta \right).
+\end{equation}
+Here, we take the convention that $\theta$ is the elevation angle, and $\phi$ is the azimuthal angle. We need to multiply by $r^2 \sin\theta$ since it is the Jacobian determinant between the two set of integration variables.\footnote{You see, the definition of an integral is \emph{not} unique upon its integrand, it also depends on which variables you are integrating. The Jacobian captures the ratio between the infinitesimal volumes of these variables. If you love math, a more general concept is called ``Radon-Nikodym derivative''.} See the \href{https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates}{Wikipedia page} or \href{http://6degreesoffreedom.co/circle-random-sampling/}{this blog post} to see how this is derived.
+
+Notice that now that we can generate uniform random numbers for $\theta$ and $\phi$ by generating two numbers between $[0, 1]$ and scale them to be between $[0, \pi]$ and $[0, 2\pi]$ respectively. This allows us to apply Monte Carlo integration:
+\begin{equation}
+	\int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi
+	\approx \frac{2\pi^2 r^2}{N} \sum_i^N f(x(\theta_i, \phi_i))\sin\theta_i.
+	\label{eq:naive_monte_carlo_sphere}
+\end{equation}
+Note that the factor $2\pi^2 r^2 \sin\theta_i$ we multiply to $f(x)$ is exactly the reciprocal of the \emph{probability density function} (PDF) of our sample $x$ (recall \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#onedimensionalmcintegration/importancesampling}{Chapter 3.4} of RTRYL). 
+
+We can do slightly better though. Notice the extra $\sin\theta$ factor in our Jacobian/PDF. This indicates that our samples do not uniformly distribute on the sphere: they have higher density when $\theta$ is close to the two polars of the sphere.
+
+To do one step better, we can apply a \emph{change of variable} to rewrite the integral again, such that the Jacobian of the change of variable is $\frac{1}{\sin\theta_i}$. This change of variable will allow us to uniformly generate a set of points on the sphere. To achieve this, we need to apply \emph{inverse transform sampling}. 
+
+We want to find two variables $u_1, u_2$ such that a mapping $\theta, \phi = M(u_1, u_2)$ has the Jacobian that is proportional to $\frac{1}{\sin\theta}$. Since our Jacobian does not depend on $\phi$, we can simplify the problem to finding a variable $u_1$ such that $\theta = M(u_1)$ and $M'(u_1) \propto \frac{1}{\sin\theta}$. Notice how this has become an \emph{antiderivative} problem: we want to find a function $M$ whose derivative is something specific. There is one awkward thing though: $M'(u_1)$ takes $u_1$ as input, but the derivative is specified in the output space $\theta$. The way we resolve this is to first find the inverse $M^{-1}(\theta)$. The derivative specification becomes ${M^{-1}}'(\theta) \propto \sin\theta$ (this comes from the \href{https://en.wikipedia.org/wiki/Inverse_function_theorem}{inverse function theorem}). 
+
+Since we know that ${M^{-1}}'(\theta)$ is exactly the PDF of our sampling process, we know that it has to integrate to one:
+\begin{equation}
+\int_{0}^{\pi} {M^{-1}}'(\theta) \mathrm{d}\theta = C\int_{0}^{\pi} \sin\theta \mathrm{d}\theta = 1.
+\end{equation}
+Since $\int_{0}^{\pi} \sin\theta \mathrm{d}\theta = 2$, we have $C = \frac{1}{2}$ and ${M^{-1}}'(\theta) = \frac{\sin\theta}{2}$. To get $M^{-1}$ from its derivative, we simply integrate it:
+\begin{equation}
+M^{-1}(\theta) = \int_{0}^{\theta} \frac{\sin\hat{\theta}}{2} \mathrm{d}\hat{\theta} = \frac{1}{2}\left(1 - \cos\theta\right).
+\end{equation}
+To get $M(u_1)$ we can just invert $M^{-1}(\theta)$:
+\begin{equation}
+\theta = M(u_1) = \cos^{-1}\left(1 - 2u_1\right).
+\end{equation}
+Just to make things more unify, we can also generate $\phi$ from $u_2$:
+\begin{equation}
+\phi = 2\pi u_2.
+\end{equation}
+Thus, we have found a change of variable to rewrite Equation~\eqref{eq:naive_monte_carlo_sphere} to remove the $\sin\theta$ term:
+\begin{equation}
+	\int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi =
+	\int_{0}^{1}\int_{0}^{1} f(x(M(u_1, u_2))) r^2 (2 \cdot 2\pi) \mathrm{d}u_1 \mathrm{d}u_2.
+	\label{eq:uniform_monte_carlo_sphere}
+\end{equation}
+The extra $2 \cdot 2\pi$ factor comes from two sources: the $2$ comes from the constant $C$, and the $2\pi$ comes from the mapping between $u_2$ and $\phi$. Notice how the extra factors simplifies to $4\pi r^2$ -- the surface area of a sphere, which is the reciprocal of the PDF of a uniform distribution on it!
+
+If my explanation does not quite work for you, \href{http://6degreesoffreedom.co/circle-random-sampling/}{this blog post} explains the same thing. Make sure you are comfortable with this -- we will ask you to do it next time!
+
+We can perform the similar process for triangles. We will omit the derivation (see \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations#SamplingaTriangle}{PBRT} if you are interested, we also talk about it in the lectures). To uniformly sample a point on a triangle, use the following mapping:
+\begin{equation}
+\begin{aligned}
+b_1 &= 1 - \sqrt{u_1} \\
+b_2 &= u_2 \sqrt{u_1} \\
+x &= (1 - b_1 - b_2) p_0 + b_1 p_1 + b_2 p_2.
+\end{aligned}
+\end{equation}
+and the Jacobian factor is the area of the triangle.
+
+Now, give these, implement area lights in your renderer. Area lights are represented in the \lstinline{ParsedScene} data structures in the following way: for each \lstinline{ParsedSphere} and \lstinline{ParsedTriangleMesh}, if it is an area light, then \lstinline{ParsedSphere::area_light_id} and \lstinline{ParsedTriangleMesh::area_light_id} would be a number that is larger than or equal to zero. If it is not, the ID is set to \lstinline{-1}. The area lights are also in the list of lights. They have the type \lstinline{ParsedDiffuseAreaLight} and the structure contains the ID to the shape and the color $I$ of the light.
+
+You will need to handle two cases: 1) When a ray hits a diffuse surface, you should loop over the lights as usual, sample a point on each light, and evaluate the contribution. 2) When a ray hits an area light, you should return the color of the light directly.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

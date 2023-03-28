@@ -26,7 +26,19 @@ Image3 hw_3_2(const std::vector<std::string> &params) {
 }
 
 Image3 hw_3_3(const std::vector<std::string> &params) {
-    // Homework 3.3: BRDFs
+    // Homework 3.3: Fresnel
+    if (params.size() < 1) {
+        return Image3(0, 0);
+    }
+
+    ParsedScene scene = parse_scene(params[0]);
+    UNUSED(scene);
+
+    return Image3(0, 0);
+}
+
+Image3 hw_3_4(const std::vector<std::string> &params) {
+    // Homework 3.4: area lights
     if (params.size() < 1) {
         return Image3(0, 0);
     }
