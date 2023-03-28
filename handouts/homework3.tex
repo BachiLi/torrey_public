@@ -283,6 +283,9 @@ Watch \href{https://www.youtube.com/watch?v=kEcDbl7eS0w}{Natty Hoffman's present
 \section{Bonus: Stratification (20 pts)}
 Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#asimplemontecarloprogram/stratifiedsamples(jittering)}{Chapter 2.3} of RTRYL and implement stratified samples for your area light sampling.
 
+\section{Bonus: sample one light at a time (20 pts)}
+Our sampling strategy currently samples one point for each light. This can be inconvienent when there is a huge amount of lights. An alternative strategy is to sample one light at a time. So you will pick a light first, then pick a point on the light. To pick a light, we want to sample based on its intensity and its surface area. You may want to read \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/Sampling_Random_Variables#x1-Example:Piecewise-Constant1DFunctions}{PBRT} for how to sample a discrete distribution. Implement this strategy and compare to your original method.
+
 \section{Bonus: More efficient spherical light sampling (20 pts)}
 Our sampling for spherical lights is not very efficient: it randomly chooses a point on a sphere, so that is 50\% of chance it will be blocked. Read \href{https://www.pbr-book.org/3ed-2018/Light_Transport_I_Surface_Reflection/Sampling_Light_Sources#x2-SamplingSpheres}{PBRT} and implement its cone sampling strategy.
 
