@@ -5,9 +5,20 @@
 
 \header{3}{Textures, shading normals, Fresnel, and area lights}
 
-In the previous homework, we mostly focused on increasing the \emph{geometric complexity} of our renderer and scenes. In this homework, we're going to implement a bunch of small features for our renderer to increase the \emph{material} and \emph{lighting complexity} of our scenes. We will use both the \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)} book and the last book of the RTOW series \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html}{Ray Tracing - The Rest of Your Life (RTRYL)} for this homework.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.2\linewidth]{imgs/hw_3_1d.png}
+    \includegraphics[width=0.2\linewidth]{imgs/hw_3_2a.png}
+    \includegraphics[width=0.2\linewidth]{imgs/hw_3_3c.png}
+    \includegraphics[width=0.15\linewidth]{imgs/hw_3_4a.png}
+    \includegraphics[width=0.2\linewidth]{imgs/hw_3_4b.png}
+    \caption{Images we will render in this homework.}
+    \label{fig:teaser}
+\end{figure}
 
-\section{Textures}
+In the previous homework, we mostly focused on increasing the \emph{geometric complexity} of our renderer and scenes. In this homework, we're going to implement a bunch of small features for our renderer to increase the \emph{material} and \emph{lighting complexity} of our scenes (Figure~\ref{fig:teaser}). We will use both the \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)} book and the last book of the RTOW series \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html}{Ray Tracing - The Rest of Your Life (RTRYL)} for this homework.
+
+\section{Textures (25 pts)}
 So far, we assume constant color per object. This is kind of boring and real world objects are {\color{red}c}{\color{orange}o}{\color{green}l}{\color{blue}o}{\color{cyan}r}f{\color{magenta}u}{\color{violet}l}. The way computer graphics deal with colors on objects is through \href{https://en.wikipedia.org/wiki/Texture_mapping}{textures} (invented by Edwin Catmull in the 70s!): basically we wrap an image around a surface and define color on that image. There are two common ways to specify a texture: you can specify it \emph{procedurally} through a program, or you can use a raster image to represent the texture. We will implement the raster image texture, and the procedural texture will be bonus.
 
 Go read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#solidtextures}{Chapter 4} and \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#imagetexturemapping}{Chapter 6} of RTNW.
@@ -69,7 +80,7 @@ We provide the references in Figure~\ref{fig:hw_3_1}.
     \label{fig:hw_3_1}
 \end{figure}
 
-\section{Shading normals}
+\section{Shading normals (25 pts)}
 You have probably noticed that some of the 3D models we rendered look ``polygonal'', while we ideally want them to be smooth. One way to improve this is to increase the polygon count, but this approach seems expensive. \href{https://en.wikipedia.org/wiki/Phong_shading}{Phong} has come up with a genius way to make polygonal surfaces look smooth. The idea is to define a \emph{shading normal} per triangle vertex, and interpolate the normal within the triangle to have smooth normals. We will implement shading normals in this part.
 
 Our \lstinline{ParsedTriangleMesh} can come with a field \lstinline{normals} which is its shading normals defined per-vertex (if \lstinline{ParsedTriangleMesh::normals.size() == 0}, then the mesh does not have shading normals). Once you hit a triangle, if it has a shading normal, interpolate the normals using the barycentric coordinates (just like how you interpolate the UV coordinates, but remember to \lstinline{normalize} after interpolation). Then, during shading, replace the normal you used with the interpolated shading normal.
@@ -91,7 +102,7 @@ You should render images like the ones in Figure~\ref{fig:hw_3_2}.
 
 \paragraph{Quiz:} Why is the shadow boundary for the teapot still looks jaggy? Propose a way to fix it. (Hint: you may want to read Hanika's article on \href{https://jo.dreggn.org/home/2021_terminator.pdf}{Hacking the shadow terminator}.)
 
-\section{Fresnel reflection}
+\section{Fresnel reflection (25 pts)}
 Real world metals and mirrors do not reflect light equally at all angles. A prominent effect is predicted by French physicst \href{https://en.wikipedia.org/wiki/Augustin-Jean_Fresnel}{Fresnel} using the wave theory of light. For example, metals become more white when you look at it from a \emph{grazing angle}. Many materials also get more mirror-like when we look at them from grazing angles.
 
 In graphics, we use an approximation proposed by \href{https://en.wikipedia.org/wiki/Schlick%27s_approximation}{Christophe Schlick}:
@@ -132,7 +143,7 @@ where the specular term already includes the Fresnel equation. Figure~\ref{fig:r
     \caption{Real world pictures showing the effect of Fresnel reflection on coated materials (look at the table).}
     \label{fig:real_world_fresnel}
 \end{figure}
-Since in this situation, the specular layer is usually dieletric, and these dielectric materials are usually monochromatic (i.e., the index of refraction is the same for all visible wavelength), we will use a single index of refraction parameter to control $F_0$. Assuming the index of refraction of air is $1$, we set $F_0 = \frac{\eta - 1}{\eta + 1}$ for all RGB. A common choice of $\eta$ is $1.5$.
+Since in this situation, the specular layer is usually dieletric, and these dielectric materials are usually monochromatic (i.e., the index of refraction is the same for all visible wavelength), we will use a single index of refraction parameter to control $F_0$. Assuming the index of refraction of air is $1$, we set $F_0 = \left(\frac{\eta - 1}{\eta + 1}\right)^2$ for all RGB. A common choice of $\eta$ is $1.5$.
 
 Implement this Fresnel-based blending in the \lstinline{plastic} material (the information is stored in \lstinline{ParsedPlastic} in the scene). Use the following scenes to test your method:
 \begin{lstlisting}[language=bash]
@@ -150,7 +161,7 @@ You should see images like the ones in Figure~\ref{fig:bunny_fresnel}.
     \label{fig:bunny_fresnel}
 \end{figure}
 
-\section{Area lights}
+\section{Area lights (25 pts)}
 This part is a bit more mathematically involved (the concept is very simple, but I am trying to prepare you for the more involved concepts in the later homework and in the future), but the implementation should be relatively easy.
 
 So far all our scenes are rendered with point lights. Point lights are nice for situations where you want your shadow to have hard boundaries, but sometimes we want softer lighting. We achieve this by turning our geometric objects themselves into lights. You can think of them as an infinite collection of small point lights (but each of them only emit light towards the direction the surface is facing, instead of emitting light to all directions).
@@ -167,7 +178,7 @@ where $\mathrm{d}A(x)$ means \emph{an infinitesimal area around x on the surface
     f(x) = \frac{\max\left(n_s \cdot l, 0\right)}{\pi} \cdot \frac{I \max\left(-n_x \cdot l, 0\right)}{d^2} \cdot K_d \cdot \text{visibility},
     \label{eq:area_light_integrand}
 \end{equation}
-where $n_s$ is the normal at the shading point, $l$ is the unit vector pointing from the shading point towards $x$, $n_x$ is the normal at point $x$ on the light source, $d$ is the distance between the shading point and $x$, and $K_d$ is the diffuse reflectance.
+where $n_s$ is the normal at the shading point, $l$ is the unit vector pointing from the shading point towards $x$, $n_x$ is the normal at point $x$ on the light source (we will use the geometric normal instead of shading normals), $d$ is the distance between the shading point and $x$, and $K_d$ is the diffuse reflectance.
 
 \paragraph{Quiz:} Compare Equation~\eqref{eq:area_light_integrand} to the point light contribution we introduced in Homework 1: why do we need an extra cosine term?
 
@@ -239,6 +250,42 @@ and the Jacobian factor is the area of the triangle.
 Now, give these, implement area lights in your renderer. Area lights are represented in the \lstinline{ParsedScene} data structures in the following way: for each \lstinline{ParsedSphere} and \lstinline{ParsedTriangleMesh}, if it is an area light, then \lstinline{ParsedSphere::area_light_id} and \lstinline{ParsedTriangleMesh::area_light_id} would be a number that is larger than or equal to zero. If it is not, the ID is set to \lstinline{-1}. The area lights are also in the list of lights. They have the type \lstinline{ParsedDiffuseAreaLight} and the structure contains the ID to the shape and the color $I$ of the light.
 
 You will need to handle two cases: 1) When a ray hits a diffuse surface, you should loop over the lights as usual, sample a point on each light, and evaluate the contribution. 2) When a ray hits an area light, you should return the color of the light directly.
+
+Finally, for triangle lights, we do not let it emit light in the backfacing direction. We will use the shading normals to decide which direction is the front facing direction. When sampling a point on the surface, you would usually want to get its normal as well (for evaluating $n_x \cdot l$ in Equation~\eqref{eq:area_light_integrand}). Return the geometric normal for $n_x$, but flip it if it is facing a different direction than the shading normal.
+
+To test your rendering, use the following commands:
+\begin{lstlisting}[language=bash]
+./torrey -hw 3_4 ../scenes/cbox/cbox_area_light_spheres.xml
+./torrey -hw 3_4 ../scenes/head/head_spherical_light.xml
+\end{lstlisting}
+
+They should render into images like the ones in Figure~\ref{fig:hw_3_4}. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.4\linewidth]{imgs/hw_3_4a.png}
+    \includegraphics[width=0.4\linewidth]{imgs/hw_3_4b.png}
+    \caption{Reference images for Homework 3.4.}
+    \label{fig:hw_3_4}
+\end{figure}
+
+\section{Bonus: Perlin noise (20 pts)}
+Read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#perlinnoise}{Chapter 5} of RTNW book and implement a procedural Perlin noise.
+
+\section{Bonus: Volumes (20 pts)}
+Read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#volumes}{Chapter 9} of RTNW book and implement homogeneous volumes.
+
+\section{Bonus: Schlick Fresnel vs actual Fresnel (20 pts)}
+Watch \href{https://www.youtube.com/watch?v=kEcDbl7eS0w}{Natty Hoffman's presentation} on Fresnel equation and write a summary of what his points are. Write about whether you agree with him or not too.
+
+\section{Bonus: Stratification (20 pts)}
+Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#asimplemontecarloprogram/stratifiedsamples(jittering)}{Chapter 2.3} of RTRYL and implement stratified samples for your area light sampling.
+
+\section{Bonus: More efficient spherical light sampling (20 pts)}
+Our sampling for spherical lights is not very efficient: it randomly chooses a point on a sphere, so that is 50\% of chance it will be blocked. Read \href{https://www.pbr-book.org/3ed-2018/Light_Transport_I_Surface_Reflection/Sampling_Light_Sources#x2-SamplingSpheres}{PBRT} and implement its cone sampling strategy.
+
+\section{Bonus: More efficient triangle light sampling (20 pts)}
+Read James Arvo's \href{https://dl.acm.org/doi/pdf/10.1145/218380.218500}{spherical triangle sampling paper} and implement it.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
