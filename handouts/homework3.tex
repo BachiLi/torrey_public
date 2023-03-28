@@ -100,7 +100,7 @@ You should render images like the ones in Figure~\ref{fig:hw_3_2}.
     \label{fig:hw_3_2}
 \end{figure}
 
-\paragraph{Quiz:} Why is the shadow boundary for the teapot still looks jaggy? Propose a way to fix it. (Hint: you may want to read Hanika's article on \href{https://jo.dreggn.org/home/2021_terminator.pdf}{Hacking the shadow terminator}.)
+\paragraph{Quiz (5 pts):} Why is the shadow boundary for the teapot still looks jaggy? Propose a way to fix it. (Hint: you may want to read Hanika's article on \href{https://jo.dreggn.org/home/2021_terminator.pdf}{Hacking the shadow terminator}.)
 
 \section{Fresnel reflection (25 pts)}
 Real world metals and mirrors do not reflect light equally at all angles. A prominent effect is predicted by French physicst \href{https://en.wikipedia.org/wiki/Augustin-Jean_Fresnel}{Fresnel} using the wave theory of light. For example, metals become more white when you look at it from a \emph{grazing angle}. Many materials also get more mirror-like when we look at them from grazing angles.
@@ -128,7 +128,7 @@ You should see something like Figure~\ref{fig:hw_3_3_fresnel}.
     \label{fig:hw_3_3_fresnel}
 \end{figure}
 
-\paragraph{Quiz:} Change the direction $l$ to point towards the incoming ray direction in your code -- does it make a difference? Why?
+\paragraph{Quiz (5 pts):} Change the direction $l$ to point towards the incoming ray direction in your code -- does it make a difference? Why?
 
 Another good use of Fresnel equation is to blend between diffuse and specular materials. The physics work like this: many materials have multiple \emph{layers}. Many materials can be modeled using two layers: a dieletric \emph{coating} on top of a diffuse layer. For example, plastic, woods, and car paint usually are like this: they have an overall diffusive appearance, but also have the shiny smooth coating on top of the surface. When a light hits the dielectric layer, $F$ amount of light will reflect, and $1 - F$ amount of light will \emph{refract} into the diffuse layer. Thus we can often blend diffuse and specular layers using the Fresnel equation:
 \begin{equation}
@@ -180,7 +180,7 @@ where $\mathrm{d}A(x)$ means \emph{an infinitesimal area around x on the surface
 \end{equation}
 where $n_s$ is the normal at the shading point, $l$ is the unit vector pointing from the shading point towards $x$, $n_x$ is the normal at point $x$ on the light source (we will use the geometric normal instead of shading normals), $d$ is the distance between the shading point and $x$, and $K_d$ is the diffuse reflectance.
 
-\paragraph{Quiz:} Compare Equation~\eqref{eq:area_light_integrand} to the point light contribution we introduced in Homework 1: why do we need an extra cosine term?
+\paragraph{Quiz (5 pts):} Compare Equation~\eqref{eq:area_light_integrand} to the point light contribution we introduced in Homework 1: why do we need an extra cosine term?
 
 How do we evaluate the integral (Equation~\eqref{eq:area_light_integral})? In colleage calculus, we often attempt to derive a closed-form solution for the integral, but that is usually hard because of the visibility term and the arbitrary shape the area light can take. Thus, we approximate the integral using a discrete sum, and such approach is called Monte Carlo integration. Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#asimplemontecarloprogram}{Chapter 2-4} of RTRYL to understand the basics of Monte Carlo integration. It is also useful to read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#samplinglightsdirectly}{Chapter 9}.
 
@@ -233,7 +233,7 @@ Thus, we have found a change of variable to rewrite Equation~\eqref{eq:naive_mon
 	\int_{0}^{1}\int_{0}^{1} f(x(M(u_1, u_2))) r^2 (2 \cdot 2\pi) \mathrm{d}u_1 \mathrm{d}u_2.
 	\label{eq:uniform_monte_carlo_sphere}
 \end{equation}
-The extra $2 \cdot 2\pi$ factor comes from two sources: the $2$ comes from the constant $C$, and the $2\pi$ comes from the mapping between $u_2$ and $\phi$. Notice how the extra factors simplifies to $4\pi r^2$ -- the surface area of a sphere, which is the reciprocal of the PDF of a uniform distribution on it!
+The extra $2 \cdot 2\pi$ factor comes from two sources: the $2$ comes from the constant $C$, and the $2\pi$ comes from the mapping between $u_2$ and $\phi$. Notice how the extra factors simplifies to $4\pi r^2$ -- the surface area of a sphere, which is the reciprocal of the PDF of a uniform distribution on it! We can then discretize the second integral in Equation~\eqref{eq:uniform_monte_carlo_sphere}.
 
 If my explanation does not quite work for you, \href{http://6degreesoffreedom.co/circle-random-sampling/}{this blog post} explains the same thing. Make sure you are comfortable with this -- we will ask you to do it next time!
 
@@ -258,6 +258,8 @@ To test your rendering, use the following commands:
 ./torrey -hw 3_4 ../scenes/cbox/cbox_area_light_spheres.xml
 ./torrey -hw 3_4 ../scenes/head/head_spherical_light.xml
 \end{lstlisting}
+
+\paragraph{Quiz (0 pts, we won't grade it):} Compare the sampling efficiency of an implementation Equation~\eqref{eq:naive_monte_carlo_sphere} and the uniform sphere sampling.
 
 They should render into images like the ones in Figure~\ref{fig:hw_3_4}. 
 
