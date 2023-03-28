@@ -214,10 +214,10 @@ Rendering with constant color is a bit boring. Let's add some variation to the c
 
 Here is where we slightly deviate from RTOW (RTOW doesn't introduce the notion of lights until the end of the second book, which I find to be a bit late). Given a list of lights and a point hit by our camera ray (we usually call it the \emph{shading point}), we will compute the following response:
 \begin{equation}
-    \sum_{\text{light}} \frac{\max\left(n \cdot l, 0\right)}{\pi} \cdot \frac{I}{d^2} \cdot K_d \cdot \text{visibility},
+    \sum_{\text{light}} \frac{K_d \cdot \max\left(n \cdot l, 0\right)}{\pi} \cdot \frac{I}{d^2} \cdot \text{visibility},
     \label{eq:lighting}
 \end{equation}
-where $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the intensity of the light, $d$ is the distance between the shading point and the light, $K_d$ is the \lstinline{color} of the surface (it is also called \emph{albedo} or \emph{reflectance}), $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection functions to compute $\text{visibility}$. 
+where $K_d$ is the \lstinline{color} of the surface (it is also called \emph{albedo} or \emph{reflectance}), $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the color of the light, $d$ is the distance between the shading point and the light, $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection functions to compute $\text{visibility}$. 
 
 You may find the \lstinline{length, length_squared, distance, distance_squared} functions in \lstinline{vector.h} to be useful.
 

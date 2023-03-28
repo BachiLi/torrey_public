@@ -1,0 +1,61 @@
+\input{preamble}
+\usepackage{xcolor}
+
+\begin{document}
+
+\header{3}{Indirect lighting and BRDFs}
+In this homework, we will implement an actual \href{https://en.wikipedia.org/wiki/Path_tracing}{path tracing} algorithm. We are close to finishing the RTRYL book!
+
+\section{Diffuse interreflection}
+So far in our code, we seem to be treating the diffuse and specular surfaces separately: diffuse surfaces gather contributions from lights, and specular surfaces trace out rays that collect color from other surfaces (and \lstinline{plastic} is a mixture of them). In real world, diffuse surfaces also collect colors from other surfaces. We will implement this in this part.
+
+In the previous homeworks, we do something like this:
+\begin{lstlisting}[language=python]
+\begin{lstlisting}[language=python]
+def radiance(scene, ray, rng):
+  if (ray intersect scene):
+    # [emission] add emission of the intersected shape
+    # ...
+    # [direct_lighting] loop over lights, sample them, and sum over their contributions
+    # ...
+    # [scattering] recursively tracing the ray by calling radiance
+    if (hit a metal or plastic):
+      # recursively trace a ray towards the mirror reflection direction
+      # ...
+  else:
+    return (0.5, 0.5, 0.5)
+\end{lstlisting}
+
+In this homework, we will temporarily suspend the direct lighting code -- we will add it back later in the next homework.
+
+We will extend the scattering code to handle diffuse materials in this homework. As with the case of area light, conceptually this is simple: instead of always tracing rays towards the mirror reflection direction, we randomly sample rays at different directions and accumulate contributions (\href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#diffusematerials}{Chapter 8} of RTOW describes one approach to do this). But what distribution should we use, and how do we weigh different directions? That's where we need to do the math.
+
+Remember the area light integral, where we integrate over all points on a light source $S$:
+\begin{equation}
+\int_{x \in S} f(x) \mathrm{d}A(x) = \int_{x \in S} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot \frac{I \max\left(-n_x \cdot l, 0\right)}{d^2} \cdot \text{visibility} \cdot \mathrm{d}A(x),
+\label{eq:area_light}
+\end{equation}
+where $K_d$ is the diffuse reflectance, $n_s$ is the normal at the shading point, $l$ is the unit vector pointing from the shading point towards $x$, $n_x$ is the geometric normal at point $x$ on the light source, and $d$ is the distance between the shading point and $x$.
+
+We will derive the equations of diffuse interreflection from Equation~\eqref{eq:area_light}. Let's play with an idea: what if everything is light source? We will figure out how to assign the intensity $I$ later. Apart from the intensity, all we need to change is the integration domain: instead of integrating a particular light source $S$, we integrate over all surfaces $\mathcal{M}$. Next, since we are tracing rays, we want to deal with directions, instead of points on surfaces. We achieve this using a \emph{change of variable} (again!) -- instead of integrating over position $x$, we integrate over direction $\omega$:
+\begin{equation}
+\int_{x \in \mathcal{M}} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot \frac{L \max\left(-n_x \cdot l, 0\right)}{d^2} \cdot \text{visibility} \cdot \mathrm{d}A(x) = 
+\int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+\label{eq:area_light_solid_angle}
+\end{equation}
+Firstly, we have replaced $S$ with $\mathcal{M}$ and $I$ with $L$ to emphasize that things are different now.
+Here, the measure $\mathrm{d}\omega$ is often called the \href{https://en.wikipedia.org/wiki/Solid_angle}{solid angle} -- it represents an infinitesimal area of a point on a unit sphere. You will notice that the equation gets a lot simpler after we switch to the solid angle measure. This is because the Jacobian of the change of variable is exactly the reciprocal of $\frac{\max\left(-n_x \cdot l, 0\right)}{d^2} \cdot \text{visibility}$ (see \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#samplinglightsdirectly/gettingthepdfofalight}{Chapter 9.1} of RTRYL for an explanation). Intuitively, the Jacobian captures the ratio of area on the surface $\mathcal{M}$ and its projcted area on a unit sphere (if it is not blocked).
+
+We still need to decide what is the color $I$. Remember in the mirror case, we recursively trace rays to determine the color. We can do the same thing for diffuse surfaces too!
+\begin{equation}
+L = \int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+\end{equation}
+This is however vacuous, because there is no \emph{base case} for this recursion. We will instead add the emission whenever we hit a light source:
+\begin{equation}
+L = L_e + \int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+\end{equation}
+
+%\bibliographystyle{plain}
+%\bibliography{refs}
+
+\end{document}

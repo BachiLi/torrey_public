@@ -175,10 +175,10 @@ The contribution of an area light is defined by an integral over all points $x$ 
 \end{equation}
 where $\mathrm{d}A(x)$ means \emph{an infinitesimal area around x on the surface}\footnote{This notation is a bit different from the usual \emph{Riemannian integral} people learn in calculus 101. If you love math, check out \href{https://www.youtube.com/watch?v=LDNDTOVnKJk}{this video} for a cool introduction to Lesbeque integration and measure theory. You don't need to understand any of these to understand this class though.}, and $f(x)$ is similar to the contribution of a single point light located at $x$:
 \begin{equation}
-    f(x) = \frac{\max\left(n_s \cdot l, 0\right)}{\pi} \cdot \frac{I \max\left(-n_x \cdot l, 0\right)}{d^2} \cdot K_d \cdot \text{visibility},
+    f(x) = \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot \frac{I \max\left(-n_x \cdot l, 0\right)}{d^2} \cdot \text{visibility},
     \label{eq:area_light_integrand}
 \end{equation}
-where $n_s$ is the normal at the shading point, $l$ is the unit vector pointing from the shading point towards $x$, $n_x$ is the normal at point $x$ on the light source (we will use the geometric normal instead of shading normals), $d$ is the distance between the shading point and $x$, and $K_d$ is the diffuse reflectance.
+where $K_d$ is the diffuse reflectance, $n_s$ is the normal at the shading point, $l$ is the unit vector pointing from the shading point towards $x$, $n_x$ is the normal at point $x$ on the light source (we will use the geometric normal instead of shading normals -- we will explain why in Homework 4), and $d$ is the distance between the shading point and $x$.
 
 \paragraph{Quiz (5 pts):} Compare Equation~\eqref{eq:area_light_integrand} to the point light contribution we introduced in Homework 1: why do we need an extra cosine term?
 
@@ -253,6 +253,20 @@ You will need to handle two cases: 1) When a ray hits a diffuse surface, you sho
 
 Finally, for triangle lights, we do not let it emit light in the backfacing direction. We will use the shading normals to decide which direction is the front facing direction. When sampling a point on the surface, you would usually want to get its normal as well (for evaluating $n_x \cdot l$ in Equation~\eqref{eq:area_light_integrand}). Return the geometric normal for $n_x$, but flip it if it is facing a different direction than the shading normal.
 
+\paragraph{Code structure.} I find the following (pseudo)code structure for computing the color given a ray to be cleaner. You don't have to do exactly the same as me.
+\begin{lstlisting}[language=python]
+def radiance(scene, ray, rng):
+  if (ray intersect scene):
+    # [emission] add emission of the intersected shape
+    # ...
+    # [direct_lighting] loop over lights, sample them, and sum over their contributions
+    # ...
+    # [scattering] recursively tracing the ray by calling radiance
+    # ...
+  else:
+    return (0.5, 0.5, 0.5)
+\end{lstlisting}
+
 To test your rendering, use the following commands:
 \begin{lstlisting}[language=bash]
 ./torrey -hw 3_4 ../scenes/cbox/cbox_area_light_spheres.xml
@@ -287,7 +301,7 @@ Watch \href{https://www.youtube.com/watch?v=kEcDbl7eS0w}{Natty Hoffman's present
 Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#asimplemontecarloprogram/stratifiedsamples(jittering)}{Chapter 2.3} of RTRYL and implement stratified samples for your area light sampling.
 
 \section{Bonus: sample one light at a time (15 pts)}
-Our sampling strategy currently samples one point for each light. This can be inconvienent when there is a huge amount of lights. An alternative strategy is to sample one light at a time. So you will pick a light first, then pick a point on the light. To pick a light, we want to sample based on its intensity and its surface area. You may want to read \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/Sampling_Random_Variables#x1-Example:Piecewise-Constant1DFunctions}{PBRT} for how to sample a discrete distribution. Implement this strategy and compare to your original method.
+Our sampling strategy currently samples one point for each light. This can be inconvienent when there is a huge amount of lights. An alternative strategy is to sample one light at a time. So you will pick a light first, then pick a point on the light. To pick a light, we want to sample based on its brightness (you can use the average of its color) and its surface area. You may want to read \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/Sampling_Random_Variables#x1-Example:Piecewise-Constant1DFunctions}{PBRT} for how to sample a discrete distribution. Implement this strategy and compare to your original method.
 
 \section{Bonus: More efficient spherical light sampling (15 pts)}
 Our sampling for spherical lights is not very efficient: it randomly chooses a point on a sphere, so that is 50\% of chance it will be blocked. Read \href{https://www.pbr-book.org/3ed-2018/Light_Transport_I_Surface_Reflection/Sampling_Light_Sources#x2-SamplingSpheres}{PBRT} and implement its cone sampling strategy.
