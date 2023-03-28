@@ -39,24 +39,24 @@ As usual, go to the function \lstinline{hw_3_1} in \lstinline{hw3.cpp}. Extend y
 
 In the Mitsuba scenes, the texture can be specified in two ways: they can be declared outside of the \lstinline{bsdf} and referenced in the reflectance, or they can be specified inside the bsdf.
 \begin{lstlisting}[language=C++]
-	<texture type="bitmap" id="grid">
-		<string name="filename" value="grid.exr"/>
-		<float name="uscale" value="4"/>
-		<float name="vscale" value="4"/>
-		<float name="uoffset" value="0.2"/>
-		<float name="voffset" value="0.3"/>
-	</texture>
+    <texture type="bitmap" id="grid">
+        <string name="filename" value="grid.exr"/>
+        <float name="uscale" value="4"/>
+        <float name="vscale" value="4"/>
+        <float name="uoffset" value="0.2"/>
+        <float name="voffset" value="0.3"/>
+    </texture>
 
-	<bsdf type="diffuse" id="grid_material">
-		<ref name="reflectance" id="grid"/>
-	</bsdf>
+    <bsdf type="diffuse" id="grid_material">
+        <ref name="reflectance" id="grid"/>
+    </bsdf>
 
 
-	<bsdf type="diffuse" id="face">
-		<texture name="reflectance" type="bitmap">
-			<string name="filename" value="lambertian.jpg"/>
-		</texture>
-	</bsdf>
+    <bsdf type="diffuse" id="face">
+        <texture name="reflectance" type="bitmap">
+            <string name="filename" value="lambertian.jpg"/>
+        </texture>
+    </bsdf>
 \end{lstlisting}
 
 To see your results, type the following in the terminal (assuming you are in the \lstinline{torrey/build} directory):
@@ -170,8 +170,8 @@ Evaluating area lights is then easy: \textbf{we randomly choose a point on the a
 
 The contribution of an area light is defined by an integral over all points $x$ on the surface $S$ of a light source:
 \begin{equation}
-	\int_{x \in S} f(x) \mathrm{d}A(x)
-	\label{eq:area_light_integral}
+    \int_{x \in S} f(x) \mathrm{d}A(x)
+    \label{eq:area_light_integral}
 \end{equation}
 where $\mathrm{d}A(x)$ means \emph{an infinitesimal area around x on the surface}\footnote{This notation is a bit different from the usual \emph{Riemannian integral} people learn in calculus 101. If you love math, check out \href{https://www.youtube.com/watch?v=LDNDTOVnKJk}{this video} for a cool introduction to Lesbeque integration and measure theory. You don't need to understand any of these to understand this class though.}, and $f(x)$ is similar to the contribution of a single point light located at $x$:
 \begin{equation}
@@ -188,20 +188,20 @@ Let's be a bit more concrete. We want to sample points on the surface to do Mont
 We also have the ability to generate uniformly distributed random numbers between $[0, 1]$. Our goal is to connect between the uniform random numbers and the random points on the surface.
 Our surface $S$ can either be a triangle or a sphere. Let's start with a sphere. In this case, given a sphere centered at $c$ with radius $r$, we can rewrite Equation~\eqref{eq:area_light_integral} in to a \href{https://en.wikipedia.org/wiki/Spherical_coordinate_system}{spherical coordinate system}:
 \begin{equation}
-	\int_{x \in S} f(x) \mathrm{d}A(x) = \int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi,
-	\label{eq:area_light_spherical}
+    \int_{x \in S} f(x) \mathrm{d}A(x) = \int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi,
+    \label{eq:area_light_spherical}
 \end{equation}
 where
 \begin{equation}
-	x(\theta, \phi) = c + r \left(\sin\theta \cos\phi, \sin\theta \sin\phi, \cos\theta \right).
+    x(\theta, \phi) = c + r \left(\sin\theta \cos\phi, \sin\theta \sin\phi, \cos\theta \right).
 \end{equation}
 Here, we take the convention that $\theta$ is the elevation angle, and $\phi$ is the azimuthal angle. We need to multiply by $r^2 \sin\theta$ since it is the Jacobian determinant between the two set of integration variables.\footnote{You see, the definition of an integral is \emph{not} unique upon its integrand, it also depends on which variables you are integrating. The Jacobian captures the ratio between the infinitesimal volumes of these variables. If you love math, a more general concept is called ``Radon-Nikodym derivative''.} See the \href{https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates}{Wikipedia page} or \href{http://6degreesoffreedom.co/circle-random-sampling/}{this blog post} to see how this is derived.
 
 Notice that now that we can generate uniform random numbers for $\theta$ and $\phi$ by generating two numbers between $[0, 1]$ and scale them to be between $[0, \pi]$ and $[0, 2\pi]$ respectively. This allows us to apply Monte Carlo integration:
 \begin{equation}
-	\int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi
-	\approx \frac{2\pi^2 r^2}{N} \sum_i^N f(x(\theta_i, \phi_i))\sin\theta_i.
-	\label{eq:naive_monte_carlo_sphere}
+    \int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi
+    \approx \frac{2\pi^2 r^2}{N} \sum_i^N f(x(\theta_i, \phi_i))\sin\theta_i.
+    \label{eq:naive_monte_carlo_sphere}
 \end{equation}
 Note that the factor $2\pi^2 r^2 \sin\theta_i$ we multiply to $f(x)$ is exactly the reciprocal of the \emph{probability density function} (PDF) of our sample $x$ (recall \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#onedimensionalmcintegration/importancesampling}{Chapter 3.4} of RTRYL). 
 
@@ -229,9 +229,9 @@ Just to make things more unify, we can also generate $\phi$ from $u_2$:
 \end{equation}
 Thus, we have found a change of variable to rewrite Equation~\eqref{eq:naive_monte_carlo_sphere} to remove the $\sin\theta$ term:
 \begin{equation}
-	\int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi =
-	\int_{0}^{1}\int_{0}^{1} f(x(M(u_1, u_2))) r^2 (2 \cdot 2\pi) \mathrm{d}u_1 \mathrm{d}u_2.
-	\label{eq:uniform_monte_carlo_sphere}
+    \int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi =
+    \int_{0}^{1}\int_{0}^{1} f(x(M(u_1, u_2))) r^2 (2 \cdot 2\pi) \mathrm{d}u_1 \mathrm{d}u_2.
+    \label{eq:uniform_monte_carlo_sphere}
 \end{equation}
 The extra $2 \cdot 2\pi$ factor comes from two sources: the $2$ comes from the constant $C$, and the $2\pi$ comes from the mapping between $u_2$ and $\phi$. Notice how the extra factors simplifies to $4\pi r^2$ -- the surface area of a sphere, which is the reciprocal of the PDF of a uniform distribution on it! We can then discretize the second integral in Equation~\eqref{eq:uniform_monte_carlo_sphere}.
 
@@ -271,25 +271,25 @@ They should render into images like the ones in Figure~\ref{fig:hw_3_4}.
     \label{fig:hw_3_4}
 \end{figure}
 
-\section{Bonus: Perlin noise (20 pts)}
+\section{Bonus: Perlin noise (15 pts)}
 Read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#perlinnoise}{Chapter 5} of RTNW book and implement a procedural Perlin noise.
 
-\section{Bonus: Volumes (20 pts)}
+\section{Bonus: Volumes (15 pts)}
 Read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#volumes}{Chapter 9} of RTNW book and implement homogeneous volumes.
 
-\section{Bonus: Schlick Fresnel vs actual Fresnel (20 pts)}
+\section{Bonus: Schlick Fresnel vs actual Fresnel (15 pts)}
 Watch \href{https://www.youtube.com/watch?v=kEcDbl7eS0w}{Natty Hoffman's presentation} on Fresnel equation and write a summary of what his points are. Write about whether you agree with him or not too.
 
-\section{Bonus: Stratification (20 pts)}
+\section{Bonus: Stratification (15 pts)}
 Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#asimplemontecarloprogram/stratifiedsamples(jittering)}{Chapter 2.3} of RTRYL and implement stratified samples for your area light sampling.
 
-\section{Bonus: sample one light at a time (20 pts)}
+\section{Bonus: sample one light at a time (15 pts)}
 Our sampling strategy currently samples one point for each light. This can be inconvienent when there is a huge amount of lights. An alternative strategy is to sample one light at a time. So you will pick a light first, then pick a point on the light. To pick a light, we want to sample based on its intensity and its surface area. You may want to read \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/Sampling_Random_Variables#x1-Example:Piecewise-Constant1DFunctions}{PBRT} for how to sample a discrete distribution. Implement this strategy and compare to your original method.
 
-\section{Bonus: More efficient spherical light sampling (20 pts)}
+\section{Bonus: More efficient spherical light sampling (15 pts)}
 Our sampling for spherical lights is not very efficient: it randomly chooses a point on a sphere, so that is 50\% of chance it will be blocked. Read \href{https://www.pbr-book.org/3ed-2018/Light_Transport_I_Surface_Reflection/Sampling_Light_Sources#x2-SamplingSpheres}{PBRT} and implement its cone sampling strategy.
 
-\section{Bonus: More efficient triangle light sampling (20 pts)}
+\section{Bonus: More efficient triangle light sampling (15 pts)}
 Read James Arvo's \href{https://dl.acm.org/doi/pdf/10.1145/218380.218500}{spherical triangle sampling paper} and implement it.
 
 %\bibliographystyle{plain}
