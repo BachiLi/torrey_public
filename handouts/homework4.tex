@@ -62,6 +62,30 @@ Now, we need to sample a direction $\omega$ for evaluating the integral in Equat
 
 Go to the function \lstinline{hw_4_1} in \lstinline{hw4.cpp} and implement diffuse interreflection using cosine hemisphere sampling. The function also takes an extra command line parameter \lstinline{-max_depth [max_depth]}, which you will use to limit the maximum recursion depth of your path tracer. 
 
+To test your results, type:
+\begin{lstlisting}[language=bash]
+./torrey -hw 4_1 ../scenes/hw1_spheres/scene0_spherical_light.xml
+./torrey -hw 4_1 ../scenes/cbox/cbox.xml
+./torrey -hw 4_1 ../scenes/party/party_bgonly.xml
+./torrey -hw 4_1 ../scenes/sponza/sponza_bgonly.xml -max-depth 6
+./torrey -hw 4_1 ../scenes/living-room-Wig42/scene_bgonly.xml
+\end{lstlisting}
+
+See Figure~\ref{fig:hw_4_1} for the references. You can notice that the images are much more noisy this time. I did not run all of them to convergence since it's starting to take a while to render. If you run them overnight (with, say, 10000 samples per pixel), you should see relatively clean images. Since we are relying on randomly trace light path until we hit a light source, the chance that it hits a light can often be small. The light sampling we will implement later helps with this, but it would not fully solve the problem as we have very large light sources in these scenes. This is why there are active research projects on trying to make rendering faster -- it's hard! Modern renderers will likely apply \href{https://cgg.mff.cuni.cz/~jirka/path-guiding-in-production/2019/index.htm}{path guiding}, \href{https://cs.dartmouth.edu/~wjarosz/publications/bitterli20spatiotemporal.html}{importance resampling} and \href{https://www.cmlab.csie.ntu.edu.tw/project/sbf/}{denoising} to speedup the rendering. These could be cool final projects if you are interested.
+
+Another thing to notice is that how the global illumination automatically make the images look significantly more realistic! By physically simulating lights, we are able to automagically create realistic images without much efforts. Before people start to simulate global illumination in their renderers, artists have to manually place lights and draw textures to approximate the effect, which is extremely time consuming -- now we just let computers spend that time! Even better, compared to recent learning-based generative models, the physically-based rendering approach still let us have full precise control of how the image looks like. We fully understand how the color of each pixel is generated and can change the way it is generated if we know how to write a renderer.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.20\linewidth]{imgs/hw_4_1a.png}
+    \includegraphics[width=0.15\linewidth]{imgs/hw_4_1b.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_4_1c.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_4_1d.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_4_1e.png}
+    \caption{References for Homework 4.1.}
+    \label{fig:hw_4_1}
+\end{figure}
+
 %\bibliographystyle{plain}
 %\bibliography{refs}
 
