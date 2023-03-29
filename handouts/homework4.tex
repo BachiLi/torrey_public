@@ -60,7 +60,7 @@ We have arrived at the (in)famous \href{https://en.wikipedia.org/wiki/Rendering_
 
 Now, we need to sample a direction $\omega$ for evaluating the integral in Equation~\eqref{eq:diffuse_rendering_equation}. For this, read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#lightscattering}{Chapter 5-8} of RTRYL. We will implement the cosine hemisphere sampling described in the book. You do not need to implement the light sampling yet (Chapter 9). You also only need to handle diffuse materials. We will add light sampling and other materials back later!
 
-Go to the function \lstinline{hw_4_1} in \lstinline{hw4.cpp} and implement diffuse interreflection using cosine hemisphere sampling. The function also takes 
+Go to the function \lstinline{hw_4_1} in \lstinline{hw4.cpp} and implement diffuse interreflection using cosine hemisphere sampling. The function also takes an extra command line parameter \lstinline{-max_depth [max_depth]}, which you will use to limit the maximum recursion depth of your path tracer. 
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

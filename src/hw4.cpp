@@ -17,7 +17,7 @@ Image3 hw_4_1(const std::vector<std::string> &params) {
         }
     }
 
-    ParsedScene scene = parse_scene(params[0]);
+    ParsedScene scene = parse_scene(filename);
     UNUSED(scene);
 
     return Image3(0, 0);
