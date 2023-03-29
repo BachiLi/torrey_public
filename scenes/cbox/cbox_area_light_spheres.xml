@@ -103,4 +103,8 @@
 		<float name="radius" value="120"/>
 		<ref id="box2"/>
 	</shape>
+
+	<background>
+		<rgb name="radiance" value="0, 0, 0"/>
+	</background>
 </scene>

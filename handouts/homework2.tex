@@ -21,7 +21,7 @@ The most commonly used primitive in computer graphics is a triangle. We will ext
 For this homework, we will move to the second book of the Ray Tracing in One Weekend series: \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)}. As usual, we take huge inspirations from Wojciech Jarosz's \href{https://cs87-dartmouth.github.io/Fall2022/assignments.html}{CS 87/287 at Dartmouth}.
 
 \section{Intersection with a single triangle (10 pts)}
-Like our previous homework, let's start with rendering a single triangle. There are many ways to do it with different degrees of efficiency. The RTNW book did not provide information about triangles, but you can easily find some online. The \href{https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm}{Moller-Trumbore intersection algorithm} described in the Wikipedia page is useful. The \href{https://www.pbr-book.org/3ed-2018/Shapes/Triangle_Meshes#TriangleIntersection}{PBRT book} contains more details.
+Like our previous homework, let's start with rendering a single triangle. There are many ways to do it with different degrees of efficiency. The RTNW book did not provide information about triangles, but you can easily find some online. The \href{https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm}{M\"oller-Trumbore intersection algorithm} described in the Wikipedia page is useful. The \href{https://www.pbr-book.org/3ed-2018/Shapes/Triangle_Meshes#TriangleIntersection}{PBRT book} contains more details.
 Or you can just google ray-triangle intersection.
 Feel free to copy paste any code.
 
@@ -145,6 +145,9 @@ A typical Mitsuba scene is an XML file that looks like the following:
     <string name="filename" value="meshes/cbox_largebox.obj"/>
     <ref id="box"/>
   </shape>
+  <background>
+    <rgb name="radiance" value="0, 0, 0"/>
+  </background>
 </scene>
 \end{lstlisting}
 
@@ -248,7 +251,7 @@ The \lstinline{<ref>} tag references the materials we declared earlier and assig
   </shape>
 \end{lstlisting}
 
-Finally, we can apply \emph{transformations} to shapes. The transformations supported are \lstinline{scale}, \lstinline{translate}, \lstinline{rotate}, \lstinline{lookat}, and \lstinline{matrix}. You specify it inside the shape:
+We can apply \emph{transformations} to shapes. The transformations supported are \lstinline{scale}, \lstinline{translate}, \lstinline{rotate}, \lstinline{lookat}, and \lstinline{matrix}. You specify it inside the shape:
 \begin{lstlisting}[language=xml]
   <shape type="obj">
     <transform name="toWorld">
@@ -264,6 +267,14 @@ Finally, we can apply \emph{transformations} to shapes. The transformations supp
 We will apply the transformations in order. The matrix transform specifies the transformation in row-major order.
 The transformation is only supported with \lstinline{obj} and \lstinline{ply}. You can't transform a sphere (we just want to make things simpler -- it is actually easy to implement transformed spheres).
 
+Finally, we can specify the color of the background when a ray doesn't hit an object:
+\begin{lstlisting}[language=xml]
+  <background>
+    <rgb name="radiance" value="0, 0, 0"/>
+  </background>
+\end{lstlisting}
+(This syntax was not in original Mitsuba, I made this to fit better to our scenes).
+
 After passing the xml file into our parser (using the \lstinline{parse_scene} function defined in \lstinline{parse_scene.h} and \lstinline{parse_scene.cpp}), it returns a \lstinline{ParsedScene}:
 \begin{lstlisting}[language=C++]
 struct ParsedScene {
@@ -271,6 +282,7 @@ struct ParsedScene {
     std::vector<ParsedMaterial> materials;
     std::vector<ParsedLight> lights;
     std::vector<ParsedShape> shapes;
+    Vector3 background_color;
     int samples_per_pixel;
 };
 \end{lstlisting}
@@ -292,7 +304,8 @@ struct ParsedDiffuse {
 struct ParsedMirror {
     ParsedColor reflectance;
 };
-using ParsedMaterial = std::variant<ParsedDiffuse, ParsedMirror>;
+// ...
+using ParsedMaterial = std::variant<ParsedDiffuse, ParsedMirror, /* ... */>;
 \end{lstlisting}
 \lstinline{ParsedLight} is defined as:
 \begin{lstlisting}[language=C++]
@@ -301,7 +314,7 @@ struct ParsedPointLight {
     Vector3 intensity;
 };
 // ...
-using ParsedLight = std::variant<ParsedPointLight, ParsedDiffuseAreaLight>;
+using ParsedLight = std::variant<ParsedPointLight, /* ... */>;
 \end{lstlisting}
 \lstinline{ParsedShape} is defined as:
 \begin{lstlisting}[language=C++]
@@ -323,12 +336,7 @@ using ParsedShape = std::variant<ParsedSphere, ParsedTriangleMesh>;
 \end{lstlisting}
 and \lstinline{ParsedColor} is defined as:
 \begin{lstlisting}[language=C++]
-struct ParsedImageTexture {
-    fs::path filename;
-    Real uscale = 1, vscale = 1;
-    Real uoffset = 0, voffset = 0;
-};
-using ParsedColor = std::variant<Vector3 /* RGB */, ParsedImageTexture>;
+using ParsedColor = std::variant<Vector3 /* RGB */, /* ... */>;
 \end{lstlisting}
 
 There is a bit of information to unpack. \lstinline{ParsedCamera} should be straightforward.
@@ -365,6 +373,7 @@ struct Scene {
     std::vector<Shape> shapes;
     std::vector<Material> materials;
     std::vector<Light> lights;
+    Vector3 background_color;
 
     int samples_per_pixel;
     // For the Triangle in the shapes to reference to.
@@ -375,6 +384,7 @@ Scene::Scene(const ParsedScene &scene) :
         camera(from_parsed_camera(scene.camera)),
         width(scene.camera.width),
         height(scene.camera.height),
+        background_color(scene.background_color),
         samples_per_pixel(scene.samples_per_pixel) {
     // Extract triangle meshes from the parsed scene.
     int tri_mesh_count = 0;
@@ -416,18 +426,20 @@ Scene::Scene(const ParsedScene &scene) :
         } else if (auto *mirror = std::get_if<ParsedMirror>(&parsed_mat)) {
             // We assume the reflectance is always RGB for now.
             materials.push_back(Mirror{std::get<Vector3>(mirror->reflectance)});
+        } else {
+            assert(false);
         }
     }
 
     // Copy the lights
     for (const ParsedLight &parsed_light : scene.lights) {
-        // We assume the light is point light for now.
+        // We assume all lights are point lights for now.
         ParsedPointLight point_light = std::get<ParsedPointLight>(parsed_light);
         lights.push_back(PointLight{point_light.intensity, point_light.position});
     }
 }
 \end{lstlisting}
-Note that we convert a triangle mesh into many triangle primitives. This will make the later part of the homework much easier and we recommend you to do so too:
+Note that we convert a triangle mesh into many triangle primitives. This will make the later part of the homework much easier, and we recommend you to do so too:
 \begin{lstlisting}[language=C++]
 struct Triangle {
     int face_index;
