@@ -22,9 +22,9 @@ However, you will have to implement the rest yourself. Trust me, it will be fun!
 
 Our homeworks are mostly inspired by the book \href{https://raytracing.github.io/}{Ray Tracing in One Weekend (RTOW)} (click the link for free access of the e-book). You are expected to read the relevant chapters of the book before implementing your own version. The structure of the homeworks is also largely inspired by \href{https://cs87-dartmouth.github.io/Fall2022/assignments.html}{CS 87/287 at Dartmouth} designed by Wojciech Jarosz (a UCSD alumni!).
 
-Before you started coding, we recommend you to go through the whole handout to have some ideas of what needs to be done.
+Before you start coding, we recommend you to go through the whole handout to have some ideas of what needs to be done.
 
-\paragraph{Submission.} Submit your code and the rendering of the scene you designed yourself (Section~\ref{sec:design_your_own}), along with a text file answering the questions below to Canvas.
+\paragraph{Submission.} Submit your code and the rendering of the scene you designed yourself (Section~\ref{sec:design_your_own}) and the scene itself, along with a text file answering the questions below to Canvas.
 
 \paragraph{Grading.} We will run your code (using the commands below) and compare to our reference solutions. The points of the quizes are included in the total points on the section titles.
 
@@ -32,16 +32,17 @@ Before you started coding, we recommend you to go through the whole handout to h
 
 \paragraph{Coordinate systems conventions.} This is the most annoying part of any graphics systems as every single one of them use a different one. We will follow the conventions used in RTOW: Y axis is up, negative Z looks into the screen from the viewer, and we use a right-handed coordinate system.
 
-\paragraph{Refacotring your code.} If you have never written a ray tracer before, you may find that you will want to refactor your code as you progress in the homework. This is totally normal and is part of the learning process: you will learn what needs to be abstracted and what does not need to be abstracted along the way. Feel free to restructure your code at any time. Also feel free to change any part of torrey if it makes your life easier.
+\paragraph{Refacotring your code.} If you have never written a ray tracer before, you may find that you will often want to refactor your code as you progress in the homework. This is totally normal and is part of the learning process: you will learn what needs to be abstracted and what does not need to be abstracted along the way. Feel free to restructure your code at any time. Also feel free to change any part of torrey if it makes your life easier.
 
-\paragraph{Links in this document.} Some of the links in this document contain hyperlinks with a \emph{named anchor} to a webpage (e.g., \url{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#overview}). On some PDF readers, I have found these links to not work very well (Adobe Acrobat Reader works well). If you encounter issues with the links, try replacing \lstinline{%23} with \lstinline{#} in the address bar of your browser.
+\paragraph{Links in this document.} Some of the links in this document contain hyperlinks with a \emph{named anchor} to a webpage (e.g., \url{https://raytracing.github.io/books/RayTracingInOneWeekend.html\#overview}). On some PDF readers, I have found these links to not work well (Adobe Acrobat Reader works well). If you encounter issues with the links, try replacing \lstinline{%23} with \lstinline{#} in the address bar of your browser.
 
 \section{Building Torrey}
-We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, stb\_image, tinyexr, miniz, tinyply) in its repo.
-We also include many 3D scenes we will render in the repo using \href{https://git-lfs.com/}{git-lfs}. Please install git-lfs in your system by downloading it in the linked webpage. Next, all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
+We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, stb\_image, tinyexr, miniz, tinyply) in its repository.
+We also include many 3D scenes we will render in the repository using \href{https://git-lfs.com/}{git-lfs}. Please install git-lfs in your system by downloading it in the linked webpage. Next, all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
 \begin{lstlisting}[language=bash]
   git lfs install
   git clone https://github.com/BachiLi/torrey_public
+  git lfs pull
   mkdir build
   cd build
   cmake ..
@@ -119,7 +120,7 @@ The results generated from our code looks like Figure~\ref{fig:hw_1_2}:
     \label{fig:hw_1_2}
 \end{figure}
 
-\paragraph{Quiz (4 pts):} If we were to add a linear transformation to the sphere (e.g., turn it into an ellipsoid), how would you do it? Briefly describe your approach.
+\paragraph{Quiz (4 pts):} If we were to add a linear transformation to the sphere (e.g., turn it into an ellipsoid), how would you render it? Briefly describe your approach.
 
 \section{Adding camera control (12 pts)}
 We will next add pose and field of view control to the camera so that we can look at the sphere at different angles. We will adopt the LookAt transform since it's more intuitive. We will also follow RTOW and take a vertical field of view angle.
@@ -128,7 +129,8 @@ First, read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
 Next, go to \lstinline{hw1.cpp} and look at the function \lstinline{hw_1_3}. Given the inputs \lstinline{lookfrom}, \lstinline{lookat}, \lstinline{up}, \lstinline{vfov} (we have parsed it for you from the command line arguments \lstinline{params}), transform your camera rays accordingly and render the same sphere in \lstinline{hw_1_2}.
 
-You may find the \lstinline{radians} function in \lstinline{torrey.h} to be useful.
+You may find the \lstinline{cross, dot, normalize} functions in \lstinline{vector.h} to be useful.
+You may also find the \lstinline{radians} function in \lstinline{torrey.h} to be useful.
 
 To see your results, in terminal, type
 \begin{lstlisting}[language=bash]
@@ -156,7 +158,7 @@ or just any parameter you like! See Figure~\ref{fig:hw_1_3} for references.
 \paragraph{Quiz (2 pts):} Compare the third and fourth images in Figure~\ref{fig:hw_1_3}. Why is the sphere in the third image more \emph{distorted} compared to the fourth image? (Hint: you may want to read \href{https://en.wikipedia.org/wiki/Perspective_distortion}{this} Wikipedia article.)
 
 \section{Intersection with many spheres (8 pts)}
-Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be much easier than the previous one. Don't worry about acceleration structures yet. That's for homework 2.
+Next, we will extend our ray tracer to handle multiple spheres in the scene. Take your code from the previous part, and add a for loop to intersect with all the spheres. This part should be easier than the previous ones. Don't worry about acceleration structures yet. That's for Homework 2.
 
 Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_4}. We will use the command line argument \lstinline{params} to access the scenes. Use \lstinline{hw1_scenes[scene_id]} to access your scene. The scene is contained in the struct \lstinline{hw1::Scene}, defined in \lstinline{hw1_scenes.h}:
 \begin{lstlisting}[language=C++]
@@ -217,7 +219,7 @@ Here is where we slightly deviate from RTOW (RTOW doesn't introduce the notion o
     \sum_{\text{light}} \frac{K_d \cdot \max\left(n \cdot l, 0\right)}{\pi} \cdot \frac{I}{d^2} \cdot \text{visibility},
     \label{eq:lighting}
 \end{equation}
-where $K_d$ is the \lstinline{color} of the surface (it is also called \emph{albedo} or \emph{reflectance}), $n$ is the normal of the surface, $l$ is the normalized vector between the shading point and the point light position, $I$ is the color of the light, $d$ is the distance between the shading point and the light, $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection functions to compute $\text{visibility}$. 
+where $K_d$ is the \lstinline{color} of the surface (it is also called \emph{albedo} or \emph{reflectance}), $n$ is the normal of the surface, $l$ is the \textbf{normalized} vector between the shading point and the point light position, $I$ is the color of the light, $d$ is the distance between the shading point and the light, $\text{visibility}$ is $1$ if the shading point can see the light and is $0$ otherwise. In practice this means you need to shoot a \emph{shadow ray} to test whether the light is blocked by your shading point. You can reuse your previous intersection functions to compute $\text{visibility}$. 
 
 You may find the \lstinline{length, length_squared, distance, distance_squared} functions in \lstinline{vector.h} to be useful.
 
@@ -227,7 +229,7 @@ Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_5}. As usual, 
 
 \paragraph{Shadow epsilon.} When doing the shadow ray test, you may find that due to the finite precision of float points, the test can accidentally mark the sphere on the shading point as occluding itself. Robustly resolving this problem is tricky, but there is an easy hack: we can set the \lstinline{tmin} and \lstinline{tmax} of our shadow ray to be $\epsilon$ and $\left(1 - \epsilon\right) d$ respectively, where $\epsilon$ is a small number. For now, let's set $\epsilon = 10^{-4}$ (ideally, $\epsilon$ should be proportional to the scale of the scene, but let's not worry about that right now).
 
-\paragraph{Front facing vs back facing normals.} Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces}{Chapter 6.4} of RTOW and have an understanding of the difference between front facing and back facing normals. In our rendering systems, we shade the surfaces on \emph{both sides}. That is, even when the surface is back facing, we still compute its color and not assign black. Note that Equation~\eqref{eq:lighting} assumes front facing normal, so if you get a back facing normal, you want to flip it to be front facing. Distinguishing between front and back facing normals is going to be important for the bonus of this homework (rendering glasses) and next homework (for rendering area lights).
+\paragraph{Front facing vs back facing normals.} Read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/frontfacesversusbackfaces}{Chapter 6.4} of RTOW and have an understanding of the difference between front facing and back facing normals. In our rendering systems, we shade the surfaces on \emph{both sides}. That is, even when the surface is back facing, we still compute its color and not assign black. Note that Equation~\eqref{eq:lighting} assumes front facing normal, so if you get a back facing normal, you want to flip it to be front facing. Distinguishing between front and back facing normals is going to be important for the bonus of this homework (rendering glasses) and Homework 3 (for rendering area lights).
 
 As usual, to see your results, in terminal, type
 \begin{lstlisting}[language=bash]
@@ -257,7 +259,7 @@ Go read \href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#ant
 
 Go to \lstinline{hw1.cpp} and modify the function \lstinline{hw_1_6}. As usual, use \lstinline{hw1_scenes[scene_id]} to access your scene. This time, we additionally take an argument \lstinline{-spp [spp]} that indicates how many \emph{samples per pixel} we will be using. We have parsed it for you. You will notice that the image resolution this time is a lot lower. We want to use this to show the effect of antialiasing. Try to compare to the previous renderings at the same resolution.
 
-\paragraph{Random number generation.} Please do \emph{not} use the C \lstinline{rand()} function. It is really really really really bad: \lstinline{rand} usually have very short period as a random number generator (32768 in many systems), it uses a global variable to store the states of the random number generator, and this significantly hurts parallelization. Most implementations of \lstinline{rand} also use a bad random number generator (a very basic LCG). The modern C++ random number generator is much better, but not perfect. I personally prefer \href{https://www.pcg-random.org/}{PCG}. Highly recommend Melissa O'Neill's \href{https://www.youtube.com/watch?v=45Oet5qjlms}{talk} about PCG if you are interested in the topic of random number generation.
+\paragraph{Random number generation.} Please do \emph{not} use the C \lstinline{rand()} function. It is really really really really bad\footnote{Check out \href{https://www.youtube.com/watch?v=LDPMpc-ENqY}{this} Youtube video if you are interested.}: \lstinline{rand} usually have very short period as a random number generator (32768 in many systems), it uses a global variable to store the states of the random number generator, and this significantly hurts parallelization. Most implementations of \lstinline{rand} also use a bad random number generator (a very basic LCG). The modern C++ random number generator is much better, but not perfect. I personally prefer \href{https://www.pcg-random.org/}{PCG}. Highly recommend Melissa O'Neill's \href{https://www.youtube.com/watch?v=45Oet5qjlms}{talk} about PCG if you are interested in the topic of random number generation.
 
 If you want to use the modern C++ random number generator, \emph{do not use} the \lstinline{random_double} function provided by the RTOW book. It effectively uses global variables through static members in the function. This makes the parallelization later we want to do much harder. Pass your generator around as you use it and don't declare it as a static member. For example, you can rewrite their \lstinline{random_double} function as follow:
 \begin{lstlisting}[language=C++]
