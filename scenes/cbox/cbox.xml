@@ -47,7 +47,7 @@
 		<ref id="light"/>
 
 		<emitter type="area">
-			<rgb name="radiance" value="10.313, 5.4544, 1.38152"/>
+			<rgb name="radiance" value="5.157, 2.7272, 0.69076"/>
 		</emitter>
 	</shape>
 
@@ -66,7 +66,7 @@
 	<shape type="obj">
 		<string name="filename" value="meshes/cbox_back.obj"/>
 
-		<ref id="brick"/>
+		<ref id="white"/>
 	</shape>
 
 	<shape type="obj">
