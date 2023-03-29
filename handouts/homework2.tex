@@ -338,6 +338,7 @@ and \lstinline{ParsedColor} is defined as:
 \begin{lstlisting}[language=C++]
 using ParsedColor = std::variant<Vector3 /* RGB */, /* ... */>;
 \end{lstlisting}
+You do not need to worry about \lstinline{area_light_id} yet. 
 
 There is a bit of information to unpack. \lstinline{ParsedCamera} should be straightforward.
 \lstinline{ParsedMaterial}, \lstinline{ParsedLight}, and \lstinline{ParsedShape} are defined using 

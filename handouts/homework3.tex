@@ -203,7 +203,7 @@ Notice that now that we can generate uniform random numbers for $\theta$ and $\p
     \approx \frac{2\pi^2 r^2}{N} \sum_i^N f(x(\theta_i, \phi_i))\sin\theta_i.
     \label{eq:naive_monte_carlo_sphere}
 \end{equation}
-Note that the factor $2\pi^2 r^2 \sin\theta_i$ we multiply to $f(x)$ is exactly the reciprocal of the \emph{probability density function} (PDF) of our sample $x$ (recall \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#onedimensionalmcintegration/importancesampling}{Chapter 3.4} of RTRYL). 
+Note that the factor $2\pi^2 r^2 \sin\theta_i$ we multiply to $f(x)$ is exactly the reciprocal of the \emph{probability density function} (PDF) of our sample $x$ (recall \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#onedimensionalmcintegration/importancesampling}{Chapter 3.4} of RTRYL). Throughout this homework, we will use $N=1$.
 
 We can do slightly better though. Notice the extra $\sin\theta$ factor in our Jacobian/PDF. This indicates that our samples do not uniformly distribute on the sphere: they have higher density when $\theta$ is close to the two polars of the sphere.
 
@@ -247,7 +247,7 @@ x &= (1 - b_1 - b_2) p_0 + b_1 p_1 + b_2 p_2.
 \end{equation}
 and the Jacobian factor is the area of the triangle.
 
-Now, give these, implement area lights in your renderer. Area lights are represented in the \lstinline{ParsedScene} data structures in the following way: for each \lstinline{ParsedSphere} and \lstinline{ParsedTriangleMesh}, if it is an area light, then \lstinline{ParsedSphere::area_light_id} and \lstinline{ParsedTriangleMesh::area_light_id} would be a number that is larger than or equal to zero. If it is not, the ID is set to \lstinline{-1}. The area lights are also in the list of lights. They have the type \lstinline{ParsedDiffuseAreaLight} and the structure contains the ID to the shape and the color $I$ of the light.
+Now, given these, implement area lights in your renderer. Area lights are represented in the \lstinline{ParsedScene} data structures in the following way: for each \lstinline{ParsedSphere} and \lstinline{ParsedTriangleMesh}, if it is an area light, then \lstinline{ParsedSphere::area_light_id} and \lstinline{ParsedTriangleMesh::area_light_id} would be a number that is larger than or equal to zero. If it is not, the ID is set to \lstinline{-1}. The area lights are also in the list of lights. They have the type \lstinline{ParsedDiffuseAreaLight} and the structure contains the ID to the shape and the color $I$ of the light.
 
 You will need to handle two cases: 1) When a ray hits a diffuse surface, you should loop over the lights as usual, sample a point on each light, and evaluate the contribution. 2) When a ray hits an area light, you should return the color of the light directly.
 
@@ -298,7 +298,7 @@ Read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#volumes
 Watch \href{https://www.youtube.com/watch?v=kEcDbl7eS0w}{Natty Hoffman's presentation} on Fresnel equation and write a summary of what his points are. Write about whether you agree with him or not too.
 
 \section{Bonus: Stratification (15 pts)}
-Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#asimplemontecarloprogram/stratifiedsamples(jittering)}{Chapter 2.3} of RTRYL and implement stratified samples for your area light sampling.
+Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#asimplemontecarloprogram/stratifiedsamples(jittering)}{Chapter 2.3} of RTRYL and implement stratified samples for your area light sampling. Read \href{https://www.pbr-book.org/3ed-2018/Sampling_and_Reconstruction/Stratified_Sampling}{PBRT} to understand how to generalize it to higher-dimensional sampling using shuffling (the shuffling technique is introduced to graphics by \href{https://graphics.pixar.com/library/StochasticSampling/paper.pdf}{Rob Cook} and is very similar to a classical statistics technique called \href{https://en.wikipedia.org/wiki/Latin_hypercube_sampling}{Latin hypercube sampling}).
 
 \section{Bonus: sample one light at a time (15 pts)}
 Our sampling strategy currently samples one point for each light. This can be inconvienent when there is a huge amount of lights. An alternative strategy is to sample one light at a time. So you will pick a light first, then pick a point on the light. To pick a light, we want to sample based on its intensity and its surface area. You may want to read \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/Sampling_Random_Variables#x1-Example:Piecewise-Constant1DFunctions}{PBRT} for how to sample a discrete distribution. Implement this strategy and compare to your original method.
