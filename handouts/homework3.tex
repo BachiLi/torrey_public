@@ -16,15 +16,15 @@
     \label{fig:teaser}
 \end{figure}
 
-In the previous homework, we mostly focused on increasing the \emph{geometric complexity} of our renderer and scenes. In this homework, we're going to implement a bunch of small features for our renderer to increase the \emph{material} and \emph{lighting complexity} of our scenes (Figure~\ref{fig:teaser}). We will use both the \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)} book and the last book of the RTOW series \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html}{Ray Tracing - The Rest of Your Life (RTRYL)} for this homework.
+In the previous homework, we mostly focused on increasing the \emph{geometric complexity} of our renderer and scenes. In this homework, we're going to implement a bunch of small features for our renderer to increase the \emph{material} and \emph{lighting complexity} of our scenes (Figure~\ref{fig:teaser}). We will use both the \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html}{Ray Tracing - The Next Week (RTNW)} book and the last book of the RTOW series, \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html}{Ray Tracing - The Rest of Your Life (RTRYL)}, for this homework.
 
 \section{Textures (22.5 pts)}
 So far, we assume constant color per object. This is kind of boring and real world objects are {\color{red}c}{\color{orange}o}{\color{green}l}{\color{blue}o}{\color{cyan}r}f{\color{magenta}u}{\color{violet}l}. The way computer graphics deal with colors on objects is through \href{https://en.wikipedia.org/wiki/Texture_mapping}{textures} (invented by Edwin Catmull in the 70s!): basically we wrap an image around a surface and define color on that image. There are two common ways to specify a texture: you can specify it \emph{procedurally} through a program, or you can use a raster image to represent the texture. We will implement the raster image texture, and the procedural texture will be bonus.
 
 Go read \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#solidtextures}{Chapter 4} and \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html#imagetexturemapping}{Chapter 6} of RTNW.
 
-For the UV coordinates, we will use the same as the RTNW book for spheres. For triangles, there are two possiblities. First, the triangle mesh can come with its own UV coordinates per triangle vertex. You can access it through \lstinline{ParsedTriangleMesh::uvs} -- if the mesh contains UV coordinates, \lstinline{uvs} would be an array with the same size as \lstinline{positions}. To get the UV coordinates at each point, we interpolate from the three UV values from the vertices using the barycentric coordinates $(s, t)$: $u = (1 - s - t)u_0 + s * u_1 + t * u_2$.
-Second, if the triangle mesh does not come with UV coordinates (\lstinline{uvs.size() == 0}), we will just use the barycentric coordinates $(s, t)$ as our UV.
+For the UV coordinates, we will use the same as the RTNW book for spheres. For triangles, there are two possiblities. First, the triangle mesh can come with its own UV coordinates per triangle vertex. You can access it through \lstinline{ParsedTriangleMesh::uvs} -- if the mesh contains UV coordinates, \lstinline{uvs} would be an array with the same size as \lstinline{positions}. To get the UV coordinates at each point, we interpolate from the three UV values from the vertices using the barycentric coordinates $(b_1, b_2)$: $u = (1 - b_1 - b_2)u_0 + b_1 * u_1 + b_2 * u_2$.
+Second, if the triangle mesh does not come with UV coordinates (\lstinline{uvs.size() == 0}), we will just use the barycentric coordinates $(b_1, b_2)$ as our UV.
 
 When looking up the texture given a UV coordinate, we will do something different from the RTNW book. Firstly, the RTNW book \emph{clamps} the UV coordinates when they are smaller than 0 or larger than 1. This is not ideal when we want to tile the textures and repeat them across the surface. Instead, we will wrap the UV coordinates around by taking a \lstinline{modulo} by one. For example, if $u = 1.5$, instead of clamping it to $1$, we wrap it to $0.5$. You may find the \lstinline{modulo} function defined in \lstinline{torrey.h} to be useful. Secondly, we introduce the parameters \lstinline{uscale, vscale, uoffset} and \lstinline{voffset} to scale and offset the UV coordinates (you can find them in \lstinline{ParsedImageTexture}). In particular, to map UV to integer image coordinates XY, we do the following:
 \begin{lstlisting}[language=C++]
@@ -100,10 +100,10 @@ You should render images like the ones in Figure~\ref{fig:hw_3_2}.
     \label{fig:hw_3_2}
 \end{figure}
 
-\paragraph{Quiz (5 pts):} Why is the shadow boundary for the teapot still looks jaggy? Propose a way to fix it. (Hint: you may want to read Hanika's article on \href{https://jo.dreggn.org/home/2021_terminator.pdf}{Hacking the shadow terminator}.)
+\paragraph{Quiz (5 pts):} Why does the shadow boundary for the teapot still look jaggy? Propose a way to fix it. (Hint: you may want to read Hanika's article on \href{https://jo.dreggn.org/home/2021_terminator.pdf}{Hacking the shadow terminator}.)
 
 \section{Fresnel reflection (22.5 pts)}
-Real world metals and mirrors do not reflect light equally at all angles. A prominent effect is predicted by French physicst \href{https://en.wikipedia.org/wiki/Augustin-Jean_Fresnel}{Fresnel} using the wave theory of light. For example, metals become more white when you look at it from a \emph{grazing angle}. Many materials also get more mirror-like when we look at them from grazing angles.
+Real world metals and mirrors do not reflect light equally at all angles. A prominent effect is predicted by a French physicst \href{https://en.wikipedia.org/wiki/Augustin-Jean_Fresnel}{Fresnel} using the wave theory of light. For example, metals become more white when you look at it from a \emph{grazing angle}. Many materials also get more mirror-like when we look at them from grazing angles.
 
 In graphics, we use an approximation proposed by \href{https://en.wikipedia.org/wiki/Schlick%27s_approximation}{Christophe Schlick}:
 \begin{equation}

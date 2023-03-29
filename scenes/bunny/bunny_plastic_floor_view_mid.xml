@@ -72,4 +72,8 @@
 		</transform>
 		<ref id="plastic"/>
 	</shape>
+
+	<background>
+		<rgb name="radiance" value="0.25, 0.35, 0.5"/>
+	</background>
 </scene>
