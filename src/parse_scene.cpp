@@ -769,6 +769,7 @@ ParsedScene parse_scene(pugi::xml_node node) {
     std::map<std::string, std::string> default_map;
     std::map<std::string /* name id */, ParsedColor> texture_map;
     std::map<std::string /* name id */, int /* index id */> material_map;
+    Vector3 background_color = Vector3{0.5, 0.5, 0.5};
     int sample_count = 16;
 
     for (auto child : node.children()) {
@@ -804,9 +805,21 @@ ParsedScene parse_scene(pugi::xml_node node) {
                 Error(std::string("Duplicated texture ID:") + id);
             }
             texture_map[id] = parse_texture(child, default_map);
+        } else if (name == "background") {
+            for (auto grandchild : child.children()) {
+                std::string name = grandchild.attribute("name").value();
+                if (name == "radiance") {
+                    background_color = parse_intensity(grandchild, default_map);
+                }
+            }
         }
     }
-    return ParsedScene{camera, materials, lights, shapes, sample_count};
+    return ParsedScene{camera,
+                       materials,
+                       lights,
+                       shapes,
+                       background_color,
+                       sample_count};
 }
 
 ParsedScene parse_scene(const fs::path &filename) {

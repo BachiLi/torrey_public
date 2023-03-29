@@ -94,6 +94,7 @@ struct ParsedScene {
     std::vector<ParsedMaterial> materials;
     std::vector<ParsedLight> lights;
     std::vector<ParsedShape> shapes;
+    Vector3 background_color;
     int samples_per_pixel;
 };
 

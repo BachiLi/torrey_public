@@ -23,7 +23,7 @@ def radiance(scene, ray, rng):
       # recursively trace a ray towards the mirror reflection direction
       # ...
   else:
-    return (0.5, 0.5, 0.5)
+    return scene.background_color
 \end{lstlisting}
 
 In this homework, we will temporarily suspend the direct lighting code -- we will add it back later in the next homework.
@@ -40,20 +40,27 @@ where $K_d$ is the diffuse reflectance, $n_s$ is the normal at the shading point
 We will derive the equations of diffuse interreflection from Equation~\eqref{eq:area_light}. Let's play with an idea: what if everything is light source? We will figure out how to assign the intensity $I$ later. Apart from the intensity, all we need to change is the integration domain: instead of integrating a particular light source $S$, we integrate over all surfaces $\mathcal{M}$. Next, since we are tracing rays, we want to deal with directions, instead of points on surfaces. We achieve this using a \emph{change of variable} (again!) -- instead of integrating over position $x$, we integrate over direction $\omega$:
 \begin{equation}
 \int_{x \in \mathcal{M}} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot \frac{L \max\left(-n_x \cdot l, 0\right)}{d^2} \cdot \text{visibility} \cdot \mathrm{d}A(x) = 
-\int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+\int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
 \label{eq:area_light_solid_angle}
 \end{equation}
 Firstly, we have replaced $S$ with $\mathcal{M}$ and $I$ with $L$ to emphasize that things are different now.
-Here, the measure $\mathrm{d}\omega$ is often called the \href{https://en.wikipedia.org/wiki/Solid_angle}{solid angle} -- it represents an infinitesimal area of a point on a unit sphere. You will notice that the equation gets a lot simpler after we switch to the solid angle measure. This is because the Jacobian of the change of variable is exactly the reciprocal of $\frac{\max\left(-n_x \cdot l, 0\right)}{d^2} \cdot \text{visibility}$ (see \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#samplinglightsdirectly/gettingthepdfofalight}{Chapter 9.1} of RTRYL for an explanation). Intuitively, the Jacobian captures the ratio of area on the surface $\mathcal{M}$ and its projcted area on a unit sphere (if it is not blocked).
+Also note that $\omega = l$.
+Here, the measure $\mathrm{d}\omega$ is often called the \href{https://en.wikipedia.org/wiki/Solid_angle}{solid angle} -- it represents an infinitesimal area of a point on a unit sphere. You will notice that the equation gets a lot simpler after we switch to the solid angle measure. This is because the Jacobian of the change of variable is exactly the reciprocal of $\frac{\max\left(-n_x \cdot \omega, 0\right)}{d^2} \cdot \text{visibility}$ (see \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#samplinglightsdirectly/gettingthepdfofalight}{Chapter 9.1} of RTRYL for an explanation). Intuitively, the Jacobian captures the ratio of area on the surface $\mathcal{M}$ and its projcted area on a unit sphere (if it is not blocked).
 
 We still need to decide what is the color $I$. Remember in the mirror case, we recursively trace rays to determine the color. We can do the same thing for diffuse surfaces too!
 \begin{equation}
-L = \int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+L = \int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
 \end{equation}
-This is however vacuous, because there is no \emph{base case} for this recursion. We will instead add the emission whenever we hit a light source:
+This is however vacuous, because there is no \emph{base case} for this recursion. We will instead add the emission whenever we hit a light source\footnote{The infinite recursion defined in Equation~\eqref{eq:diffuse_rendering_equation} is actually mathematically well-behaved, as long as $K_d < 1$ for all channels. The reason is that after each bounce, some energy will be absorbed by $K_d$, and eventually the ray will carry zero energy.}:
 \begin{equation}
-L = L_e + \int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+L = L_e + \int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+\label{eq:diffuse_rendering_equation}
 \end{equation}
+We have arrived at the (in)famous \href{https://en.wikipedia.org/wiki/Rendering_equation}{rendering equation} (though specialized at diffuse BRDFs).
+
+Now, we need to sample a direction $\omega$ for evaluating the integral in Equation~\eqref{eq:diffuse_rendering_equation}. For this, read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#lightscattering}{Chapter 5-8} of RTRYL. We will implement the cosine hemisphere sampling described in the book. You do not need to implement the light sampling yet (Chapter 9). You also only need to handle diffuse materials. We will add light sampling and other materials back later!
+
+Go to the function \lstinline{hw_4_1} in \lstinline{hw4.cpp} and implement diffuse interreflection using cosine hemisphere sampling. The function also takes 
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

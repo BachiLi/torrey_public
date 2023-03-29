@@ -264,7 +264,7 @@ def radiance(scene, ray, rng):
     # [scattering] recursively tracing the ray by calling radiance
     # ...
   else:
-    return (0.5, 0.5, 0.5)
+    return scene.background_color
 \end{lstlisting}
 
 To test your rendering, use the following commands:

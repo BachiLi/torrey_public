@@ -90,4 +90,8 @@
 		<string name="filename" value="meshes/cbox_largebox.obj"/>
 		<ref id="box"/>
 	</shape>
+
+	<background>
+		<rgb name="radiance" value="0.5, 0.5, 0.5"/>
+	</background>
 </scene>
