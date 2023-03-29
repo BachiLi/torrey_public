@@ -516,7 +516,7 @@ Read through \href{https://raytracing.github.io/books/RayTracingTheNextWeek.html
 
 We provide a few more scenes for you to test your algorithms. The models are from the \href{https://graphics.stanford.edu/data/3Dscanrep/}{Stanford 3D Scanning Repository} and from \href{https://casual-effects.com/data/}{Morgan Mcguire's Computer Graphics Archive}. The \lstinline{teapot} has 15704 triangles, the \lstinline{bunny} has 144046 triangles, the \lstinline{buddha} has 1087474 triangles, the \lstinline{dragon} has 871306 triangles, and the \lstinline{armadillo} has 212574 triangles. Imagine how long it would take to render these scenes if you don't have a BVH!
 
-\paragraph{Quiz: choosing the axis to divide in BVH construction. (3 pts)} The book recommended to split the BVH by randomly choosing an axis. Another popular strategy is to choose the axis with the largest extent. Experiment both and let us know which one is faster for you.
+\paragraph{Quiz: choosing the axis to divide in BVH construction (3 pts).} The RTNW book recommended to split the BVH by randomly choosing an axis. Another popular strategy is to choose the axis with the largest extent. Experiment both and let us know which one is faster for you.
 
 \paragraph{ProgressReporter and Timer.} From now on, the scenes in the homeworks can take longer to render. To assist you to judge how long it takes to render a scene, we provide two classes for showing the rendering progress and the rendering time. The \lstinline{ProgressReporter} prints out the percentage of completion of a task and the \lstinline{Timer} is a wrapper around the modern C++ \lstinline{std::chrono} library. See the comments for how to use them in \lstinline{progress_reporter.h} and \lstinline{timer.h}.
 

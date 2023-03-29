@@ -1,6 +1,7 @@
 #include "hw2.h"
 #include "parse_scene.h"
 #include "print_scene.h"
+#include "timer.h"
 
 Image3 hw_2_1(const std::vector<std::string> &params) {
     // Homework 2.1: render a single triangle and outputs
@@ -76,7 +77,10 @@ Image3 hw_2_3(const std::vector<std::string> &params) {
         return Image3(0, 0);
     }
 
+    Timer timer;
+    tick(timer);
     ParsedScene scene = parse_scene(params[0]);
+    std::cout << "Scene parsing done. Took " << tick(timer) << " seconds." << std::endl;
     std::cout << scene << std::endl;
 
     return Image3(0, 0);
@@ -88,7 +92,10 @@ Image3 hw_2_4(const std::vector<std::string> &params) {
         return Image3(0, 0);
     }
 
+    Timer timer;
+    tick(timer);
     ParsedScene scene = parse_scene(params[0]);
+    std::cout << "Scene parsing done. Took " << tick(timer) << " seconds." << std::endl;
     UNUSED(scene);
 
     return Image3(0, 0);
@@ -100,7 +107,10 @@ Image3 hw_2_5(const std::vector<std::string> &params) {
         return Image3(0, 0);
     }
 
+    Timer timer;
+    tick(timer);
     ParsedScene scene = parse_scene(params[0]);
+    std::cout << "Scene parsing done. Took " << tick(timer) << " seconds." << std::endl;
     UNUSED(scene);
 
     return Image3(0, 0);
