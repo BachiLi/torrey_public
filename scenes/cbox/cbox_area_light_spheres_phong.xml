@@ -9,27 +9,33 @@
 		<float name="fov" value="39.3077"/>
 
 		<sampler type="independent">
-			<integer name="sampleCount" value="512"/>
+			<integer name="sampleCount" value="4"/>
 		</sampler>
 
 		<film type="hdrfilm">
-			<integer name="width" value="512"/>
+			<integer name="width" value="1024"/>
 			<integer name="height" value="512"/>
 		</film>
 	</sensor>
 
 	<bsdf type="phong" id="box1">
-		<float name="eta" value="1.5"/>
-		<rgb name="diffuse_reflectance" value="0.3, 0.2, 0.1"/>
-		<rgb name="specular_reflectance" value="0.8, 0.5, 0.5"/>
+		<rgb name="reflectance" value="0.7, 0.5, 0.2"/>
+		<float name="exponent" value="1"/>
+	</bsdf>
+
+	<bsdf type="phong" id="box2">
+		<rgb name="reflectance" value="0, 0, 0"/>
 		<float name="exponent" value="5"/>
 	</bsdf>
 
-	<bsdf type="plastic" id="box2">
-		<float name="eta" value="1.5"/>
-		<rgb name="diffuse_reflectance" value="0.1, 0.2, 0.3"/>
-		<rgb name="specular_reflectance" value="0.8, 0.5, 0.5"/>
+	<bsdf type="phong" id="box3">
+		<rgb name="reflectance" value="0.2, 0.7, 0.5"/>
 		<float name="exponent" value="10"/>
+	</bsdf>
+
+	<bsdf type="phong" id="box4">
+		<rgb name="reflectance" value="0.5, 0.7, 0.2"/>
+		<float name="exponent" value="50"/>
 	</bsdf>
 
 	<bsdf type="diffuse" id="white">
@@ -52,62 +58,99 @@
 		<texture type="bitmap" name="reflectance">
 			<!-- downloaded from https://polyhaven.com/a/brick_wall_001 -->
 			<string name="filename" value="brick.png"/>
+			<float name="uscale" value="2"/>
 		</texture>
 	</bsdf>
 
 	<shape type="obj">
 		<string name="filename" value="meshes/cbox_luminaire.obj"/>
 		<transform name="toWorld">
-			<translate x="0" y="-0.5" z="0"/>
+			<scale x="2" y="1" z="1"/>
+			<translate x="-275" y="-0.5" z="0"/>
 		</transform>
 
 		<ref id="light"/>
 
 		<emitter type="area">
-			<rgb name="radiance" value="10.313, 5.4544, 1.38152"/>
+			<rgb name="radiance" value="5.157, 2.7272, 0.69076"/>
 		</emitter>
 	</shape>
 
 	<shape type="obj">
+		<transform name="toWorld">
+			<scale x="2" y="1" z="1"/>
+			<translate x="-275"/>
+		</transform>
+
 		<string name="filename" value="meshes/cbox_floor.obj"/>
 
 		<ref id="white"/>
 	</shape>
 
 	<shape type="obj">
+		<transform name="toWorld">
+			<scale x="2" y="1" z="1"/>
+			<translate x="-275"/>
+		</transform>
+
 		<string name="filename" value="meshes/cbox_ceiling.obj"/>
 
 		<ref id="white"/>
 	</shape>
 
 	<shape type="obj">
+		<transform name="toWorld">
+			<scale x="2" y="1" z="1"/>
+			<translate x="-275"/>
+		</transform>
+
 		<string name="filename" value="meshes/cbox_back.obj"/>
 
 		<ref id="brick"/>
 	</shape>
 
 	<shape type="obj">
+		<transform name="toWorld">
+			<translate x="-275"/>
+		</transform>
+
 		<string name="filename" value="meshes/cbox_greenwall.obj"/>
 
 		<ref id="green"/>
 	</shape>
 
 	<shape type="obj">
+		<transform name="toWorld">
+			<translate x="275"/>
+		</transform>
+
 		<string name="filename" value="meshes/cbox_redwall.obj"/>
 
 		<ref id="red"/>
 	</shape>
 
 	<shape type="sphere">
-		<point name="center" x="150" y="100" z="200"/>
-		<float name="radius" value="100"/>
+		<point name="center" x="-100" y="120" z="250"/>
+		<float name="radius" value="120"/>
 		<ref id="box1"/>
 	</shape>
 
 	<shape type="sphere">
-		<point name="center" x="380" y="120" z="300"/>
+		<point name="center" x="150" y="120" z="250"/>
 		<float name="radius" value="120"/>
 		<ref id="box2"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="400" y="120" z="250"/>
+		<float name="radius" value="120"/>
+		<ref id="box3"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="650" y="120" z="250"/>
+		<float name="radius" value="120"/>
+		<ref id="box3"/>
 	</shape>
 
 	<background>
