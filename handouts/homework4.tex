@@ -11,7 +11,6 @@ So far in our code, we seem to be treating the diffuse and specular surfaces sep
 
 In the previous homeworks, we do something like this:
 \begin{lstlisting}[language=python]
-\begin{lstlisting}[language=python]
 def radiance(scene, ray, rng):
   if (ray intersect scene):
     # [emission] add emission of the intersected shape
@@ -91,7 +90,7 @@ Another thing to notice is that how the global illumination automatically make t
 \section{Adding non-diffuse materials}
 Let's add back \lstinline{mirror}, \lstinline{plastic}, and let's add more. 
 
-\subsection{Adding back \lstinline{mirror} and \lstinline{plastic}}
+\subsection{Adding back \protect\lstinline!mirror! and \protect\lstinline!plastic!}
 Adding back \lstinline{mirror} should be easy, we will let you figure that out. Adding back \lstinline{plastic} is slightly more involved. Should we follow the diffuse sampling direction or the specular sampling direction? The answer is -- we choose them stochastically! Since the diffuse and specular components are weighted by the Fresnel term $F$, we roll a dice and trace the specular ray with probability $F$, and trace the difuse ray with probability $1-F$. To be more concrete, mathematically it works like this -- we have an expression:
 \begin{equation}
 L = F a + (1 - F) b.
@@ -122,14 +121,14 @@ Is it unbiased? Should we use this one or Equation~\eqref{eq:discrete_mc}?\footn
 Check your \lstinline{mirror} and \lstinline{plastic} renderings using the following scenes:
 \begin{lstlisting}[language=bash]
 ./torrey -hw 4_2 ../scenes/hw1_spheres/scene1_spherical_light.xml
-./torrey -hw 4_2 ../scenes/cbox/area_light_spheres.xml
+./torrey -hw 4_2 ../scenes/cbox/cbox_area_light_spheres.xml
 \end{lstlisting}
 Figure~\ref{fig:hw_4_2_mirror_plastic} shows our renderings of them.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.30\linewidth]{imgs/hw_4_2a.png}
-    \includegraphics[width=0.30\linewidth]{imgs/hw_4_2b.png}
+    \includegraphics[width=0.40\linewidth]{imgs/hw_4_2a.png}
+    \includegraphics[width=0.40\linewidth]{imgs/hw_4_2b.png}
     \caption{References for \lstinline{mirror} and \lstinline{plastic} materials for HW 4.2.}
     \label{fig:hw_4_2_mirror_plastic}
 \end{figure}
@@ -169,18 +168,31 @@ The second integral in Equation~\eqref{eq:phong_inequality} has a close form. To
 So, if we set $C = \frac{\alpha + 2}{2\pi}$, as long as $K_s \leq 1$, Phong BRDF always conserve energy:
 \begin{equation}
 \rho_{\text{phong}} = K_s \frac{\alpha + 2}{2\pi} \max\left(r \cdot \omega, 0\right)^\alpha \max\left(n_s \cdot \omega, 0\right).
-\label{eq:phonog}
+\label{eq:phong}
 \end{equation}
 
-For sampling this variant of Phong reflection model, read \href{https://www.cs.princeton.edu/courses/archive/fall03/cs526/papers/lafortune94.pdf}{Chapter 3.3.2} of the article ``Using the Modified Phong Reflectance Model for Physically Based Rendering'' by Lafortune and Willem. Roughly speaking, you will do something similar to the cosine hemisphere sampling with $z$-axis being up (but modify the inverse transform sampling so that it's proportional to $\cos^{\alpha}$ instead of $\cos$), build a ONB frame around the ray reflection direction, convert the coordinate system from the local coordinate to the ONB frame coordinate.
+For sampling this variant of Phong reflection model, read \href{https://www.cs.princeton.edu/courses/archive/fall03/cs526/papers/lafortune94.pdf}{Chapter 3.3.2} of the article ``Using the Modified Phong Reflectance Model for Physically Based Rendering'' by Lafortune and Willem (ignore the diffuse component). Roughly speaking, you will do something similar to the cosine hemisphere sampling with $z$-axis being up (but modify the inverse transform sampling so that it's proportional to $\cos^{\alpha}$ instead of $\cos$), build a ONB frame around the ray reflection direction, convert the coordinate system from the local coordinate to the ONB frame coordinate.
 
 Now, add the Phong BRDF (Equation~\eqref{eq:phong}) into your \lstinline{hw_4_2} code. A Phong BRDF of a scene is stored in the following format:
-\begin{lstlisting}
+\begin{lstlisting}[language=C++]
 struct ParsedPhong {
     ParsedColor reflectance; // Ks
     Real exponent; // alpha
 };
 \end{lstlisting}
+
+We provide yet another Cornell box scene (yes, I am uncreative) for you to test your code:
+\begin{lstlisting}[language=bash]
+./torrey -hw 4_2 ../scenes/cbox/cbox_area_light_spheres_phong.xml
+\end{lstlisting}
+Our rendering of the scene is in Figure~\ref{fig:hw_4_3_phong}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.80\linewidth]{imgs/hw_4_2c.png}
+    \caption{Reference for the \lstinline{phong} materials for HW 4.2. The Phong exponents are 100, 40, 8, 1, from left to right.}
+    \label{fig:hw_4_3_phong}
+\end{figure}
 
 
 %\bibliographystyle{plain}
