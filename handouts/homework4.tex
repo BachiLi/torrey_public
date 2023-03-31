@@ -172,7 +172,7 @@ So, if we set $C = \frac{\alpha + 2}{2\pi}$, as long as $K_s \leq 1$, Phong BRDF
 \label{eq:phonog}
 \end{equation}
 
-For sampling this variant of Phong reflection model, read \href{https://www.cs.princeton.edu/courses/archive/fall03/cs526/papers/lafortune94.pdf}{Chapter 3.3.2} of the article ``Using the Modified Phong Reflectance Model for Physically Based Rendering'' by Lafortune and Willem.
+For sampling this variant of Phong reflection model, read \href{https://www.cs.princeton.edu/courses/archive/fall03/cs526/papers/lafortune94.pdf}{Chapter 3.3.2} of the article ``Using the Modified Phong Reflectance Model for Physically Based Rendering'' by Lafortune and Willem. Roughly speaking, you will do something similar to the cosine hemisphere sampling with $z$-axis being up (but modify the inverse transform sampling so that it's proportional to $\cos^{\alpha}$ instead of $\cos$), build a ONB frame around the ray reflection direction, convert the coordinate system from the local coordinate to the ONB frame coordinate.
 
 Now, add the Phong BRDF (Equation~\eqref{eq:phong}) into your \lstinline{hw_4_2} code. A Phong BRDF of a scene is stored in the following format:
 \begin{lstlisting}
