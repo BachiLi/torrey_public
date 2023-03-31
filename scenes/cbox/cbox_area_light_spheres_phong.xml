@@ -9,7 +9,7 @@
 		<float name="fov" value="39.3077"/>
 
 		<sampler type="independent">
-			<integer name="sampleCount" value="4"/>
+			<integer name="sampleCount" value="512"/>
 		</sampler>
 
 		<film type="hdrfilm">
@@ -24,18 +24,18 @@
 	</bsdf>
 
 	<bsdf type="phong" id="box2">
-		<rgb name="reflectance" value="0, 0, 0"/>
-		<float name="exponent" value="5"/>
+		<rgb name="reflectance" value="0.2, 0.5, 0.7"/>
+		<float name="exponent" value="8"/>
 	</bsdf>
 
 	<bsdf type="phong" id="box3">
 		<rgb name="reflectance" value="0.2, 0.7, 0.5"/>
-		<float name="exponent" value="10"/>
+		<float name="exponent" value="40"/>
 	</bsdf>
 
 	<bsdf type="phong" id="box4">
 		<rgb name="reflectance" value="0.5, 0.7, 0.2"/>
-		<float name="exponent" value="50"/>
+		<float name="exponent" value="100"/>
 	</bsdf>
 
 	<bsdf type="diffuse" id="white">
@@ -150,7 +150,7 @@
 	<shape type="sphere">
 		<point name="center" x="650" y="120" z="250"/>
 		<float name="radius" value="120"/>
-		<ref id="box3"/>
+		<ref id="box4"/>
 	</shape>
 
 	<background>
