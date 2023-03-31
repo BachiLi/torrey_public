@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<scene version="0.6.0">
+	<sensor type="perspective">
+		<string name="fovAxis" value="y"/>
+		<transform name="toWorld">
+			<lookAt origin="278, 273, -800" target="278, 273, -799" up="0, 1, 0"/>
+		</transform>
+		<float name="fov" value="39.3077"/>
+
+		<sampler type="independent">
+			<integer name="sampleCount" value="512"/>
+		</sampler>
+
+		<film type="hdrfilm">
+			<integer name="width" value="512"/>
+			<integer name="height" value="512"/>
+		</film>
+	</sensor>
+
+	<bsdf type="phong" id="box1">
+		<float name="eta" value="1.5"/>
+		<rgb name="diffuse_reflectance" value="0.3, 0.2, 0.1"/>
+		<rgb name="specular_reflectance" value="0.8, 0.5, 0.5"/>
+		<float name="exponent" value="5"/>
+	</bsdf>
+
+	<bsdf type="plastic" id="box2">
+		<float name="eta" value="1.5"/>
+		<rgb name="diffuse_reflectance" value="0.1, 0.2, 0.3"/>
+		<rgb name="specular_reflectance" value="0.8, 0.5, 0.5"/>
+		<float name="exponent" value="10"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="white">
+		<rgb name="reflectance" value="0.884774, 0.699933, 0.666224"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="red">
+		<rgb name="reflectance" value="0.56581, 0.0447145, 0.0441583"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="green">
+		<rgb name="reflectance" value="0.105092, 0.378697, 0.0762035"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="light">
+		<rgb name="reflectance" value="0.78, 0.78, 0.78"/>
+	</bsdf>
+
+	<bsdf type="diffuse" id="brick">
+		<texture type="bitmap" name="reflectance">
+			<!-- downloaded from https://polyhaven.com/a/brick_wall_001 -->
+			<string name="filename" value="brick.png"/>
+		</texture>
+	</bsdf>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_luminaire.obj"/>
+		<transform name="toWorld">
+			<translate x="0" y="-0.5" z="0"/>
+		</transform>
+
+		<ref id="light"/>
+
+		<emitter type="area">
+			<rgb name="radiance" value="10.313, 5.4544, 1.38152"/>
+		</emitter>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_floor.obj"/>
+
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_ceiling.obj"/>
+
+		<ref id="white"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_back.obj"/>
+
+		<ref id="brick"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_greenwall.obj"/>
+
+		<ref id="green"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/cbox_redwall.obj"/>
+
+		<ref id="red"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="150" y="100" z="200"/>
+		<float name="radius" value="100"/>
+		<ref id="box1"/>
+	</shape>
+
+	<shape type="sphere">
+		<point name="center" x="380" y="120" z="300"/>
+		<float name="radius" value="120"/>
+		<ref id="box2"/>
+	</shape>
+
+	<background>
+		<rgb name="radiance" value="0, 0, 0"/>
+	</background>
+</scene>

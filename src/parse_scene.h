@@ -36,7 +36,17 @@ struct ParsedPlastic {
     ParsedColor reflectance;
 };
 
-using ParsedMaterial = std::variant<ParsedDiffuse, ParsedMirror, ParsedPlastic>;
+struct ParsedPhong {
+    Real eta; // index of refraction
+    ParsedColor diffuse_reflectance; // Kd
+    ParsedColor specular_reflectance; // Ks
+    Real exponent; // alpha
+};
+
+using ParsedMaterial = std::variant<ParsedDiffuse,
+                                    ParsedMirror,
+                                    ParsedPlastic,
+                                    ParsedPhong>;
 
 struct ParsedPointLight {
     Vector3 position;

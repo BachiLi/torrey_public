@@ -171,15 +171,24 @@ So, if we set $C = \frac{\alpha + 2}{2\pi}$, as long as $K_s \leq 1$, Phong BRDF
 \rho_{\text{phong-specular}} = K_s \frac{\alpha + 2}{2\pi} \max\left(r \cdot \omega, 0\right)^\alpha \max\left(n_s \cdot \omega, 0\right).
 \end{equation}
 
-Finally, we can do something similar to \lstinline{plastic} to combine a diffuse component and $\rho_{\text{phong-specular}}$:
+Finally, we can do something similar to \lstinline{plastic} to combine a diffuse component and $\rho_{\text{phong-specular}}$ using Fresnel reflection:
 \begin{equation}
-\rho_{\text{phong}} = \frac{K_d}{\pi} \max\left(n_s \cdot \omega, 0\right) + \rho_{\text{phong-specular}}.
+\rho_{\text{phong}} = (1 - F) \frac{K_d}{\pi} \max\left(n_s \cdot \omega, 0\right) + F \rho_{\text{phong-specular}}.
 \label{eq:phong}
 \end{equation}
+$F$ is defined the same as the Fresnel in \lstinline{plastic}, which depends on another parameter \lstinline{eta}. As long as $K_d \leq 1$ and $K_s \leq 1$, the energy is conserved.
 
 For sampling this variant of Phong reflection model, read \href{https://www.cs.princeton.edu/courses/archive/fall03/cs526/papers/lafortune94.pdf}{Chapter 3.3.2} of the article ``Using the Modified Phong Reflectance Model for Physically Based Rendering'' by Lafortune and Willem.
 
-Now, add the Phong BRDF (Equation~\eqref{eq:phong}) into your \lstinline{hw_4_2} code.
+Now, add the Phong BRDF (Equation~\eqref{eq:phong}) into your \lstinline{hw_4_2} code. A Phong BRDF of a scene is stored in the following format:
+\begin{lstlisting}
+struct ParsedPhong {
+    Real eta; // index of refraction
+    ParsedColor diffuse_reflectance; // Kd
+    ParsedColor specular_reflectance; // Ks
+    Real exponent; // alpha
+};
+\end{lstlisting}
 
 
 %\bibliographystyle{plain}
