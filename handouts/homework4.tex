@@ -3,8 +3,8 @@
 
 \begin{document}
 
-\header{3}{Indirect lighting and BRDFs}
-In this homework, we will implement an actual \href{https://en.wikipedia.org/wiki/Path_tracing}{path tracing} algorithm. We are close to finishing the RTRYL book!
+\header{3}{Indirect lighting, BRDFs, and Multiple Importance Sampling}
+In this homework, we will implement an actual \href{https://en.wikipedia.org/wiki/Path_tracing}{path tracing} algorithm. We will finish the RTRYL book this time!
 
 \section{Diffuse interreflection}
 So far in our code, we seem to be treating the diffuse and specular surfaces separately: diffuse surfaces gather contributions from lights, and specular surfaces trace out rays that collect color from other surfaces (and \lstinline{plastic} is a mixture of them). In real world, diffuse surfaces also collect colors from other surfaces. We will implement this in this part.
@@ -71,9 +71,11 @@ To test your results, type:
 ./torrey -hw 4_1 ../scenes/living-room-Wig42/scene_bgonly.xml
 \end{lstlisting}
 
+\paragraph{Energy conservation.} Remove the $\frac{1}{\pi}$ in Equation~\eqref{eq:diffuse_rendering_equation} and render the \lstinline{cbox} scene again (you still need to have the $\pi$ in your PDF since PDFs need to integrate to $1$). What do you observe? Why?
+
 See Figure~\ref{fig:hw_4_1} for the references. You can notice that the images are much more noisy this time. I did not run all of them to convergence since it's starting to take a while to render. If you run them overnight (with, say, 10000 samples per pixel), you should see relatively clean images. Since we are relying on randomly trace light path until we hit a light source, the chance that it hits a light can often be small. The light sampling we will implement later helps with this, but it would not fully solve the problem as we have very large light sources in these scenes. This is why there are active research projects on trying to make rendering faster -- it's hard! Modern renderers will likely apply \href{https://cgg.mff.cuni.cz/~jirka/path-guiding-in-production/2019/index.htm}{path guiding}, \href{https://cs.dartmouth.edu/~wjarosz/publications/bitterli20spatiotemporal.html}{importance resampling} and \href{https://www.cmlab.csie.ntu.edu.tw/project/sbf/}{denoising} to speedup the rendering. These could be cool final projects if you are interested.
 
-Another thing to notice is that how the global illumination automatically make the images look significantly more realistic! By physically simulating lights, we are able to automagically create realistic images without much efforts. Before people start to simulate global illumination in their renderers, artists have to manually place lights and draw textures to approximate the effect, which is extremely time consuming -- now we just let computers spend that time! Even better, compared to recent learning-based generative models, the physically-based rendering approach still let us have full precise control of how the image looks like. We fully understand how the color of each pixel is generated and can change the way it is generated if we know how to write a renderer.
+Another thing to notice is that how the global illumination automatically make the images look significantly more realistic! By physically simulating lights, we are able to automagically create realistic images without much efforts. Before people start to simulate global illumination in their renderers, artists have to manually place lights and draw textures to approximate the effect, which is extremely time consuming -- now we just let computers spend that time! Even better, compared to recent learning-based generative models, the physically-based rendering approach still let us have full precise control of how the image looks like. We fully understand how the color of each pixel is generated, and we can change the way it is generated if we know how to write a renderer.
 
 \begin{figure}[ht]
     \centering
@@ -85,6 +87,72 @@ Another thing to notice is that how the global illumination automatically make t
     \caption{References for Homework 4.1.}
     \label{fig:hw_4_1}
 \end{figure}
+
+\section{Adding non-diffuse materials}
+Let's add back \lstinline{mirror}, \lstinline{plastic}, and let's add more. Adding back \lstinline{mirror} should be easy, we will let you figure that out. Adding back \lstinline{plastic} is slightly more involved. Should we follow the diffuse sampling direction or the specular sampling direction? The answer is -- we choose them stochastically! Since the diffuse and specular components are weighted by the Fresnel term $F$, we roll a dice and trace the specular ray with probability $F$, and trace the difuse ray with probability $1-F$. To be more concrete, mathematically it works like this -- we have an expression:
+\begin{equation}
+L = F a + (1 - F) b.
+\end{equation}
+We want to use Monte Carlo sampling to evaluate this expression. We evaluate the first term with probability $F$, and the second term with probability $1-F$. Our Monte Carlo estimator is:
+\begin{equation}
+\left<L\right> = \begin{cases}
+\frac{F a}{F} & \text{with probability } F \\
+\frac{\left(1 - F\right) b}{1 - F} & \text{with probability } 1 - F
+\end{cases}.
+\label{eq:discrete_mc}
+\end{equation}
+If we take the expectation of $\left<L\right>$, we can see that it is an \href{https://en.wikipedia.org/wiki/Bias_of_an_estimator}{unbiased estimator}:
+\begin{equation}
+E\left[\left<L\right>\right] = F \cdot \frac{F a}{F} + (1 - F) \cdot \frac{(1 - F) b}{1 - F}.
+\end{equation}
+The same math works even if $a$ and $b$ are both Monte Carlo estimators themselves.
+
+\paragraph{Quiz:} Let's consider the following, different estimator:
+\begin{equation}
+\left<\hat{L}\right> = \begin{cases}
+\frac{F a + (1 - F)b}{F} & \text{with probability } F \\
+\frac{F a + (1 - F)b}{1 - F} & \text{with probability } 1 - F
+\end{cases}.
+\end{equation}
+Is it unbiased? Should we use this one or Equation~\eqref{eq:discrete_mc}?\footnote{If you love math, \href{https://ecommons.cornell.edu/handle/1813/13985}{Chapter 2.3} of Milos Hasan's thesis has some cool theoretical discussions on what is the best way to do this.}
+
+After you add back \lstinline{plastic}, let's add a few more materials. It feels weird that our rays either uniformly spread like a diffuse material, or it pinpoint at the mirror reflection direction -- there must be something in between! In general, instead of a cosine distribution multiplied by $\frac{K_d}{\pi}$, we can replace it with a general \emph{bidirectional reflectance distribution function} (BRDF) $\rho$\footnote{In many literatures, BRDF does not include the cosine term, but I find it cleaner to combine the both most of the time.}:
+\begin{equation}
+L = L_e + \int_{\omega \in \Omega} \rho \cdot L \cdot \mathrm{d}\omega.
+\label{eq:rendering_equation}
+\end{equation}
+
+\paragraph{Phong BRDF.} Designing a good BRDF $\rho$ is an active research topic. A simple BRDF, again goes back to the legedary \href{https://en.wikipedia.org/wiki/Phong_reflection_model}{Phong}, is to define a cosine falloff function around the mirror reflection direction:
+\begin{equation}
+\rho_{\text{phong}} \propto K_s \max\left(r \cdot \omega, 0\right)^\alpha \max\left(n_s \cdot \omega, 0\right),
+\end{equation}
+where $K_s$ is the reflectance color, $r$ is the mirror reflection direction, and $\alpha$ is usually called the \emph{Phong exponent} -- the larger it is, the sharper the distribution is. Notice that we only define the distribution up to a normalization constant. Choosing a proper normalization is important for BRDFs (why?). When Phong derived his reflection model, they did not have to worry about normalization because they were not doing path tracing. To use Phong's reflection model in our renderer, we need to derive a constant.
+
+For a BRDF $\rho(\omega_i, \omega_o)$ to be energy conserving, it needs to satisfy the following condition:
+\begin{equation}
+\int_{\omega_o \in \Omega} \rho(\omega_i, \omega_o) \mathrm{d}\omega_o \leq 1 \text{ for all } \omega_i.
+\end{equation}
+To ensure the Phong BRDF $\rho_{\text{phong}}$ satisfies this criterion, we need to choose a constant $C$ such that
+\begin{equation}
+C \cdot K_s \int_{\omega \in \Omega} \left(r \cdot \omega\right)^\alpha n_s \cdot \omega \mathrm{d} \omega \leq 1
+\end{equation}
+for any incoming ray direction $\omega_i$ ($r = \omega_i - 2 n_s \left(n_s \cdot \omega_i\right)$). 
+We find that the maximum of the integral is achieved when $\omega_i = n_s$. In such case, the reflection direction $r$ is also at the normal direction $n_s$:
+\begin{equation}
+K_s \int_{\omega \in \Omega} \left(r \cdot \omega\right)^\alpha n_s \cdot \omega \mathrm{d} \omega \leq K_s \int_{\omega \in \Omega} \left(n_s \cdot \omega\right)^{\alpha + 1} \mathrm{d} \omega.
+\label{eq:phong_inequality}
+\end{equation}
+The second integral in Equation~\eqref{eq:phong_inequality} has a close form. To see this, let's convert it to a spherical coordinate where the $z$-axis is the direction of $n_s$:
+\begin{equation}
+\int_{\omega \in \Omega} \left(n_s \cdot \omega\right)^{\alpha + 1} \mathrm{d} \omega = 
+\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}} \left(\cos\theta\right)^{\alpha + 1} \sin\theta \mathrm{d}\theta \mathrm{d}\phi = \int_{0}^{2\pi} \left. \frac{1}{\alpha + 2} \left(\cos\theta\right)^{\alpha + 2} \right|_{\theta=0}^{\frac{\pi}{2}} \mathrm{d}\phi = \frac{2\pi}{\alpha + 2}.
+\end{equation}
+So, if we set $C = \frac{\alpha + 2}{2\pi}$, as long as $K_s \leq 1$, Phong BRDF always conserve energy:
+\begin{equation}
+\rho_{\text{phong}} = K_s \frac{\alpha + 2}{2\pi} \max\left(r \cdot \omega, 0\right)^\alpha \max\left(n_s \cdot \omega, 0\right).
+\end{equation}
+
+For sampling this variant of Phong reflection model, read \href{https://www.cs.princeton.edu/courses/archive/fall03/cs526/papers/lafortune94.pdf}{Chapter 3.3.2} of the article ``Using the Modified Phong Reflectance Model for Physically Based Rendering'' by Lafortune and Willem.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

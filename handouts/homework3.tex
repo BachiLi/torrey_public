@@ -31,7 +31,7 @@ When looking up the texture given a UV coordinate, we will do something differen
 x = img.width * modulo(uscale * u + uoffset, 1);
 y = img.height * modulo(vscale * v + uoffset, 1);
 \end{lstlisting}
-Finally, RTNW applies \emph{nearest neighbor} lookup. This gives blocky artifacts when zooming into a texture. Instead, we will apply \emph{bilinear} interpolation. Read the \href{https://en.wikipedia.org/wiki/Bilinear_interpolation}{Wikipedia page} for how to do it.
+Finally, RTNW applies \href{https://en.wikipedia.org/wiki/Nearest-neighbor_interpolation}{nearest neighbor lookup}. This gives blocky artifacts when zooming into a texture. Instead, we will apply \emph{bilinear} interpolation. Read the \href{https://en.wikipedia.org/wiki/Bilinear_interpolation}{Wikipedia page} for how to do it.
 
 For loading an image, you can use the \lstinline{imread3} function defined in \lstinline{image.h}.
 
