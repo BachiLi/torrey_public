@@ -37,9 +37,7 @@ struct ParsedPlastic {
 };
 
 struct ParsedPhong {
-    Real eta; // index of refraction
-    ParsedColor diffuse_reflectance; // Kd
-    ParsedColor specular_reflectance; // Ks
+    ParsedColor reflectance; // Ks
     Real exponent; // alpha
 };
 

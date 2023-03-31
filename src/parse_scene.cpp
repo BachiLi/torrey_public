@@ -518,17 +518,12 @@ std::tuple<std::string /* ID */, ParsedMaterial> parse_bsdf(
         }
         return std::make_tuple(id, ParsedPlastic{eta, reflectance});
     } else if (type == "phong") {
-        ParsedColor diffuse_reflectance(Vector3{0.5, 0.5, 0.5});
-        ParsedColor specular_reflectance(Vector3{0.5, 0.5, 0.5});
-        Real eta = 1.5;
+        ParsedColor reflectance(Vector3{0.5, 0.5, 0.5});
         Real exponent = 5;
         for (auto child : node.children()) {
             std::string name = child.attribute("name").value();
-            if (name == "diffuse_reflectance") {
-                diffuse_reflectance = parse_color(
-                    child, texture_map, default_map);
-            } else if (name == "specular_reflectance") {
-                specular_reflectance = parse_color(
+            if (name == "reflectance") {
+                reflectance = parse_color(
                     child, texture_map, default_map);
             } else if (name == "ior" || name == "eta") {
                 eta = parse_float(child.attribute("value").value(), default_map);
@@ -536,8 +531,7 @@ std::tuple<std::string /* ID */, ParsedMaterial> parse_bsdf(
                 exponent = parse_float(child.attribute("value").value(), default_map);
             }
         }
-        return std::make_tuple(id, ParsedPhong{
-            eta, diffuse_reflectance, specular_reflectance, exponent});
+        return std::make_tuple(id, ParsedPhong{reflectance, exponent});
     } else {
         Error(std::string("Unknown BSDF: ") + type);
     }
