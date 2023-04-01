@@ -209,33 +209,43 @@ We can do slightly better though. Notice the extra $\sin\theta$ factor in our Ja
 
 To do one step better, we can apply a \emph{change of variable} to rewrite the integral again, such that the Jacobian of the change of variable is $\frac{1}{\sin\theta_i}$. This change of variable will allow us to uniformly generate a set of points on the sphere. To achieve this, we need to apply \emph{inverse transform sampling}. 
 
-We want to find two variables $u_1, u_2$ such that a mapping $\theta, \phi = M(u_1, u_2)$ has the Jacobian that is proportional to $\frac{1}{\sin\theta}$. Since our Jacobian does not depend on $\phi$, we can simplify the problem to finding a variable $u_1$ such that $\theta = M(u_1)$ and $M'(u_1) \propto \frac{1}{\sin\theta}$. Notice how this has become an \emph{antiderivative} problem: we want to find a function $M$ whose derivative is something specific. There is one awkward thing though: $M'(u_1)$ takes $u_1$ as input, but the derivative is specified in the output space $\theta$. The way we resolve this is to first find the inverse $M^{-1}(\theta)$. The derivative specification becomes ${M^{-1}}'(\theta) \propto \sin\theta$ (this comes from the \href{https://en.wikipedia.org/wiki/Inverse_function_theorem}{inverse function theorem}). 
+We want to find two variables $u_1, u_2$ such that a mapping $\theta, \phi = \mathbf{M}(u_1, u_2)$ has the Jacobian that is proportional to $\frac{1}{\sin\theta}$. Since our Jacobian does not depend on $\phi$, we can simplify the problem to finding a variable $u_1$ such that $\theta = M_{\theta}(u_1)$ and ${M_{\theta}}'(u_1) \propto \frac{1}{\sin\theta}$. Notice how this has become an \emph{antiderivative} problem: we want to find a function $M$ whose derivative is something specific. There is one awkward thing though: $M'(u_1)$ takes $u_1$ as input, but the derivative is specified in the output space $\theta$. The way we resolve this is to first find the inverse $M_{\theta}^{-1}(\theta)$. The derivative specification becomes ${M_{\theta}^{-1}}'(\theta) \propto \sin\theta$ (this comes from the \href{https://en.wikipedia.org/wiki/Inverse_function_theorem}{inverse function theorem}). 
 
-Since we know that ${M^{-1}}'(\theta)$ is exactly the PDF of our sampling process, we know that it has to integrate to one:
+Since we know that ${M_{\theta}^{-1}}'(\theta)$ is exactly the PDF of our sampling process, we know that it has to integrate to one:
 \begin{equation}
-\int_{0}^{\pi} {M^{-1}}'(\theta) \mathrm{d}\theta = C\int_{0}^{\pi} \sin\theta \mathrm{d}\theta = 1.
+\int_{0}^{\pi} {M_{\theta}^{-1}}'(\theta) \mathrm{d}\theta = C\int_{0}^{\pi} \sin\theta \mathrm{d}\theta = 1.
+\label{eq:pdf_normalization}
 \end{equation}
-Since $\int_{0}^{\pi} \sin\theta \mathrm{d}\theta = 2$, we have $C = \frac{1}{2}$ and ${M^{-1}}'(\theta) = \frac{\sin\theta}{2}$. To get $M^{-1}$ from its derivative, we simply integrate it:
+Since $\int_{0}^{\pi} \sin\theta \mathrm{d}\theta = 2$, we have $C = \frac{1}{2}$ and ${M_{\theta}^{-1}}'(\theta) = \frac{\sin\theta}{2}$. To get $M_{\theta}^{-1}$ from its derivative, we simply integrate it:
 \begin{equation}
 M^{-1}(\theta) = \int_{0}^{\theta} \frac{\sin\hat{\theta}}{2} \mathrm{d}\hat{\theta} = \frac{1}{2}\left(1 - \cos\theta\right).
 \end{equation}
-To get $M(u_1)$ we can just invert $M^{-1}(\theta)$:
+To get $M_{\theta}(u_1)$ we can just invert $M_{\theta}^{-1}(\theta)$:
 \begin{equation}
-\theta = M(u_1) = \cos^{-1}\left(1 - 2u_1\right).
+\theta = M_{\theta}(u_1) = \cos^{-1}\left(1 - 2u_1\right).
 \end{equation}
 Just to make things more unify, we can also generate $\phi$ from $u_2$:
 \begin{equation}
-\phi = 2\pi u_2.
+\phi = M_{\phi}(u_2) = 2\pi u_2.
 \end{equation}
 Thus, we have found a change of variable to rewrite Equation~\eqref{eq:naive_monte_carlo_sphere} to remove the $\sin\theta$ term:
 \begin{equation}
     \int_{0}^{2\pi}\int_{0}^{\pi} f(x(\theta, \phi)) r^2 \sin\theta \mathrm{d}\theta \mathrm{d} \phi =
-    \int_{0}^{1}\int_{0}^{1} f(x(M(u_1, u_2))) r^2 (2 \cdot 2\pi) \mathrm{d}u_1 \mathrm{d}u_2.
+    \int_{0}^{1}\int_{0}^{1} f(x(\mathbf{M}(u_1, u_2))) r^2 (2 \cdot 2\pi) \mathrm{d}u_1 \mathrm{d}u_2.
     \label{eq:uniform_monte_carlo_sphere}
 \end{equation}
 The extra $2 \cdot 2\pi$ factor comes from two sources: the $2$ comes from the constant $C$, and the $2\pi$ comes from the mapping between $u_2$ and $\phi$. Notice how the extra factors simplifies to $4\pi r^2$ -- the surface area of a sphere, which is the reciprocal of the PDF of a uniform distribution on it! We can then discretize the second integral in Equation~\eqref{eq:uniform_monte_carlo_sphere}.
 
 If my explanation does not quite work for you, \href{http://6degreesoffreedom.co/circle-random-sampling/}{this blog post} explains the same thing. Make sure you are comfortable with this -- we will ask you to do it next time!
+
+To summarize, the \emph{inverse transform sampling} for finding the change of variable works as the following:
+\begin{itemize}
+    \item Pick a target PDF $p(x)$ (which is our desired Jacobian factor) up to a normalization constant: $p(x) \propto f(x)$. In the case above, our target is $\sin\theta$.
+    \item Compute the normalization constant for $p(x)$ by integrating over the domain. In the case above, we derived it in Equation~\eqref{eq:pdf_normalization} and $C = \frac{1}{2}$.
+    \item Compute the cumulative distribution function (CDF) by integrating over the PDF $M^{-1}(x) = \int_{0}^{x}p(\hat{x})\mathrm{d}\hat{x}$. This is the inverse of our change of variable.
+    \item Invert the CDF to get our change of variable mapping. Feed uniform random variables to the inverse CDF to obtain the target distribution.
+\end{itemize}
+If there are multiple variables, a common way to derive inverse transform sampling is to factor the PDF. For example, for a 2D PDF we can factor such that $p(x, y) = p(x)p(y|x)$. That is, we first sample a variable $x$, then sample another variable $y$ given $x$. $p(x)$ is the marginal PDF: $p(x) = \int p(x, y)$ and we can sample $p(x)$ and $p(y|x)$ using the same process above. \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations}{PBRT} provides a nice explanation of the process. We also talk about it in the class.
 
 We can perform the similar process for triangles. We will omit the derivation (see \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/2D_Sampling_with_Multidimensional_Transformations#SamplingaTriangle}{PBRT} if you are interested, we also talk about it in the lectures). To uniformly sample a point on a triangle, use the following mapping:
 \begin{equation}

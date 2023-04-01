@@ -36,28 +36,28 @@ Remember the area light integral, where we integrate over all points on a light 
 \end{equation}
 where $K_d$ is the diffuse reflectance, $n_s$ is the normal at the shading point, $l$ is the unit vector pointing from the shading point towards $x$, $n_x$ is the geometric normal at point $x$ on the light source, and $d$ is the distance between the shading point and $x$.
 
-We will derive the equations of diffuse interreflection from Equation~\eqref{eq:area_light}. Let's play with an idea: what if everything is light source? We will figure out how to assign the intensity $I$ later. Apart from the intensity, all we need to change is the integration domain: instead of integrating a particular light source $S$, we integrate over all surfaces $\mathcal{M}$. Next, since we are tracing rays, we want to deal with directions, instead of points on surfaces. We achieve this using a \emph{change of variable} (again!) -- instead of integrating over position $x$, we integrate over direction $\omega$:
+We will derive the equations of diffuse interreflection from Equation~\eqref{eq:area_light}. Let's play with an idea: what if everything is light source? We will figure out how to assign the intensity $I$ later. Apart from the intensity, all we need to change is the integration domain: instead of integrating a particular light source $S$, we integrate over all surfaces $\mathcal{M}$. Next, since we are tracing rays, we want to deal with directions, instead of points on surfaces. We achieve this using a \emph{change of variable} (again!) -- instead of integrating over position $x$, we integrate over (outgoing) direction $\omega_o$:
 \begin{equation}
 \int_{x \in \mathcal{M}} \frac{K_d \cdot \max\left(n_s \cdot l, 0\right)}{\pi} \cdot \frac{L \max\left(-n_x \cdot l, 0\right)}{d^2} \cdot \text{visibility} \cdot \mathrm{d}A(x) = 
-\int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+\int_{\omega_o \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega_o, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega_o.
 \label{eq:area_light_solid_angle}
 \end{equation}
 Firstly, we have replaced $S$ with $\mathcal{M}$ and $I$ with $L$ to emphasize that things are different now.
-Also note that $\omega = l$.
-Here, the measure $\mathrm{d}\omega$ is often called the \href{https://en.wikipedia.org/wiki/Solid_angle}{solid angle} -- it represents an infinitesimal area of a point on a unit sphere. You will notice that the equation gets a lot simpler after we switch to the solid angle measure. This is because the Jacobian of the change of variable is exactly the reciprocal of $\frac{\max\left(-n_x \cdot \omega, 0\right)}{d^2} \cdot \text{visibility}$ (see \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#samplinglightsdirectly/gettingthepdfofalight}{Chapter 9.1} of RTRYL for an explanation). Intuitively, the Jacobian captures the ratio of area on the surface $\mathcal{M}$ and its projcted area on a unit sphere (if it is not blocked).
+Also note that $\omega_o = l$.
+Here, the measure $\mathrm{d}\omega_o$ is often called the \href{https://en.wikipedia.org/wiki/Solid_angle}{solid angle} -- it represents an infinitesimal area of a point on a unit sphere. You will notice that the equation gets a lot simpler after we switch to the solid angle measure. This is because the Jacobian of the change of variable is exactly the reciprocal of $\frac{\max\left(-n_x \cdot \omega_o, 0\right)}{d^2} \cdot \text{visibility}$ (see \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#samplinglightsdirectly/gettingthepdfofalight}{Chapter 9.1} of RTRYL for an explanation). Intuitively, the Jacobian captures the ratio of area on the surface $\mathcal{M}$ and its projcted area on a unit sphere (if it is not blocked).
 
 We still need to decide what is the color $I$. Remember in the mirror case, we recursively trace rays to determine the color. We can do the same thing for diffuse surfaces too!
 \begin{equation}
-L = \int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+L = \int_{\omega_o \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega_o, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega_o.
 \end{equation}
 This is however vacuous, because there is no \emph{base case} for this recursion. We will instead add the emission whenever we hit a light source\footnote{The infinite recursion defined in Equation~\eqref{eq:diffuse_rendering_equation} is actually mathematically well-behaved, as long as $K_d < 1$ for all channels. The reason is that after each bounce, some energy will be absorbed by $K_d$, and eventually the ray will carry zero energy.}:
 \begin{equation}
-L = L_e + \int_{\omega \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega.
+L = L_e + \int_{\omega_o \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega_o, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega_o.
 \label{eq:diffuse_rendering_equation}
 \end{equation}
 We have arrived at the (in)famous \href{https://en.wikipedia.org/wiki/Rendering_equation}{rendering equation} (though specialized at diffuse BRDFs).
 
-Now, we need to sample a direction $\omega$ for evaluating the integral in Equation~\eqref{eq:diffuse_rendering_equation}. For this, read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#lightscattering}{Chapter 5-8} of RTRYL. We will implement the cosine hemisphere sampling described in the book. You do not need to implement the light sampling yet (Chapter 9). You also only need to handle diffuse materials. We will add light sampling and other materials back later!
+Now, we need to sample a direction $\omega_o$ for evaluating the integral in Equation~\eqref{eq:diffuse_rendering_equation}. For this, read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#lightscattering}{Chapter 5-8} of RTRYL. We will implement the cosine hemisphere sampling described in the book. You do not need to implement the light sampling yet (Chapter 9). You also only need to handle diffuse materials. We will add light sampling and other materials back later!
 
 Go to the function \lstinline{hw_4_1} in \lstinline{hw4.cpp} and implement diffuse interreflection using cosine hemisphere sampling. The function also takes an extra command line parameter \lstinline{-max_depth [max_depth]}, which you will use to limit the maximum recursion depth of your path tracer. 
 
@@ -133,16 +133,16 @@ Figure~\ref{fig:hw_4_2_mirror_plastic} shows our renderings of them.
     \label{fig:hw_4_2_mirror_plastic}
 \end{figure}
 
-\subsection{Adding Phong BRDF}
+\subsection{Phong BRDF}
 After you add back \lstinline{plastic}, let's add a few more materials. It feels weird that our rays either uniformly spread like a diffuse material, or it pinpoint at the mirror reflection direction -- there must be something in between! In general, instead of a cosine distribution multiplied by $\frac{K_d}{\pi}$, we can replace it with a general \emph{bidirectional reflectance distribution function} (BRDF) $\rho$\footnote{In many literatures, BRDF does not include the cosine term, but I find it cleaner to combine the both most of the time.}:
 \begin{equation}
-L = L_e + \int_{\omega \in \Omega} \rho \cdot L \cdot \mathrm{d}\omega.
+L = L_e + \int_{\omega_o \in \Omega} \rho \cdot L \cdot \mathrm{d}\omega_o.
 \label{eq:rendering_equation}
 \end{equation}
 
 Designing a good BRDF $\rho$ is an active research topic. A simple BRDF, again goes back to the legedary \href{https://en.wikipedia.org/wiki/Phong_reflection_model}{Phong}, is to define a cosine falloff function around the mirror reflection direction:
 \begin{equation}
-\rho_{\text{phong}} \propto K_s \max\left(r \cdot \omega, 0\right)^\alpha \max\left(n_s \cdot \omega, 0\right),
+\rho_{\text{phong}} \propto K_s \max\left(r \cdot \omega_o, 0\right)^\alpha \max\left(n_s \cdot \omega_o, 0\right),
 \end{equation}
 where $K_s$ is the reflectance color, $r$ is the mirror reflection direction, and $\alpha$ is usually called the \emph{Phong exponent} -- the larger it is, the sharper the distribution is. Notice that we only define the distribution up to a normalization constant. Choosing a proper normalization is important for BRDFs (why?). When Phong derived his reflection model, they did not have to worry about normalization because they were not doing path tracing. To use Phong's reflection model in our renderer, we need to derive a constant.
 
@@ -152,26 +152,64 @@ For a BRDF $\rho(\omega_i, \omega_o)$ to be energy conserving, it needs to satis
 \end{equation}
 To ensure the Phong BRDF $\rho_{\text{phong}}$ satisfies this criterion, we need to choose a constant $C$ such that
 \begin{equation}
-C \cdot K_s \int_{\omega \in \Omega} \left(r \cdot \omega\right)^\alpha n_s \cdot \omega \mathrm{d} \omega \leq 1
+C \cdot K_s \int_{\omega_o \in \Omega} \left(r \cdot \omega_o\right)^\alpha n_s \cdot \omega_o \mathrm{d} \omega_o \leq 1
 \end{equation}
 for any incoming ray direction $\omega_i$ ($r = \omega_i - 2 n_s \left(n_s \cdot \omega_i\right)$). 
 We find that the maximum of the integral is achieved when $\omega_i = n_s$. In such case, the reflection direction $r$ is also at the normal direction $n_s$:
 \begin{equation}
-K_s \int_{\omega \in \Omega} \left(r \cdot \omega\right)^\alpha n_s \cdot \omega \mathrm{d} \omega \leq K_s \int_{\omega \in \Omega} \left(n_s \cdot \omega\right)^{\alpha + 1} \mathrm{d} \omega.
+K_s \int_{\omega_o \in \Omega} \left(r \cdot \omega_o\right)^\alpha n_s \cdot \omega_o \mathrm{d} \omega_o \leq K_s \int_{\omega_o \in \Omega} \left(n_s \cdot \omega_o\right)^{\alpha + 1} \mathrm{d} \omega_o.
 \label{eq:phong_inequality}
 \end{equation}
-The second integral in Equation~\eqref{eq:phong_inequality} has a close form. To see this, let's convert it to a spherical coordinate where the $z$-axis is the direction of $n_s$:
+The second integral in Equation~\eqref{eq:phong_inequality} has a closed-form. To see this, let's convert it to a spherical coordinate where the $z$-axis is the direction of $n_s$:
 \begin{equation}
-\int_{\omega \in \Omega} \left(n_s \cdot \omega\right)^{\alpha + 1} \mathrm{d} \omega = 
-\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}} \left(\cos\theta\right)^{\alpha + 1} \sin\theta \mathrm{d}\theta \mathrm{d}\phi = \int_{0}^{2\pi} \left. \frac{1}{\alpha + 2} \left(\cos\theta\right)^{\alpha + 2} \right|_{\theta=0}^{\frac{\pi}{2}} \mathrm{d}\phi = \frac{2\pi}{\alpha + 2}.
+\int_{\omega_o \in \Omega} \left(n_s \cdot \omega_o\right)^{\alpha + 1} \mathrm{d} \omega_o = 
+\int_{0}^{2\pi}\int_{0}^{\frac{\pi}{2}} \left(\cos\theta\right)^{\alpha + 1} \sin\theta \mathrm{d}\theta \mathrm{d}\phi = 
+\int_{0}^{2\pi} \left. \frac{-1}{\alpha + 2} \left(\cos\theta\right)^{\alpha + 2} \right|_{\theta=0}^{\frac{\pi}{2}} \mathrm{d}\phi = \frac{2\pi}{\alpha + 2}.
+\label{eq:phong_normalization}
 \end{equation}
 So, if we set $C = \frac{\alpha + 2}{2\pi}$, as long as $K_s \leq 1$, Phong BRDF always conserve energy:
 \begin{equation}
-\rho_{\text{phong}} = K_s \frac{\alpha + 2}{2\pi} \max\left(r \cdot \omega, 0\right)^\alpha \max\left(n_s \cdot \omega, 0\right).
+\rho_{\text{phong}} = K_s \frac{\alpha + 2}{2\pi} \max\left(r \cdot \omega_o, 0\right)^\alpha \max\left(n_s \cdot \omega_o, 0\right).
 \label{eq:phong}
 \end{equation}
 
-For sampling this variant of Phong reflection model, read \href{https://www.cs.princeton.edu/courses/archive/fall03/cs526/papers/lafortune94.pdf}{Chapter 3.3.2} of the article ``Using the Modified Phong Reflectance Model for Physically Based Rendering'' by Lafortune and Willem (ignore the diffuse component). Roughly speaking, you will do something similar to the cosine hemisphere sampling with $z$-axis being up (but modify the inverse transform sampling so that it's proportional to $\cos^{\alpha}$ instead of $\cos$), build a ONB frame around the ray reflection direction, convert the coordinate system from the local coordinate to the ONB frame coordinate.
+Sampling the Phong BRDF isn't that different from sampling the diffuse BRDF. We first sample the cosine lobe ($\max\left(r \cdot \omega_o, 0\right)^\alpha$) assuming the mirror reflection direction $r$ is facing towards $z$. Then we build an orthonormal basis with the $z$ axis pointing towards the mirror reflection direction. We then use the orthonormal basis to transform the local 3D vector to the mirror reflection direction basis.
+
+To importance sample the local cosine lobe, we turn into spherical coordinates and define the PDF we want to sample from:
+\begin{equation}
+\mathbf{p}_{\text{phong}}(\theta, \phi) \propto \left(\cos\theta\right)^{\alpha} \sin\theta.
+\end{equation}
+From Equation~\eqref{eq:phong_normalization}, we already know that the normalization factor of this PDF:
+\begin{equation}
+\mathbf{p}_{\text{phong}}(\theta, \phi) = \frac{\alpha + 1}{2\pi}\left(\cos\theta\right)^{\alpha}.
+\end{equation}
+
+To apply inverse transform sampling, we note that $\phi$ can be handled separately and focus on $\theta$. We first get the normalization factor of $p_{\text{phong}}(\theta)$:
+\begin{equation}
+\begin{aligned}
+& p_{\text{phong}}(\theta) \propto \left(\cos\theta\right)^{\alpha}\sin\theta \\
+& \int_0^{\frac{\pi}{2}} \left(\cos\theta\right)^{\alpha}\sin\theta \mathrm{d}\theta = \frac{1}{\alpha + 1} \\
+& p_{\text{phong}}(\theta) = \left(\alpha + 1\right) \left(\cos\theta\right)^{\alpha}.
+\end{aligned}
+\end{equation}
+Next, we integrate to get the CDF:
+\begin{equation}
+M_{\theta}^{-1}(\theta) = \int_{0}^{\theta} p_{\text{phong}}(\hat{\theta})\mathrm{d}\hat{\theta} = \left.-\left(\cos\hat{\theta}\right)^{\alpha + 1}\right|_{\hat{\theta}=0}^{\theta} = 1 - \left(\cos\theta\right)^{\alpha + 1}
+\end{equation}
+Next, we invert to get the change of variable:
+\begin{equation}
+\theta = M_{\theta}(u_1) = \cos^{-1}\left(\left(1 - u_1\right)^{\frac{1}{\alpha + 1}}\right).
+\label{eq:phong_theta}
+\end{equation}
+The mapping for $\phi$ is easy:
+\begin{equation}
+\phi = M_{\phi}(u_2) = 2\pi u_2.
+\label{eq:phong_phi}
+\end{equation}
+
+From $\theta$ and $\phi$, we come up with the local direction. We can then convert this local direction to the coordinate basis defined by the mirror reflection direction $r$. This conversion is also a change of variable, and we normally have to account for the Jacobian of this coordinate transformation. Interestingly, because the coordinate basis is orthonormal, the conversion has an Jacobian of $1$, so we do not need to account for the Jacobian.
+
+If my explanation does not quite work for you, you can also read \href{https://www.cs.princeton.edu/courses/archive/fall03/cs526/papers/lafortune94.pdf}{Chapter 3.3.2} of the article ``Using the Modified Phong Reflectance Model for Physically Based Rendering'' by Lafortune and Willem (ignore the diffuse component).
 
 Now, add the Phong BRDF (Equation~\eqref{eq:phong}) into your \lstinline{hw_4_2} code. A Phong BRDF of a scene is stored in the following format:
 \begin{lstlisting}[language=C++]
@@ -181,19 +219,79 @@ struct ParsedPhong {
 };
 \end{lstlisting}
 
-We provide yet another Cornell box scene (yes, I am uncreative) for you to test your code:
+We provide yet another Cornell box scene (yes, I am uncreative) and two other scenes for you to test your code:
 \begin{lstlisting}[language=bash]
 ./torrey -hw 4_2 ../scenes/cbox/cbox_area_light_spheres_phong.xml
+./torrey -hw 4_2 ../scenes/teapot/teapot_textured_phong.xml
+./torrey -hw 4_2 ../scenes/teapot/teapot_textured_grazing.xml
 \end{lstlisting}
-Our rendering of the scene is in Figure~\ref{fig:hw_4_3_phong}.
+Our rendering of the scene is in Figure~\ref{fig:hw_4_2_phong}.
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.80\linewidth]{imgs/hw_4_2c.png}
-    \caption{Reference for the \lstinline{phong} materials for HW 4.2. The Phong exponents are 100, 40, 8, 1, from left to right.}
-    \label{fig:hw_4_3_phong}
+    \includegraphics[width=0.45\linewidth]{imgs/hw_4_2c.png}
+    \includegraphics[width=0.225\linewidth]{imgs/hw_4_2d.png}
+    \includegraphics[width=0.225\linewidth]{imgs/hw_4_2e.png}
+    \caption{Reference for the \lstinline{phong} materials for HW 4.2. For the left most scene, the Phong exponents are 100, 40, 8, 1, from left to right. For the middle and right scenes, the Phong exponent is 50.}
+    \label{fig:hw_4_2_phong}
 \end{figure}
 
+\subsection{Blinn-Phong BRDF}
+There are two issues of the Phong BRDF: firstly, when we look at a surface from the grazing angle, the mirror reflection direction $r$ would also be very close to the surface. Assigning a cosine lobe around $r$ in this case would make a large portion of rays having zero contribution, due to the two clamp-to-zero operations we applied to the BRDF.\footnote{\href{https://learnopengl.com/Advanced-Lighting/Advanced-Lighting}{This article} explains the issue great.} See the last image in Figure~\ref{fig:hw_4_2_phong}: the teapot appears less specular, and there is severe darkening of the floor because of the clamping. Secondly, it is not fully clear how to assign the Fresnel term like we did for \lstinline{mirror}: do we apply Fresnel using the normal and the viewing direction $n_s \cdot \omega_i$? Or do we apply Fresnel using the normal and the outgoing/light direction $n_s \cdot \omega_o$? Both can be good or bad depending on the situations.
+
+The Blinn-Phong BRDF fixes the two issues with one trick. Instead of defining a cosine lobe round the mirror reflection direction, we use the cosine between the normal and the half vector $h = \frac{\omega_i + \omega_o}{\left\|\omega_i + \omega_o\right\|}$:
+\begin{equation}
+\begin{aligned}
+\rho_{\text{blinn}} &\propto F_h \left(n_s \cdot h\right)^{\alpha} \max\left(n_s \cdot \omega_o, 0\right) \\
+F_h &= K_s + (1 - K_s) (1 - h \cdot \omega_o)^5
+\end{aligned}.
+\end{equation}
+What's so special about the half vector $h$? First, notice that $\omega_i \cdot h = \omega_o \cdot h$ (due to the symmetry). Next, when $h = n_s$, this means that the incoming direction $\omega_i$ and the outgoing direction $\omega_o$ satisfies the mirror reflection criteria. Therefore, the similarity between the half vector and the normal is a good metric for measuring how close the two directions are to form a mirror reflection.
+
+Note about two things: firstly, we no longer need to clamp the cosine lobe -- as long as viewing direction $\omega_i$ and lighting direction $\omega_o$ are on the same side of the surface, $n_s \cdot h$ is always positive. Secondly, $F_h$ now takes the half vector as the normal, and $h \cdot \omega_o = h \cdot \omega_i$, so the evaluating the Fresnel for view direction and the light direction is exactly the same now. 
+Not only is Blinn-Phong more mathematically well-behaved, it has been shown that it fits significantly better to real BRDF data. See the article by \href{http://people.csail.mit.edu/addy/research/brdf/index.html}{Ngan et al.} for more detail.
+
+The Blinn-Phong BRDF can be normalized using the similar way we did for the Phong BRDF. The closed-form is more complicated, so we just post the end result here and refer you to the article by \href{http://www.farbrausch.de/~fg/stuff/phong.pdf}{Fabian Giesen} for the derivation:
+\begin{equation}
+\rho_{\text{blinn}} = \frac{\left(\alpha + 2\right)\left(\alpha + 4\right)}{8\pi \left(2^{-\frac{\alpha}{2}} + \alpha\right)} F_h \left(n_s \cdot h\right)^{\alpha} \max\left(n_s \cdot \omega_o, 0\right).
+\end{equation}
+
+Sampling the Blinn-Phong BRDF is slightly more involved than Phong, because the cosine lobe is defined using the half vector instead of the outgoing direction directly. Our strategy of sampling Blinn-Phong would be the following:
+\begin{itemize}
+  \item Sample a half vector $h$ with PDF $p_{\text{blinn}}^h(h) \propto \left(n_s \cdot h\right)^{\alpha}$.
+  \item Given an incoming direction $\omega_i$, get the outgoing direction $\omega_o$ by applying mirror reflection over the half vector $h$. 
+\end{itemize}
+
+Step 1 is similar to Equation~\eqref{eq:phong_theta} and~\eqref{eq:phong_phi}, but instead of transforming the coordinates to the a basis formed by $r$, we use the basis formed by $n_s$. Generating an outgoing direction from Step 2 is then straightforward. However, the reflection in Step 2 is yet another change of variable that transform the PDF in the half vector space to the outgoing direction space. This time the Jacobian is not identity. We need to account for the derivatives between $\omega_o$ and $h$:
+\begin{equation}
+\left|\frac{\mathrm{d}\omega_o}{\mathrm{d}h}\right| = \frac{1}{\left|\frac{\mathrm{d}h}{\mathrm{d}\omega_o}\right|}.
+\end{equation}
+Expanding $h = \frac{\omega_i + \omega_o}{\left\|\omega_i + \omega_o\right\|}$, algebraically, we need to compute a $3 \times 3$ Jacobian matrix. The derivation is not too hard but very tedious. Fortunately, there is a very elegant geometric derivative (taken from \href{http://www.graphics.cornell.edu/~bjw/microfacetbsdf.pdf}{Microfacet Models for Refraction through Rough Surfaces} from Walter et al.):
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.4\linewidth]{imgs/half_vector_jacobian.pdf}
+    \caption{Geometric derivation of the Jacobian between the transformation of the half vector and the outgoing direction.}
+    \label{fig:half_vector_jacobian}
+\end{figure}
+Figure~\ref{fig:half_vector_jacobian} illustrates the proof: the cyan line represents the incoming direction $\omega_i$, the green line represents the outgoing direction $\omega_o$, and the half vector before normalization $\omega_i + \omega_o$ is the yellow line. The normalization of the half vector brings it back to the sphere of $\omega_i$. The Jacobian is the ratio of the small area $\mathrm{d}\omega_o$ on the $\omega_o$ sphere, and the small area $\mathrm{d}h$ on the $\omega_i$ sphere. The ratio of the area is exactly the geometry term: cosine divided by squared distance.
+
+There is one more simplification we can do: notice from the figure that $\left\|\omega_i + \omega_o\right\| = \omega_i \cdot h + \omega_o \cdot h$. Also note that $\omega_i \cdot h = \omega_o \cdot h$. So the Jacobian can be simplify into:
+\begin{equation}
+\left|\frac{\mathrm{d}h}{\mathrm{d}\omega_o}\right| = \frac{1}{4 \omega_o \cdot h}.
+\end{equation}
+Multiplying the Jacobian to the PDF, we obtain the final PDF of the Blinn-Phong BRDF sampling procedure:
+\begin{equation}
+p_{\text{blinn}}^{\omega}(\omega_o) = \frac{\left(\alpha + 1\right) \left(n_s \cdot h\right)^{\alpha}}{2\pi \cdot 4 \left(\omega_o \cdot h\right)}.
+\end{equation}
+
+Implement Blinn-Phong BRDF in your \lstinline{hw_4_2} code. A Blinn-Phong BRDF has the same parameters as a Phong BRDF:
+\begin{lstlisting}[language=C++]
+struct ParsedBlinnPhong {
+    ParsedColor reflectance; // Ks
+    Real exponent; // alpha
+};
+\end{lstlisting}
+According to \href{https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model}{Wikipedia}, \lstinline{ParsedBlinnPhong::exponent} $\approx$ \lstinline{4 * ParsedPhong::exponent}.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}
