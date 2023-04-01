@@ -41,6 +41,11 @@ struct ParsedPhong {
     Real exponent; // alpha
 };
 
+struct ParsedBlinnPhong {
+    ParsedColor reflectance; // Ks
+    Real exponent; // alpha
+};
+
 struct ParsedBlinnPhongMicrofacet {
     ParsedColor reflectance; // Ks
     Real exponent; // alpha
@@ -50,6 +55,7 @@ using ParsedMaterial = std::variant<ParsedDiffuse,
                                     ParsedMirror,
                                     ParsedPlastic,
                                     ParsedPhong,
+                                    ParsedBlinnPhong,
                                     ParsedBlinnPhongMicrofacet>;
 
 struct ParsedPointLight {

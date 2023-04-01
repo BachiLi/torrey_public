@@ -542,6 +542,19 @@ std::tuple<std::string /* ID */, ParsedMaterial> parse_bsdf(
                 exponent = parse_float(child.attribute("value").value(), default_map);
             }
         }
+        return std::make_tuple(id, ParsedBlinnPhong{reflectance, exponent});
+    } else if (type == "blinn_microfacet" || type == "blinnphong_microfacet") {
+        ParsedColor reflectance(Vector3{0.5, 0.5, 0.5});
+        Real exponent = 5;
+        for (auto child : node.children()) {
+            std::string name = child.attribute("name").value();
+            if (name == "reflectance") {
+                reflectance = parse_color(
+                    child, texture_map, default_map);
+            } else if (name == "exponent" || name == "alpha") {
+                exponent = parse_float(child.attribute("value").value(), default_map);
+            }
+        }
         return std::make_tuple(id, ParsedBlinnPhongMicrofacet{reflectance, exponent});
     } else {
         Error(std::string("Unknown BSDF: ") + type);
