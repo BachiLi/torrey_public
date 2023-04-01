@@ -150,11 +150,12 @@ For a BRDF $\rho(\omega_i, \omega_o)$ to be energy conserving, it needs to satis
 \begin{equation}
 \int_{\omega_o \in \Omega} \rho(\omega_i, \omega_o) \mathrm{d}\omega_o \leq 1 \text{ for all } \omega_i.
 \end{equation}
+Throughout this homework, we assume $\omega_i$ to be pointing \textbf{out} from the surface.
 To ensure the Phong BRDF $\rho_{\text{phong}}$ satisfies this criterion, we need to choose a constant $C$ such that
 \begin{equation}
 C \cdot K_s \int_{\omega_o \in \Omega} \left(r \cdot \omega_o\right)^\alpha n_s \cdot \omega_o \mathrm{d} \omega_o \leq 1
 \end{equation}
-for any incoming ray direction $\omega_i$ ($r = \omega_i - 2 n_s \left(n_s \cdot \omega_i\right)$). 
+for any incoming direction $\omega_i$ ($r = -\omega_i + 2 n_s \left(n_s \cdot \omega_i\right)$). 
 We find that the maximum of the integral is achieved when $\omega_i = n_s$. In such case, the reflection direction $r$ is also at the normal direction $n_s$:
 \begin{equation}
 K_s \int_{\omega_o \in \Omega} \left(r \cdot \omega_o\right)^\alpha n_s \cdot \omega_o \mathrm{d} \omega_o \leq K_s \int_{\omega_o \in \Omega} \left(n_s \cdot \omega_o\right)^{\alpha + 1} \mathrm{d} \omega_o.
@@ -184,28 +185,7 @@ From Equation~\eqref{eq:phong_normalization}, we already know that the normaliza
 \mathbf{p}_{\text{phong}}(\theta, \phi) = \frac{\alpha + 1}{2\pi}\left(\cos\theta\right)^{\alpha}.
 \end{equation}
 
-To apply inverse transform sampling, we note that $\phi$ can be handled separately and focus on $\theta$. We first get the normalization factor of $p_{\text{phong}}(\theta)$:
-\begin{equation}
-\begin{aligned}
-& p_{\text{phong}}(\theta) \propto \left(\cos\theta\right)^{\alpha}\sin\theta \\
-& \int_0^{\frac{\pi}{2}} \left(\cos\theta\right)^{\alpha}\sin\theta \mathrm{d}\theta = \frac{1}{\alpha + 1} \\
-& p_{\text{phong}}(\theta) = \left(\alpha + 1\right) \left(\cos\theta\right)^{\alpha}.
-\end{aligned}
-\end{equation}
-Next, we integrate to get the CDF:
-\begin{equation}
-M_{\theta}^{-1}(\theta) = \int_{0}^{\theta} p_{\text{phong}}(\hat{\theta})\mathrm{d}\hat{\theta} = \left.-\left(\cos\hat{\theta}\right)^{\alpha + 1}\right|_{\hat{\theta}=0}^{\theta} = 1 - \left(\cos\theta\right)^{\alpha + 1}
-\end{equation}
-Next, we invert to get the change of variable:
-\begin{equation}
-\theta = M_{\theta}(u_1) = \cos^{-1}\left(\left(1 - u_1\right)^{\frac{1}{\alpha + 1}}\right).
-\label{eq:phong_theta}
-\end{equation}
-The mapping for $\phi$ is easy:
-\begin{equation}
-\phi = M_{\phi}(u_2) = 2\pi u_2.
-\label{eq:phong_phi}
-\end{equation}
+\paragraph{Quiz:} Apply inverse transform sampling to derive the sampling procedure for the PDF above. Show your derivation process.
 
 From $\theta$ and $\phi$, we come up with the local direction. We can then convert this local direction to the coordinate basis defined by the mirror reflection direction $r$. This conversion is also a change of variable, and we normally have to account for the Jacobian of this coordinate transformation. Interestingly, because the coordinate basis is orthonormal, the conversion has an Jacobian of $1$, so we do not need to account for the Jacobian.
 
@@ -236,33 +216,76 @@ Our rendering of the scene is in Figure~\ref{fig:hw_4_2_phong}.
     \label{fig:hw_4_2_phong}
 \end{figure}
 
-\subsection{Blinn-Phong BRDF}
+\subsection{(Blinn-Phong) Microfacet BRDF}
 There are two issues of the Phong BRDF: firstly, when we look at a surface from the grazing angle, the mirror reflection direction $r$ would also be very close to the surface. Assigning a cosine lobe around $r$ in this case would make a large portion of rays having zero contribution, due to the two clamp-to-zero operations we applied to the BRDF.\footnote{\href{https://learnopengl.com/Advanced-Lighting/Advanced-Lighting}{This article} explains the issue great.} See the last image in Figure~\ref{fig:hw_4_2_phong}: the teapot appears less specular, and there is severe darkening of the floor because of the clamping. Secondly, it is not fully clear how to assign the Fresnel term like we did for \lstinline{mirror}: do we apply Fresnel using the normal and the viewing direction $n_s \cdot \omega_i$? Or do we apply Fresnel using the normal and the outgoing/light direction $n_s \cdot \omega_o$? Both can be good or bad depending on the situations.
 
-The Blinn-Phong BRDF fixes the two issues with one trick. Instead of defining a cosine lobe round the mirror reflection direction, we use the cosine between the normal and the half vector $h = \frac{\omega_i + \omega_o}{\left\|\omega_i + \omega_o\right\|}$:
-\begin{equation}
-\begin{aligned}
-\rho_{\text{blinn}} &\propto F_h \left(n_s \cdot h\right)^{\alpha} \max\left(n_s \cdot \omega_o, 0\right) \\
-F_h &= K_s + (1 - K_s) (1 - h \cdot \omega_o)^5
-\end{aligned}.
-\end{equation}
+A key idea to fix the two issues, introduced to graphics by \href{https://dl.acm.org/doi/10.1145/965141.563893}{Blinn} and originated in optics from \href{https://www.graphics.cornell.edu/~westin/pubs/TorranceSparrowJOSA1967.pdf}{Torrance and Sparrow}, is to use the half vector $h = \frac{\omega_i + \omega_o}{\left\|\omega_i + \omega_o\right\|}$. Instead of defining a cosine lobe round the mirror reflection direction $\left(r \cdot \omega_o\right)^{\alpha}$, we use the cosine between the normal and the half vector: $\left(n_s \cdot h\right)^{\alpha}$. Furthermore, when evaluating the Fresnel equation, we replace the normal $n_s$ with the half vector $h$.
+
 What's so special about the half vector $h$? First, notice that $\omega_i \cdot h = \omega_o \cdot h$ (due to the symmetry). Next, when $h = n_s$, this means that the incoming direction $\omega_i$ and the outgoing direction $\omega_o$ satisfies the mirror reflection criteria. Therefore, the similarity between the half vector and the normal is a good metric for measuring how close the two directions are to form a mirror reflection.
 
-Note about two things: firstly, we no longer need to clamp the cosine lobe -- as long as viewing direction $\omega_i$ and lighting direction $\omega_o$ are on the same side of the surface, $n_s \cdot h$ is always positive. Secondly, $F_h$ now takes the half vector as the normal, and $h \cdot \omega_o = h \cdot \omega_i$, so the evaluating the Fresnel for view direction and the light direction is exactly the same now. 
-Not only is Blinn-Phong more mathematically well-behaved, it has been shown that it fits significantly better to real BRDF data. See the article by \href{http://people.csail.mit.edu/addy/research/brdf/index.html}{Ngan et al.} for more detail.
+Note about two things: firstly, we no longer need to clamp the cosine lobe -- as long as viewing direction $\omega_i$ and lighting direction $\omega_o$ are on the same side of the surface, $n_s \cdot h$ is always positive. Secondly, since $h \cdot \omega_o = h \cdot \omega_i$, evaluating the Fresnel for view and light directions is exactly the same now. 
 
-The Blinn-Phong BRDF can be normalized using the similar way we did for the Phong BRDF. The closed-form is more complicated, so we just post the end result here and refer you to the article by \href{http://www.farbrausch.de/~fg/stuff/phong.pdf}{Fabian Giesen} for the derivation:
+Turns out we can build a geometrical/physical explanation of the idea of using half vectors to define BRDFs. The physical explanation is called \emph{Microfacet theory}.\footnote{Microfacet theory was developed in optical physics in 1960s to study electromagnectic wave scatter on surfaces. See ``The scattering of electromagnetic waves from rough surfaces'' from Beckmann and Spizzichino.} The idea is to treat the surface as a statistical collection of small oriented mirrors (and these mirrors are called the \emph{microfacets}). Mirrors only reflect lights when the half vector is aligned with its normal direction. So if we are reflecting light at half vector $h$, we must have hit a small mirror with \emph{micronormal} $m=h$. The half vector cosine lobe $\left(n_s \cdot h\right)^{\alpha}$ can be seen as defining a distribution of normals, by counting how many mirrors have the normal $h$. Each individual mirror also has its own Fresnel reflection, which is why we use half vector instead of shading normal for the Fresnel. Finally, the microfacets can block each other, causing shadowing effects. Mathematically, a microfacet BRDF is defined as:
 \begin{equation}
-\rho_{\text{blinn}} = \frac{\left(\alpha + 2\right)\left(\alpha + 4\right)}{8\pi \left(2^{-\frac{\alpha}{2}} + \alpha\right)} F_h \left(n_s \cdot h\right)^{\alpha} \max\left(n_s \cdot \omega_o, 0\right).
+\rho_{\text{microfacet}} = \frac{F_h \cdot D \cdot G}{4 \left(\omega_i \cdot n_s\right) \left(\omega_o \cdot n_s\right)} \max\left(n_s \cdot \omega_o, 0\right),
+\label{eq:microfacet}
+\end{equation}
+where $F_h$ is the Fresnel term but evaluated at the half vector, $D$ is the \emph{Normal Distribution Function} (NDF) that describes the distribution of the normals of the microfacets, and $G$ is the geometric \emph{shadowing masking} term, which accounts for the porortion of unblocked microfacets. The $\omega_i \cdot n_s$ and the $\omega_o \cdot n_s$ term models the total projection area of microfacets towards incoming and outgoing directions (if you look at a surface from the grazing angle, you will see more area). The $4$ in the denominator is a normalization constant for energy conservation.
+Microfacet BRDFs are the most popular BRDFs in computer graphics now, because of how well they fit to our current BRDF datasets (see the article by \href{http://people.csail.mit.edu/addy/research/brdf/index.html}{Ngan et al.} for more detail).
+
+For this homework, we will use the Schilick Fresnel:
+\begin{equation}
+F_h = F_0 + (1 - F_0) \left(1 - h \cdot \omega_o\right)^5,
+\end{equation}
+where $F_0$ is the reflectance of the surface. For $D$, we will use a \href{https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model}{Blinn-Phong} inspired NDF:
+\begin{equation}
+D \propto \left(n_s \cdot h\right)^{\alpha}.
+\label{eq:blinn_NDF}
+\end{equation}
+$G$ can usually be derived from the geometric configuration of the microfacets. The most popular configuration is developed by \href{https://ieeexplore.ieee.org/document/1138991}{Smith}: they assume that the microfacets' orientations are uncorrelated to each other. With this assumption, the geometry term is a function solely on the two viewing directions: 
+\begin{equation}
+\begin{aligned}
+G(\omega_i, \omega_o) &= G_1(\omega_i) G_1(\omega_o) \\
+G_1(\omega) = \begin{cases}
+0 & \text{ if } \omega \cdot h \leq 0 \\
+\hat{G}_1(\omega) & \text{ otherwise.}
+\end{cases}
+\end{aligned}
+\end{equation}
+We can derive $G_1$ using the conservation of projection area of the microfacet:
+\begin{equation}
+\begin{aligned}
+\omega \cdot n_s &= \int_{\Omega_h} G_1(\omega) D(h) \omega \cdot h \mathrm{d} h \\
+G_1(\omega) &= \frac{\omega \cdot n_s}{\int_{\Omega_h} D(h) \omega \cdot h \mathrm{d} h}. 
+\label{eq:smith_g1}
+\end{aligned}
+\end{equation}
+(See \href{https://jcgt.org/published/0003/02/03/}{Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs} for a comprehensive derivation).
+
+Unfortunately, the integral in Equation~\eqref{eq:smith_g1} does not have a known closed-form for the Blinn-Phong NDF. We will use the rational polynomial fit from \href{http://www.graphics.cornell.edu/~bjw/microfacetbsdf.pdf}{Walter et al.} instead:
+\begin{equation}
+\begin{aligned}
+a &= \frac{\sqrt{0.5 \alpha + 1}}{\tan\theta} \\
+\hat{G}_1(\omega) &= \begin{cases}
+\frac{3.535a + 2.181a^2}{1 + 2.276a + 2.577a^2} & \text{ if } a < 1.6 \\
+1 & \text{ otherwise}
+\end{cases}
+\end{aligned}.
 \end{equation}
 
-Sampling the Blinn-Phong BRDF is slightly more involved than Phong, because the cosine lobe is defined using the half vector instead of the outgoing direction directly. Our strategy of sampling Blinn-Phong would be the following:
+Notice that our NDF (Equation~\eqref{eq:blinn_NDF}) is only defined up to a constant. Normalization of NDF is slightly different from normalizing the Phong BRDF. We, again, need to take the projection area of the microfacets into account:
+\begin{equation}
+\int_{\omega_h} D(h) n_s \cdot h \mathrm{d}h = 1.
+\end{equation}
+See \href{https://www.reedbeta.com/blog/hows-the-ndf-really-defined/}{this blog post} from Nathan Reed for a nice explanation. Fortunately, the integral above has a closed-form this time. Let $D(h) = C \left(n_s \cdot h\right)^{\alpha}$, the integral is exactly the same as Equation~\eqref{eq:phong_normalization}, so we get $C = \frac{\alpha + 2}{2\pi}$ again.
+
+Sampling a (Blinn-Phong-inspired) microfacet BRDF is slightly more involved than Phong, because the cosine lobe is defined using the half vector instead of the outgoing direction directly. Our strategy of sampling Blinn-Phong would be the following:
 \begin{itemize}
   \item Sample a half vector $h$ with PDF $p_{\text{blinn}}^h(h) \propto \left(n_s \cdot h\right)^{\alpha}$.
   \item Given an incoming direction $\omega_i$, get the outgoing direction $\omega_o$ by applying mirror reflection over the half vector $h$. 
 \end{itemize}
 
-Step 1 is similar to Equation~\eqref{eq:phong_theta} and~\eqref{eq:phong_phi}, but instead of transforming the coordinates to the a basis formed by $r$, we use the basis formed by $n_s$. Generating an outgoing direction from Step 2 is then straightforward. However, the reflection in Step 2 is yet another change of variable that transform the PDF in the half vector space to the outgoing direction space. This time the Jacobian is not identity. We need to account for the derivatives between $\omega_o$ and $h$:
+Step 1 is similar to the Phong BRDF sampling, but instead of transforming the coordinates to the a basis formed by $r$, we use the basis formed by $n_s$. Generating an outgoing direction from Step 2 is then straightforward. However, the reflection in Step 2 is yet another change of variable that transforms the PDF in the half vector space to the outgoing direction space. This time the Jacobian is not identity. We need to account for the derivatives between $\omega_o$ and $h$:
 \begin{equation}
 \left|\frac{\mathrm{d}\omega_o}{\mathrm{d}h}\right| = \frac{1}{\left|\frac{\mathrm{d}h}{\mathrm{d}\omega_o}\right|}.
 \end{equation}
@@ -284,14 +307,14 @@ Multiplying the Jacobian to the PDF, we obtain the final PDF of the Blinn-Phong 
 p_{\text{blinn}}^{\omega}(\omega_o) = \frac{\left(\alpha + 1\right) \left(n_s \cdot h\right)^{\alpha}}{2\pi \cdot 4 \left(\omega_o \cdot h\right)}.
 \end{equation}
 
-Implement Blinn-Phong BRDF in your \lstinline{hw_4_2} code. A Blinn-Phong BRDF has the same parameters as a Phong BRDF:
+Implement the Blinn-Phong microfacet BRDF in your \lstinline{hw_4_2} code. Our microfacet BRDF has the same parameters as a Phong BRDF:
 \begin{lstlisting}[language=C++]
-struct ParsedBlinnPhong {
+struct ParsedBlinnPhongMicrofacet {
     ParsedColor reflectance; // Ks
     Real exponent; // alpha
 };
 \end{lstlisting}
-According to \href{https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model}{Wikipedia}, \lstinline{ParsedBlinnPhong::exponent} $\approx$ \lstinline{4 * ParsedPhong::exponent}.
+According to \href{https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model}{Wikipedia}, \lstinline{ParsedBlinnPhongMicrofacet::exponent} $\approx$ \lstinline{4 * ParsedPhong::exponent}.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

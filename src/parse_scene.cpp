@@ -542,7 +542,7 @@ std::tuple<std::string /* ID */, ParsedMaterial> parse_bsdf(
                 exponent = parse_float(child.attribute("value").value(), default_map);
             }
         }
-        return std::make_tuple(id, ParsedBlinnPhong{reflectance, exponent});
+        return std::make_tuple(id, ParsedBlinnPhongMicrofacet{reflectance, exponent});
     } else {
         Error(std::string("Unknown BSDF: ") + type);
     }
