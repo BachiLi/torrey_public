@@ -41,10 +41,16 @@ struct ParsedPhong {
     Real exponent; // alpha
 };
 
+struct ParsedBlinnPhong {
+    ParsedColor reflectance; // Ks
+    Real exponent; // alpha
+};
+
 using ParsedMaterial = std::variant<ParsedDiffuse,
                                     ParsedMirror,
                                     ParsedPlastic,
-                                    ParsedPhong>;
+                                    ParsedPhong,
+                                    ParsedBlinnPhong>;
 
 struct ParsedPointLight {
     Vector3 position;
