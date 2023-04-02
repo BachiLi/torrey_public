@@ -24,9 +24,9 @@
 		</texture>
 	</bsdf>
 
-	<bsdf type="phong" id="gray">
+	<bsdf type="blinn_microfacet" id="gray">
 		<rgb name="reflectance" value="1.0, 1.0, 1.0"/>
-		<float name="exponent" value="250"/>
+		<float name="exponent" value="1000"/>
 	</bsdf>
 
 	<shape type="obj">

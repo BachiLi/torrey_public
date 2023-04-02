@@ -19,14 +19,14 @@
 	</sensor>
 
 	<bsdf type="diffuse" id="checkerboard">
-		<texture type="bitmap" name="reflectance">
-			<string name="filename" value="default.png"/>
+ 		<texture type="bitmap" name="reflectance">
+			<string name="filename" value="default_colored.png"/>
 		</texture>
 	</bsdf>
 
 	<bsdf type="phong" id="gray">
 		<rgb name="reflectance" value="1.0, 1.0, 1.0"/>
-		<float name="exponent" value="50"/>
+		<float name="exponent" value="250"/>
 	</bsdf>
 
 	<shape type="obj">

@@ -207,7 +207,7 @@ We provide yet another Cornell box scene (yes, I am uncreative) and two other sc
 \begin{lstlisting}[language=bash]
 ./torrey -hw 4_2 ../scenes/cbox/cbox_area_light_spheres_phong.xml
 ./torrey -hw 4_2 ../scenes/teapot/teapot_textured_phong.xml
-./torrey -hw 4_2 ../scenes/teapot/teapot_textured_grazing.xml
+./torrey -hw 4_2 ../scenes/teapot/teapot_textured_phong_grazing_view.xml
 \end{lstlisting}
 Our rendering of the scene is in Figure~\ref{fig:hw_4_2_phong}.
 
@@ -228,9 +228,11 @@ Our rendering of the scene is in Figure~\ref{fig:hw_4_2_phong}.
     \label{fig:phong_reflection}
 \end{figure}
 
-There are two issues of the Phong BRDF: firstly, the cosine lobe can be extended below the surface (Figure~\ref{fig:phong_reflection}), and this can lead to undesired discontinuity.\footnote{\href{https://learnopengl.com/Advanced-Lighting/Advanced-Lighting}{This article} illustrates the issue too.} See the last image in Figure~\ref{fig:hw_4_2_phong}: the teapot appears less specular, and there is severe darkening of the floor because of the clamping. Secondly, it is not fully clear how to assign the Fresnel term like we did for \lstinline{mirror}: do we apply Fresnel using the normal and the viewing direction $n_s \cdot \omega_i$? Or do we apply Fresnel using the normal and the outgoing/light direction $n_s \cdot \omega_o$? Both can be good or bad depending on the situations.
+There are two issues of the Phong BRDF: firstly, the cosine lobe can be extended below the surface (Figure~\ref{fig:phong_reflection}), and this can lead to undesired discontinuity.\footnote{\href{https://learnopengl.com/Advanced-Lighting/Advanced-Lighting}{This article} illustrates the issue too.} See the last image in Figure~\ref{fig:hw_4_2_phong}: the teapot appears less specular at grazing angle, and there is some darkening of the floor because of the clamping. This makes it difficult for Phong BRDF to model reflection at grazing angle, such as sun's reflection on the sea close to the horizon.
+Secondly, it is not fully clear how to assign the Fresnel term like we did for \lstinline{mirror}: do we apply Fresnel using the normal and the viewing direction $n_s \cdot \omega_i$? Or do we apply Fresnel using the normal and the outgoing/light direction $n_s \cdot \omega_o$? Both can be good or bad depending on the situations.
 
-The Blinn-Phong BRDF fixes the two issues with one trick.\footnote{The \href{https://dl.acm.org/doi/10.1145/360349.360353}{original paper} from Blinn did not include the Fresnel term, but it's natural to add it.} Instead of defining a cosine lobe round the mirror reflection direction, we use the cosine between the normal and the half vector $h = \frac{\omega_i + \omega_o}{\left\|\omega_i + \omega_o\right\|}$:
+The Blinn-Phong BRDF attempts to fix the two issues with one trick.\footnote{The \href{https://dl.acm.org/doi/10.1145/360349.360353}{original paper} from Blinn did not include the Fresnel term, but it's natural to add it.} 
+Instead of defining a cosine lobe round the mirror reflection direction, we use the cosine between the normal and the half vector $h = \frac{\omega_i + \omega_o}{\left\|\omega_i + \omega_o\right\|}$:
 \begin{equation}
 \begin{aligned}
 \rho_{\text{blinn}} &\propto \begin{cases}
@@ -287,6 +289,23 @@ struct ParsedBlinnPhong {
 \end{lstlisting}
 According to \href{https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model}{Wikipedia}, \lstinline{ParsedBlinnPhong::exponent} $\approx$ \lstinline{4 * ParsedPhong::exponent}.
 
+Test your method in these scenes:
+\begin{lstlisting}[language=bash]
+./torrey -hw 4_2 ../scenes/cbox/cbox_area_light_spheres_blinn.xml
+./torrey -hw 4_2 ../scenes/teapot/teapot_textured_blinn.xml
+./torrey -hw 4_2 ../scenes/teapot/teapot_textured_blinn_grazing_view.xml
+\end{lstlisting}
+Our rendering of the scene is in Figure~\ref{fig:hw_4_2_blinn}. Unfortunately, the results are a bit underwhelming. The good news is that for the first two scenes, we maintain similar highlight shape, and for the third scene, we manage to make the teapot looks more specular at the grazing view. However, there is an overall darkening of the color, especially at grazing angle. Our next BRDF will fix the darkening issue.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\linewidth]{imgs/hw_4_2f.png}
+    \includegraphics[width=0.225\linewidth]{imgs/hw_4_2g.png}
+    \includegraphics[width=0.225\linewidth]{imgs/hw_4_2h.png}
+    \caption{Reference for the \lstinline{blinnphong} materials for HW 4.2.}
+    \label{fig:hw_4_2_blinn}
+\end{figure}
+
 \subsection{(Blinn-Phong) Microfacet BRDF}
 The use of half vectors in the Blinn-Phong BRDF reveals an important physical insight.
 Turns out we can build a geometrical/physical explanation of the idea of using half vectors to define BRDFs. The physical explanation is called \emph{Microfacet theory}.\footnote{Microfacet theory was developed in optical physics in 1960s by Beckmann anad Spizzchino to study electromagnectic wave scatter on surfaces. \href{https://www.graphics.cornell.edu/~westin/pubs/TorranceSparrowJOSA1967.pdf}{Torrance and Sparrow} then used similar theory to design microfacet BRDFs. \href{https://dl.acm.org/doi/10.1145/965141.563893}{Blinn} introduced the idea to graphics. \href{https://graphics.pixar.com/library/ReflectanceModel/paper.pdf}{Cook and Torrance} later wrote a more comprehensive introduction.} The idea is to treat the surface as a statistical collection of small oriented mirrors (and these mirrors are called the \emph{microfacets}). Mirrors only reflect lights when the half vector is aligned with its normal direction. So if we are reflecting light at half vector $h$, we must have hit a small mirror with \emph{micronormal} $m=h$. The half vector cosine lobe $\left(n_s \cdot h\right)^{\alpha}$ can be seen as defining a distribution of normals, by counting how many mirrors have the normal $h$. Each individual mirror also has its own Fresnel reflection, which is why we use half vector instead of shading normal for the Fresnel. Finally, the microfacets can block each other, causing shadowing effects. Mathematically, a microfacet BRDF is defined as:
@@ -300,12 +319,14 @@ Turns out we can build a geometrical/physical explanation of the idea of using h
 where $F_h$ is the Fresnel term (we will use the Schlick Fresnel as in Equation~\eqref{eq:schilick_fresnel}) but evaluated at the half vector, $D$ is the \emph{Normal Distribution Function} (NDF) that describes the distribution of the normals of the microfacets, and $G$ is the geometric \emph{shadowing masking} term, which accounts for the porortion of unblocked microfacets. The $n_s \cdot \omega_i$ models the total projection area of microfacets towards incoming (if you look at a surface from the grazing angle, you will see more area). The $4$ in the denominator is a normalization constant for energy conservation.
 Microfacet BRDFs are the most popular BRDFs in computer graphics now, because of how well they fit to our current BRDF datasets (see, again, the article by \href{http://people.csail.mit.edu/addy/research/brdf/index.html}{Ngan et al.} for more detail).
 
-For $D$, we will use a \href{https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model}{Blinn-Phong} inspired NDF:
+For $D$, we will use a Blinn-Phong inspired NDF:
 \begin{equation}
 D \propto \left(n_s \cdot h\right)^{\alpha}.
 \label{eq:blinn_NDF}
 \end{equation}
-Notice how Equation~\eqref{eq:microfacet} is basically the Blinn-Phong BRDF but taking into the microfacet projection area and occlusion.
+Notice how Equation~\eqref{eq:microfacet} is basically the Blinn-Phong BRDF but taking into account the microfacet projection area and occlusion.
+The division of the projection area of microfacets is what will fix our darkening issue in Blinn-Phong!
+$G$, on the other hand, is crucial for physical consistency.
 
 $G$ can usually be derived from the geometric configuration of the microfacets. The most popular configuration is developed by \href{https://ieeexplore.ieee.org/document/1138991}{Smith}: they assume that the microfacets' orientations are uncorrelated to each other. With this assumption, the geometry term is a function solely on the two viewing directions: 
 \begin{equation}
@@ -353,6 +374,23 @@ struct ParsedBlinnPhongMicrofacet {
     Real exponent; // alpha
 };
 \end{lstlisting}
+
+If we render the same scenes again (Figure~\ref{fig:hw_4_2_blinn_microfacet}):
+\begin{lstlisting}[language=bash]
+./torrey -hw 4_2 ../scenes/cbox/cbox_area_light_spheres_blinn_microfacet.xml
+./torrey -hw 4_2 ../scenes/teapot/teapot_textured_blinn_microfacet.xml
+./torrey -hw 4_2 ../scenes/teapot/teapot_textured_blinn_microfacet_grazing_view.xml
+\end{lstlisting}
+We will notice that the darkening issue is gone, and we reproduce the desired grazing angle behavior in the last scene!
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.45\linewidth]{imgs/hw_4_2i.png}
+    \includegraphics[width=0.225\linewidth]{imgs/hw_4_2j.png}
+    \includegraphics[width=0.225\linewidth]{imgs/hw_4_2k.png}
+    \caption{Reference for the \lstinline{blinn_microfacet} materials for HW 4.2.}
+    \label{fig:hw_4_2_blinn_microfacet}
+\end{figure}
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

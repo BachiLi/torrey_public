@@ -4,7 +4,7 @@
 	<sensor type="perspective">
 		<string name="fovAxis" value="y"/>
 		<transform name="toWorld">
-			<lookAt origin="100, 170, 250" target="0, 30, 0" up="0, 1, 0"/>
+			<lookAt origin="100, 5, 250" target="0, 30, 0" up="0, 1, 0"/>
 		</transform>
 		<float name="fov" value="45"/>
 
@@ -19,14 +19,14 @@
 	</sensor>
 
 	<bsdf type="diffuse" id="checkerboard">
-		<texture type="bitmap" name="reflectance">
+ 		<texture type="bitmap" name="reflectance">
 			<string name="filename" value="default_colored.png"/>
 		</texture>
 	</bsdf>
 
-	<bsdf type="phong" id="gray">
+	<bsdf type="blinn_microfacet" id="gray">
 		<rgb name="reflectance" value="1.0, 1.0, 1.0"/>
-		<float name="exponent" value="250"/>
+		<float name="exponent" value="1000"/>
 	</bsdf>
 
 	<shape type="obj">
