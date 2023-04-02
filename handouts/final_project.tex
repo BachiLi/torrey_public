@@ -1,0 +1,104 @@
+\input{preamble}
+
+\begin{document}
+
+\header{5}{Final Project}
+
+The final project will be a project of your choice. You can implement some non-trivial rendering algorithms, or render some interesting scenes in torrey or your own renderer. It can also be a rendering-related research project with a new algorithm or system. 
+Below we provide some options for you to think about, but feel free to come up with your own ones.
+
+\paragraph{Grading.} 
+The project will be graded based on three aspects: technical sophistication, artistic sophistication, and report quality.
+You can have a project that does not have much technical component, but it renders beautiful images.
+Alternatively, you can have a project that produces programmer arts, but is highly technical. 
+To encourage people to pursue ambitious projects, the more ambitious the project is, the less requirement that is to the completness of the project. 
+For example, if you aim to work on a research idea that is novel enough to be published at SIGGRAPH, we will not judge you using the standard of a technical paper.
+It is sufficient to show your work and the initial prototypes and experiments you develop, even if the initial result does not show practical benefit yet.
+
+\paragraph{Logistics.}
+Before 2/27, please let us know what you plan to do for the final project by submitting a 1-2 pages brief report to Canvas.
+Schedule a chat with us if you have any question. 
+We will have a checkpoint at 3/13: send us a brief progress report in a few pages on Canvas (ideally provide results and images) describing what you did and what you plan to do next.
+Let's have a maximum of two people in a group. 
+For the research type projects, to avoid conflicts, if multiple groups want to work on the same project, we will consider merging the groups. 
+
+\section{Ideas}
+
+The general recommendation is to add some features to your renderer. Try to come up with some cool scenes to demonstrate the features you added. Following are some features that you can add to torrey. For projects marked with \emph{very easy} or \emph{easy}, you might need to implement a few of them.
+
+\paragraph{Bump/normal mapping (very easy).}
+One way to add more details to surfaces is to use a \emph{bump map} or a \emph{normal map}: textures that modify the shading normal. Read \href{https://www.pbr-book.org/3ed-2018/Materials/Bump_Mapping}{PBRT} for detail about bump mapping and add it to your renderer.
+
+\paragraph{Environment maps/image-based lighting (easy).}
+These are infinitely far away light sources with directionally varying intensity. Our \emph{background} in torrey is actually already secretly a constant color environment map. Read \href{https://www.pbr-book.org/3ed-2018/Light_Sources/Infinite_Area_Lights}{PBRT} for some references. 
+
+\paragraph{Mipmapping (easy).}
+Currently we lookup our textures using a bilinear interpolation. A better way is to \emph{prefilter} the textures. Read \href{https://www.pbr-book.org/3ed-2018/Texture/Sampling_and_Antialiasing.html}{Chapter 10.1} and \href{https://www.pbr-book.org/3ed-2018/Texture/Image_Texture}{Chapter 10.4} of PBRT and implement texture filtering in your renderer. Show some scenes where it makes differences.
+
+\paragraph{Curve geometry (easy).}
+It is common to use Beizer curves, instead of triangles, to represent hair and fur or other thin geometry. Read \href{https://www.pbr-book.org/3ed-2018/Shapes/Curves}{PBRT} and implement ray curve intersection in your renderer.
+
+\paragraph{Nonlinear motion blur (easy).}
+The bonus motion blur discussed in the RTNW book only supports translation and does not handle rotation and scaling. Read \href{https://www.pbr-book.org/3ed-2018/Geometry_and_Transformations/Animating_Transformations}{PBRT} and implement motion blur that supports rotational and scaling motion.
+
+\paragraph{Tonemapping (medium).}
+Implement advanced tonemapping algorithms and compare their efficiency. A few good candidates are: \href{https://www-old.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf}{Reinhard's photographic tone mapping}, \href{http://people.csail.mit.edu/fredo/PUBLI/Siggraph2002/}{Durand's bilateral filtering}, \href{https://resources.mpi-inf.mpg.de/tmo/logmap/}{Drago's adaptive log mapping}.
+
+\paragraph{Texture cache (medium).}
+In production rendering, the textures may not totally fit in the memory. Therefore, we need to read textures from hard disk on demand and cache them in the memory. Read \href{https://pbrt.org/texcache.pdf}{Matt Pharr's note} on texture caches and implement it in your renderer.
+
+\paragraph{Realistic camera (medium).}
+It is possible to simulate the whole lens system in a ray tracer. This allows us to reproduce distinctive characteristic of real cameras e.g., depth of field, vignetting, spherical abberation, etc. Read \href{https://www.pbr-book.org/3ed-2018/Camera_Models/Realistic_Cameras}{PBRT} for how to implement a lens system in a renderer and implement it in your renderer.
+
+\paragraph{Low-discrepancy sampling (medium).}
+In production rendering, independent random sampling is rarely used. In practice, we always apply stratification to our random number sequences. Pick a low-discrepancy sampling sequence in PBRT, e.g., \href{https://www.pbr-book.org/3ed-2018/Sampling_and_Reconstruction/The_Halton_Sampler.html}{Halton/Hammersley}, \href{https://www.pbr-book.org/3ed-2018/Sampling_and_Reconstruction/(0,_2)-Sequence_Sampler.html}{(0, 2)}, or \href{https://www.pbr-book.org/3ed-2018/Sampling_and_Reconstruction/Sobol_Sampler.html}{Sobol}, and implement it in your renderer.
+
+\paragraph{Irradiance caching (medium).}
+Implement irradiance caching or its variants.
+
+\paragraph{(Progressive) photon mapping (medium).}
+Implement photon mapping or its variants.
+
+\paragraph{Light baking and precomputed radiance transfer (medium).}
+Use your path tracer to bake directionally dependent global illumination into textures or light probes, and load it in a real-time renderer.
+
+\paragraph{Denoising and adaptive sampling (medium).}
+Implement a Monte Carlo denoiser and/or add adaptive sampling features to it.
+
+\paragraph{Vector graphics renderer (medium).}
+Implement a 2D vector graphics renderer that supports closed Bezier curves and strokes.
+
+\paragraph{Layered BSDFs (medium).}
+Implement Weidlich and Wilkie's \href{https://www.cg.tuwien.ac.at/research/publications/2007/weidlich_2007_almfs/weidlich_2007_almfs-paper.pdf}{Arbitrarily Layered Micro-Facet Surfaces} for rendering layered BSDFs.
+
+\paragraph{Watertight ray triangle intersection (medium).}
+Our current code does not ensure a robust intersection between rays and triangles and can be inaccurate due to floating point cancellation error. Read \href{https://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error}{PBRT} for a more robust strategy for handling intersection.
+
+\paragraph{Multiple-scattering volume rendering (medium-hard).}
+Read \href{https://cseweb.ucsd.edu/~tzli/cse272/wi2023/homework2.pdf}{Homework 2} of CSE 272 and implement it.
+
+\paragraph{Order-independent transparency (medium-hard)}
+Implement a real-time renderer that supports transparency. Compared different strategies: depth peeling, linked list sorting, and/or \href{https://momentsingraphics.de/I3D2018.html}{moment-based order independent transparency}.
+
+\paragraph{Tesselation-free displacement mapping (hard).}
+A higher-fidelity way to add details to surfaces compared to normal mapping is displacement mapping. Instead of perturbing normals, we perturb positions. It is possible to apply displacement mapping on-the-fly without preprocess the displacement map into a detailed mesh. Read \href{https://perso.telecom-paristech.fr/boubek/papers/TFDM/}{Tessellation-Free Displacement Mapping for Ray Tracing} and implement the method.
+
+\paragraph{Moment shadow mapping (hard).}
+Implement \href{https://momentsingraphics.de/I3D2015.html}{moment shadow mapping} in a real-time renderer.
+
+\paragraph{Bidirectional path tracing (hard).}
+Implement \href{https://www.pbr-book.org/3ed-2018/Light_Transport_III_Bidirectional_Methods/Bidirectional_Path_Tracing}{Bidirectional Path Tracing}.
+
+\paragraph{Fourier BSDF (hard).}
+Implement \href{https://www.pbr-book.org/3ed-2018/Reflection_Models/Fourier_Basis_BSDFs}{Fourier BSDF} for rendering measured BSDFs.
+
+\paragraph{GPU rendering (hard).}
+Port torrey to modern GPU hardware (CUDA/OpenCL/OptiX/Vulkan/DirectX).
+
+\paragraph{Level of details (hard).}
+Read Pixar's \href{https://graphics.pixar.com/library/StochasticSimplification/paper.pdf}{Stochastic Simplification of Aggregate Detail} and implement the method.
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
