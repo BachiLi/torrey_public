@@ -81,6 +81,9 @@ int main(int argc, char *argv[]) {
     } else if (hw_num == "4_2") {
         Image3 img = hw_4_2(parameters);
         imwrite("hw_4_2.exr", img);
+    } else if (hw_num == "4_3") {
+        Image3 img = hw_4_3(parameters);
+        imwrite("hw_4_3.exr", img);
     }
 
     parallel_cleanup();
