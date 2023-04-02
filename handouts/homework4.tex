@@ -6,7 +6,9 @@
 \header{3}{Indirect lighting, BRDFs, and Multiple Importance Sampling}
 In this homework, we will implement an actual \href{https://en.wikipedia.org/wiki/Path_tracing}{path tracing} algorithm. We will finish the RTRYL book this time!
 
-\section{Diffuse interreflection}
+\textbf{Warning: this homework is more difficult than previous ones. Start early!}
+
+\section{Diffuse interreflection (30 pts)}
 So far in our code, we seem to be treating the diffuse and specular surfaces separately: diffuse surfaces gather contributions from lights, and specular surfaces trace out rays that collect color from other surfaces (and \lstinline{plastic} is a mixture of them). In real world, diffuse surfaces also collect colors from other surfaces. We will implement this in this part.
 
 In the previous homeworks, we do something like this:
@@ -61,6 +63,8 @@ Now, we need to sample a direction $\omega_o$ for evaluating the integral in Equ
 
 Go to the function \lstinline{hw_4_1} in \lstinline{hw4.cpp} and implement diffuse interreflection using cosine hemisphere sampling. The function also takes an extra command line parameter \lstinline{-max_depth [max_depth]}, which you will use to limit the maximum recursion depth of your path tracer. 
 
+\paragraph{Debugging tip.} First set \lstinline{-max_depth 2}, and compare the rendered images with your Homework 3.4 renderer. They should produce more or less the same image (but with different level of noise).  
+
 To test your results, type:
 \begin{lstlisting}[language=bash]
 ./torrey -hw 4_1 ../scenes/hw1_spheres/scene0_spherical_light.xml
@@ -69,12 +73,6 @@ To test your results, type:
 ./torrey -hw 4_1 ../scenes/sponza/sponza_bgonly.xml -max_depth 6
 ./torrey -hw 4_1 ../scenes/living-room-Wig42/scene_bgonly.xml
 \end{lstlisting}
-
-\paragraph{Energy conservation.} Remove the $\frac{1}{\pi}$ in Equation~\eqref{eq:diffuse_rendering_equation} and render the \lstinline{cbox} scene again (you still need to have the $\pi$ in your PDF since PDFs need to integrate to $1$). What do you observe? Why?
-
-See Figure~\ref{fig:hw_4_1} for the references. You can notice that the images are much more noisy this time. I did not run all of them to convergence since it's starting to take a while to render (even so, these images can already take tens of minutes to render!). If you run them overnight (with, say, 10000 samples per pixel), you should see relatively clean images. Since we are relying on randomly trace light path until we hit a light source, the chance that it hits a light can often be small. The light sampling we will implement later helps with this, but it would not fully solve the problem as we have very large light sources in these scenes. This is why there are active research projects on trying to make rendering faster -- it's hard! Modern renderers will likely apply \href{https://cgg.mff.cuni.cz/~jirka/path-guiding-in-production/2019/index.htm}{path guiding}, \href{https://cs.dartmouth.edu/~wjarosz/publications/bitterli20spatiotemporal.html}{importance resampling} and \href{https://www.cmlab.csie.ntu.edu.tw/project/sbf/}{denoising} to speedup the rendering. These could be cool final projects if you are interested.
-
-Another thing to notice is that how the global illumination automatically make the images look significantly more realistic! By physically simulating lights, we are able to automagically create realistic images without much efforts. Before people start to simulate global illumination in their renderers, artists have to manually place lights and draw textures to approximate the effect, which is extremely time consuming -- now we just let computers spend that time! Even better, compared to recent learning-based generative models, the physically-based rendering approach still let us have full precise control of how the image looks like. We fully understand how the color of each pixel is generated, and we can change the way it is generated if we know how to write a renderer.
 
 \begin{figure}[ht]
     \centering
@@ -87,7 +85,14 @@ Another thing to notice is that how the global illumination automatically make t
     \label{fig:hw_4_1}
 \end{figure}
 
-\section{Adding non-diffuse materials}
+See Figure~\ref{fig:hw_4_1} for the references of our rendering. 
+You can notice that the images are much more noisy this time. I did not run all of them to convergence since it's starting to take a while to render (even so, these images can already take tens of minutes to render!). If you run them overnight (with, say, 10000 samples per pixel), you should see relatively clean images. Since we are relying on randomly trace light path until we hit a light source, the chance that it hits a light can often be small. The light sampling we will implement later helps with this, but it would not fully solve the problem as we have very large light sources in these scenes. This is why there are active research projects on trying to make rendering faster -- it's hard! Modern renderers will likely apply \href{https://cgg.mff.cuni.cz/~jirka/path-guiding-in-production/2019/index.htm}{path guiding}, \href{https://cs.dartmouth.edu/~wjarosz/publications/bitterli20spatiotemporal.html}{importance resampling} and \href{https://www.cmlab.csie.ntu.edu.tw/project/sbf/}{denoising} to speedup the rendering. These could be cool final projects if you are interested.
+
+Another thing to notice is that how the global illumination automatically make the images look significantly more realistic! By physically simulating lights, we are able to automagically create realistic images without much efforts. Before people start to simulate global illumination in their renderers, artists have to manually place lights and draw textures to approximate the effect, which is extremely time consuming -- now we just let computers spend that time! Even better, compared to recent learning-based generative models, the physically-based rendering approach still let us have full precise control of how the image looks like. We fully understand how the color of each pixel is generated, and we can change the way it is generated if we know how to write a renderer.
+
+\paragraph{[Energy conservation] Quiz:} Remove the $\frac{1}{\pi}$ in Equation~\eqref{eq:diffuse_rendering_equation} and render the \lstinline{cbox} scene again (you still need to have the $\pi$ in your PDF since PDFs need to integrate to $1$). What do you observe? Why?
+
+\section{Adding non-diffuse materials (30 pts)}
 Let's add back \lstinline{mirror}, \lstinline{plastic}, and let's add more. 
 
 \subsection{Adding back \protect\lstinline!mirror! and \protect\lstinline!plastic!}
@@ -202,6 +207,8 @@ struct ParsedPhong {
     Real exponent; // alpha
 };
 \end{lstlisting}
+
+\paragraph{Debugging tip.} A common bug in rendering code is the inconsistency between the sampling procedure and the PDF code (and they are hard to check just by looking at the images!). One way I find useful for testing sampling procedure is to use finite differences to compute the Jacobian determinant of the sampling procedure, and check if our PDF code is consistent with the finite differences. You can look at the BRDF unit tests in my other renderer \href{https://github.com/BachiLi/lajolla_public/blob/main/src/tests/materials.cpp}{lajolla} to see how this is done. I have caught real bugs using these tests!
 
 We provide yet another Cornell box scene (yes, I am uncreative) and two other scenes for you to test your code:
 \begin{lstlisting}[language=bash]
@@ -392,10 +399,210 @@ We will notice that the darkening issue is gone, and we reproduce the desired gr
     \label{fig:hw_4_2_blinn_microfacet}
 \end{figure}
 
-\section{Multiple importance sampling}
+\section{Multiple importance sampling (30 pts)}
 It's time to add explicit light sampling (i.e. \emph{next event estimation}) from the previous homework back. Now at each shading point, we have two sampling strategies: one importance samples the BRDF, and the other one importance sample the light source. We will adopt \href{https://cseweb.ucsd.edu/~viscomp/classes/cse168/sp21/readings/veach.pdf}{Multiple Importance Sampling} (MIS) for combining the two strategies. In particular, we will adopt the \emph{one-sample} variant of MIS: instead of deterministically shooting rays for both lights and BRDFs and weighing them, we randomly choose one and combine the distribution. The deterministic version of MIS is usually more efficient (because of the stratification effect), but the one-sample variant fits much better to our current code and is easier to implement.
 
 Read \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#mixturedensities}{Chapter 10-12} of RTRYL and combine light sampling with BRDF sampling by blending their sampling distribution in your code. You should combine light sampling with the sampling procedures we implemented for \lstinline{diffuse}, \lstinline{plastic}, \lstinline{phong}, \lstinline{blinnphong}, and \lstinline{blinn_microfacet}. For \lstinline{mirror}, light sampling won't have any effect. Implement the code in \lstinline{hw_4_3}. Your renderer should converge to the same images before, but hopefully faster in some cases (especially in the case where the light source is mostly not blocked).
+
+\paragraph{Code structure.} I find it useful to refactor the path tracing code in Homework 4.2 to look like the following (again, you don't have to do the same as me):
+\begin{lstlisting}[language=python]
+def sample_brdf(...):
+  if pure_specular:
+    # sample mirror reflection direction
+    return wo, is_pure_specular, sampling_weight
+  else:
+    # sample BRDF
+    return wo, not_pure_specular, null
+
+def eval_brdf(...):
+  # compute both the BRDF value (with cosine) and the sampling PDF
+  # ...
+  return value, pdf
+
+def radiance(scene, ray, rng, depth):
+  if depth <= 0:
+    return (0, 0, 0)
+  if intersect:
+    L = 0
+    if hit light source:
+      L += emission
+    wo, is_pure_specular, sampling_weight = sample_brdf(...)
+    next_ray = ...
+    if is_pure_specular:
+      if sampling_weight > 0:
+        L += sampling_weight * radiance(scene, next_ray, rng, depth - 1)
+    else:
+      value, pdf = eval_brdf(...)
+      if value > 0 and pdf > 0:
+        L += (value / pdf) * radiance(scene, next_ray, rng, depth - 1)
+    return L
+  else:
+    return scene.background
+\end{lstlisting}
+I will let you figure out how to add light sampling to this!
+
+\paragraph{Spherical sampling PDF computation.} If you reuse your sphere area sampling code from previous homework (instead of the cone sampling strategy in the RTRYL book), since a ray can intersect a sphere twice, you need to sum up the PDF of both intersections when computing the mixture PDF. Alternatively, you can just implement the sphere sampling strategy in \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#cleaninguppdfmanagement/samplingasphereobject}{Chapter 12.3} of the RTRYL book. It's more efficient anyway. The references here are rendered using the sphere area sampling, which is less efficient.
+
+We can use some previous scenes to test our new MIS code.
+\begin{lstlisting}[language=bash]
+./torrey -hw 4_3 ../scenes/hw1_spheres/scene0_spherical_light.xml
+./torrey -hw 4_3 ../scenes/cbox/cbox.xml
+./torrey -hw 4_3 ../scenes/hw1_spheres/scene1_spherical_light.xml
+./torrey -hw 4_3 ../scenes/cbox/cbox_area_light_spheres_phong.xml
+\end{lstlisting}
+Since the previous scenes are designed to have larger light sources, the variance reduction may not be too significant. See Figure~\ref{fig:hw_4_3} for our renderings.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.20\linewidth]{imgs/hw_4_3a.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_4_3b.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_4_3c.png}
+    \includegraphics[width=0.20\linewidth]{imgs/hw_4_3d.png}
+    \caption{References for Homework 4.3.}
+    \label{fig:hw_4_3}
+\end{figure}
+
+We can also render some new scenes!
+\begin{lstlisting}[language=bash]
+./torrey -hw 4_3 ../scenes/veach_mi/mi.xml
+./torrey -hw 4_3 ../scenes/dining-room/scene.xml
+\end{lstlisting}
+Our renderings are shown in Figure~\ref{fig:hw_4_3_more}. Try render these two scenes using your Homework 4.2 code!
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.40\linewidth]{imgs/hw_4_3e.png}
+    \includegraphics[width=0.40\linewidth]{imgs/hw_4_3f.png}
+    \caption{More references for Homework 4.3.}
+    \label{fig:hw_4_3_more}
+\end{figure}
+
+Now. reflects a bit how far we have come! Remember the first image we rendered? Now we can render a scene with complex geometry, textures, materials, and lighting. 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.40\linewidth]{imgs/hw_1_1after.png}
+    \includegraphics[width=0.40\linewidth]{imgs/hw_4_3f.png}
+    \caption{How it started/How its going.}
+\end{figure}
+
+Similar to the business card ray tracer, it's actually possible to implement a very compact path tracer. \href{http://www.kevinbeason.com/smallpt/}{smallpt} is a great reference that implements a basic path tracer in 99 lines:
+\begin{lstlisting}[language=C++]
+ #include <math.h>   // smallpt, a Path Tracer by Kevin Beason, 2008 
+ #include <stdlib.h> // Make : g++ -O3 -fopenmp smallpt.cpp -o smallpt 
+ #include <stdio.h>  //        Remove "-fopenmp" for g++ version < 4.2 
+ struct Vec {        // Usage: time ./smallpt 5000 && xv image.ppm 
+   double x, y, z;                  // position, also color (r,g,b) 
+   Vec(double x_=0, double y_=0, double z_=0){ x=x_; y=y_; z=z_; } 
+   Vec operator+(const Vec &b) const { return Vec(x+b.x,y+b.y,z+b.z); } 
+   Vec operator-(const Vec &b) const { return Vec(x-b.x,y-b.y,z-b.z); } 
+   Vec operator*(double b) const { return Vec(x*b,y*b,z*b); } 
+   Vec mult(const Vec &b) const { return Vec(x*b.x,y*b.y,z*b.z); } 
+   Vec& norm(){ return *this = *this * (1/sqrt(x*x+y*y+z*z)); } 
+   double dot(const Vec &b) const { return x*b.x+y*b.y+z*b.z; } // cross: 
+   Vec operator%(Vec&b){return Vec(y*b.z-z*b.y,z*b.x-x*b.z,x*b.y-y*b.x);} 
+ }; 
+ struct Ray { Vec o, d; Ray(Vec o_, Vec d_) : o(o_), d(d_) {} }; 
+ enum Refl_t { DIFF, SPEC, REFR };  // material types, used in radiance() 
+ struct Sphere { 
+   double rad;       // radius 
+   Vec p, e, c;      // position, emission, color 
+   Refl_t refl;      // reflection type (DIFFuse, SPECular, REFRactive) 
+   Sphere(double rad_, Vec p_, Vec e_, Vec c_, Refl_t refl_): 
+     rad(rad_), p(p_), e(e_), c(c_), refl(refl_) {} 
+   double intersect(const Ray &r) const { // returns distance, 0 if nohit 
+     Vec op = p-r.o; // Solve t^2*d.d + 2*t*(o-p).d + (o-p).(o-p)-R^2 = 0 
+     double t, eps=1e-4, b=op.dot(r.d), det=b*b-op.dot(op)+rad*rad; 
+     if (det<0) return 0; else det=sqrt(det); 
+     return (t=b-det)>eps ? t : ((t=b+det)>eps ? t : 0); 
+   } 
+ }; 
+ Sphere spheres[] = {//Scene: radius, position, emission, color, material 
+   Sphere(1e5, Vec( 1e5+1,40.8,81.6), Vec(),Vec(.75,.25,.25),DIFF),//Left 
+   Sphere(1e5, Vec(-1e5+99,40.8,81.6),Vec(),Vec(.25,.25,.75),DIFF),//Rght 
+   Sphere(1e5, Vec(50,40.8, 1e5),     Vec(),Vec(.75,.75,.75),DIFF),//Back 
+   Sphere(1e5, Vec(50,40.8,-1e5+170), Vec(),Vec(),           DIFF),//Frnt 
+   Sphere(1e5, Vec(50, 1e5, 81.6),    Vec(),Vec(.75,.75,.75),DIFF),//Botm 
+   Sphere(1e5, Vec(50,-1e5+81.6,81.6),Vec(),Vec(.75,.75,.75),DIFF),//Top 
+   Sphere(16.5,Vec(27,16.5,47),       Vec(),Vec(1,1,1)*.999, SPEC),//Mirr 
+   Sphere(16.5,Vec(73,16.5,78),       Vec(),Vec(1,1,1)*.999, REFR),//Glas 
+   Sphere(600, Vec(50,681.6-.27,81.6),Vec(12,12,12),  Vec(), DIFF) //Lite 
+ }; 
+ inline double clamp(double x){ return x<0 ? 0 : x>1 ? 1 : x; } 
+ inline int toInt(double x){ return int(pow(clamp(x),1/2.2)*255+.5); } 
+ inline bool intersect(const Ray &r, double &t, int &id){ 
+   double n=sizeof(spheres)/sizeof(Sphere), d, inf=t=1e20; 
+   for(int i=int(n);i--;) if((d=spheres[i].intersect(r))&&d<t){t=d;id=i;} 
+   return t<inf; 
+ } 
+ Vec radiance(const Ray &r, int depth, unsigned short *Xi){ 
+   double t;                               // distance to intersection 
+   int id=0;                               // id of intersected object 
+   if (!intersect(r, t, id)) return Vec(); // if miss, return black 
+   const Sphere &obj = spheres[id];        // the hit object 
+   Vec x=r.o+r.d*t, n=(x-obj.p).norm(), nl=n.dot(r.d)<0?n:n*-1, f=obj.c; 
+   double p = f.x>f.y && f.x>f.z ? f.x : f.y>f.z ? f.y : f.z; // max refl 
+   if (++depth>5) if (erand48(Xi)<p) f=f*(1/p); else return obj.e; //R.R. 
+   if (obj.refl == DIFF){                  // Ideal DIFFUSE reflection 
+     double r1=2*M_PI*erand48(Xi), r2=erand48(Xi), r2s=sqrt(r2); 
+     Vec w=nl, u=((fabs(w.x)>.1?Vec(0,1):Vec(1))%w).norm(), v=w%u; 
+     Vec d = (u*cos(r1)*r2s + v*sin(r1)*r2s + w*sqrt(1-r2)).norm(); 
+     return obj.e + f.mult(radiance(Ray(x,d),depth,Xi)); 
+   } else if (obj.refl == SPEC)            // Ideal SPECULAR reflection 
+     return obj.e + f.mult(radiance(Ray(x,r.d-n*2*n.dot(r.d)),depth,Xi)); 
+   Ray reflRay(x, r.d-n*2*n.dot(r.d));     // Ideal dielectric REFRACTION 
+   bool into = n.dot(nl)>0;                // Ray from outside going in? 
+   double nc=1, nt=1.5, nnt=into?nc/nt:nt/nc, ddn=r.d.dot(nl), cos2t; 
+   if ((cos2t=1-nnt*nnt*(1-ddn*ddn))<0)    // Total internal reflection 
+     return obj.e + f.mult(radiance(reflRay,depth,Xi)); 
+   Vec tdir = (r.d*nnt - n*((into?1:-1)*(ddn*nnt+sqrt(cos2t)))).norm(); 
+   double a=nt-nc, b=nt+nc, R0=a*a/(b*b), c = 1-(into?-ddn:tdir.dot(n)); 
+   double Re=R0+(1-R0)*c*c*c*c*c,Tr=1-Re,P=.25+.5*Re,RP=Re/P,TP=Tr/(1-P); 
+   return obj.e + f.mult(depth>2 ? (erand48(Xi)<P ?   // Russian roulette 
+     radiance(reflRay,depth,Xi)*RP:radiance(Ray(x,tdir),depth,Xi)*TP) : 
+     radiance(reflRay,depth,Xi)*Re+radiance(Ray(x,tdir),depth,Xi)*Tr); 
+ } 
+ int main(int argc, char *argv[]){ 
+   int w=1024, h=768, samps = argc==2 ? atoi(argv[1])/4 : 1; // # samples 
+   Ray cam(Vec(50,52,295.6), Vec(0,-0.042612,-1).norm()); // cam pos, dir 
+   Vec cx=Vec(w*.5135/h), cy=(cx%cam.d).norm()*.5135, r, *c=new Vec[w*h]; 
+ #pragma omp parallel for schedule(dynamic, 1) private(r)       // OpenMP 
+   for (int y=0; y<h; y++){                       // Loop over image rows 
+     fprintf(stderr,"\rRendering (%d spp) %5.2f%%",samps*4,100.*y/(h-1)); 
+     for (unsigned short x=0, Xi[3]={0,0,y*y*y}; x<w; x++)   // Loop cols 
+       for (int sy=0, i=(h-y-1)*w+x; sy<2; sy++)     // 2x2 subpixel rows 
+         for (int sx=0; sx<2; sx++, r=Vec()){        // 2x2 subpixel cols 
+           for (int s=0; s<samps; s++){ 
+             double r1=2*erand48(Xi), dx=r1<1 ? sqrt(r1)-1: 1-sqrt(2-r1); 
+             double r2=2*erand48(Xi), dy=r2<1 ? sqrt(r2)-1: 1-sqrt(2-r2); 
+             Vec d = cx*( ( (sx+.5 + dx)/2 + x)/w - .5) + 
+                     cy*( ( (sy+.5 + dy)/2 + y)/h - .5) + cam.d; 
+             r = r + radiance(Ray(cam.o+d*140,d.norm()),0,Xi)*(1./samps); 
+           } // Camera rays are pushed ^^^^^ forward to start in interior 
+           c[i] = c[i] + Vec(clamp(r.x),clamp(r.y),clamp(r.z))*.25; 
+         } 
+   } 
+   FILE *f = fopen("image.ppm", "w");         // Write image to PPM file. 
+   fprintf(f, "P3\n%d %d\n%d\n", w, h, 255); 
+   for (int i=0; i<w*h; i++) 
+     fprintf(f,"%d %d %d ", toInt(c[i].x), toInt(c[i].y), toInt(c[i].z)); 
+ }
+\end{lstlisting}
+\href{https://github.com/hi2p-perim/minpt}{minpt} is another cool reference that implements a more sophisticated path tracer in 300 lines (it even supports stuff we didn't implement!).
+
+\section{Design your own scene (10 pts)}
+Now, render some pretty pictures with your renderer! 
+
+\section{Bonus: Russian roulette (10 pts)}
+Our renderer currently assumes a maximum depth, but it doesn't need to. The idea of \emph{Russian roulette}, invented in the nuclear engineering community and brought to rendering by James Arvo and David Kirk, is that we can probabilistically terminate a path, while maintaining an unbiased estimation of the infinite sum. Read \href{https://www.pbr-book.org/3ed-2018/Monte_Carlo_Integration/Russian_Roulette_and_Splitting}{Chapter 13.7} and \href{https://www.pbr-book.org/3ed-2018/Light_Transport_I_Surface_Reflection/Path_Tracing#fragment-PossiblyterminatethepathwithRussianroulette-0}{Chapter 14.5.4} of PBRT for how to implement Russian roulette in a path tracer and add it to your code.
+
+\section{Bonus: GGX/Trowbridge-Reitz microfacet distribution (10 pts)}
+There are many normal distribution functions other than the Blinn-Phong NDF. The most popular NDF is developed by Trowbridge and Reitz, often called GGX in graphics (named by \href{http://www.graphics.cornell.edu/~bjw/microfacetbsdf.pdf}{Walter et al.}, it means ``Ground Glass Unknown''). Read about it in \href{https://www.pbr-book.org/3ed-2018/Reflection_Models/Microfacet_Models#MicrofacetDistributionFunctions}{PBRT} and implement the GGX/Trowbridge-Reitz microfacet distribution in your code. You might also be interested in \href{https://jcgt.org/published/0007/04/01/}{Eric Heitz's article} of importance sampling $D \cdot G_1$ for GGX.
+
+\section{Bonus: Rough dielectric BSDF (20 pts)}
+Just like there is a fuzzy generalization of mirrors, there is a fuzzy generalization of glasses too. It's also easy to model them using microfacet theory. Read \href{http://www.graphics.cornell.edu/~bjw/microfacetbsdf.pdf}{Walter et al.'s article} about a refractive microfacet model and implement it in your code.
+
+\section{Bonus: deterministic MIS (20 pts)}
+An alternative, and more standard way to combine light sampling and BRDF sampling, is to always shoot rays towards light and BRDFs at each bounce. This can be potentially more efficient due to two reasons: first, the light sampling now only requires an occlusion test, which is faster than a nearest hit intersection test. Second, the determinisic nature can drastically reduces variance, while allowing us to use more aggressive MIS heuristic e.g., power heuristic. Read \href{https://www.pbr-book.org/3ed-2018/Light_Transport_I_Surface_Reflection/Path_Tracing}{PBRT} to see how deterministic MIS is incorporated in a path tracer and implement it in your code.
 
 %\bibliographystyle{plain}
 %\bibliography{refs}

@@ -9,7 +9,7 @@
 		<float name="radius" value=".5"/>
 
 		<emitter type="area">
-			<rgb name="radiance" value="800, 800, 800"/>
+			<rgb name="radiance" value="400, 400, 400"/>
 		</emitter>
 
 		<bsdf type="diffuse">
@@ -22,7 +22,7 @@
 		<float name="radius" value=".1"/>
 
 		<emitter type="area">
-			<rgb name="radiance" value="100, 100, 100"/>
+			<rgb name="radiance" value="50, 25, 37"/>
 		</emitter>
 
 		<bsdf type="diffuse">
@@ -35,7 +35,7 @@
 		<float name="radius" value=".03333"/>
 
 		<emitter type="area">
-			<rgb name="radiance" value="901.803 901.803 901.803"/>
+			<rgb name="radiance" value="450 350 225"/>
 		</emitter>
 
 		<bsdf type="diffuse">
@@ -48,7 +48,7 @@
 		<float name="radius" value=".3"/>
 
 		<emitter type="area">
-			<rgb name="radiance" value="11.1111 11.1111 11.1111"/>
+			<rgb name="radiance" value="2.5 5.5 3"/>
 		</emitter>
 
 		<bsdf type="diffuse">
@@ -61,7 +61,7 @@
 		<float name="radius" value=".9"/>
 
 		<emitter type="area">
-			<rgb name="radiance" value="1.23457 1.23457 1.23457"/>
+			<rgb name="radiance" value="0.3 0.3 0.6"/>
 		</emitter>
 
 		<bsdf type="diffuse">
@@ -121,7 +121,7 @@
 		<float name="fov" value="28"/>
 
 		<sampler type="independent">
-			<integer name="sampleCount" value="16"/>
+			<integer name="sampleCount" value="512"/>
 		</sampler>
 
 		<film type="hdrfilm">
