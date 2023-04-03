@@ -12,7 +12,7 @@
     \includegraphics[width=0.19\linewidth]{imgs/hw_4_2i.png}
     \includegraphics[width=0.19\linewidth]{imgs/hw_4_3e.png}
     \includegraphics[width=0.19\linewidth]{imgs/hw_4_3f.png}
-    \caption{Images we will render in this homework.}
+    \caption{Images we will render in this homework. 3D scenes courtesy of Marko Dabrovic, Blender Swap creator Wig42, Eric Veach, Wenzel Jakob, and Benedikt Bitterli.}
     \label{fig:teaser}
 \end{figure}
 
@@ -102,7 +102,7 @@ You can notice that the images are much more noisy this time. I did not run all 
 
 Another thing to notice is that how the global illumination automatically make the images look significantly more realistic! By physically simulating lights, we are able to automagically create realistic images without much efforts. Before people start to simulate global illumination in their renderers, artists have to manually place lights and draw textures to approximate the effect, which is extremely time consuming -- now we just let computers spend that time! Even better, compared to recent learning-based generative models, the physically-based rendering approach still let us have full precise control of how the image looks like. We fully understand how the color of each pixel is generated, and we can change the way it is generated if we know how to write a renderer.
 
-\paragraph{[Energy conservation] Quiz:} Remove the $\frac{1}{\pi}$ in Equation~\eqref{eq:diffuse_rendering_equation} and render the \lstinline{cbox} scene again (you still need to have the $\pi$ in your PDF since PDFs need to integrate to $1$). What do you observe? Why?
+\paragraph{[Energy conservation] Quiz (3 pts):} Remove the $\frac{1}{\pi}$ in Equation~\eqref{eq:diffuse_rendering_equation} and render the \lstinline{cbox} scene again (you still need to have the $\pi$ in your PDF since PDFs need to integrate to $1$). What do you observe? Why?
 
 \section{Adding non-diffuse materials (30 pts)}
 Let's add back \lstinline{mirror}, \lstinline{plastic}, and let's add more. 
@@ -124,16 +124,22 @@ If we take the expectation of $\left<L\right>$, we can see that it is an \href{h
 \begin{equation}
 E\left[\left<L\right>\right] = F \cdot \frac{F a}{F} + (1 - F) \cdot \frac{(1 - F) b}{1 - F}.
 \end{equation}
-The same math works even if $a$ and $b$ are both Monte Carlo estimators themselves.
-
-\paragraph{Quiz:} Let's consider the following, different estimator:
+The same math works even if $\left<a\right>$ and $\left<b\right>$ are both Monte Carlo estimators themselves:
 \begin{equation}
-\left<\hat{L}\right> = \begin{cases}
-\frac{F a + (1 - F)b}{F} & \text{with probability } F \\
-\frac{F a + (1 - F)b}{1 - F} & \text{with probability } 1 - F
+\left<L\right> = \begin{cases}
+\frac{F \left<a\right>}{F} & \text{with probability } F \\
+\frac{\left(1 - F\right) \left<b\right>}{1 - F} & \text{with probability } 1 - F
 \end{cases}.
 \end{equation}
-Is it unbiased? Should we use this one or Equation~\eqref{eq:discrete_mc}?\footnote{If you love math, \href{https://ecommons.cornell.edu/handle/1813/13985}{Chapter 2.3} of Milos Hasan's thesis has some cool theoretical discussions on what is the best way to do this.}
+
+\paragraph{Quiz (3 pts):} Let's consider the following, different estimator:
+\begin{equation}
+\left<\hat{L}\right> = \begin{cases}
+\frac{F \left<a\right> + (1 - F)\left<b\right>}{F} & \text{with probability } F \\
+\frac{F \left<a\right> + (1 - F)\left<b\right>}{1 - F} & \text{with probability } 1 - F
+\end{cases}.
+\end{equation}
+(note that $\left<a\right>$ and $\left<b\right>$ can be Monte Carlo estimators) Is it unbiased? Should we use this one or Equation~\eqref{eq:discrete_mc}?\footnote{If you love math, \href{https://ecommons.cornell.edu/handle/1813/13985}{Chapter 2.3} of Milos Hasan's thesis has some cool theoretical discussions on what is the best way to do this.}
 
 Check your \lstinline{mirror} and \lstinline{plastic} renderings using the following scenes:
 \begin{lstlisting}[language=bash]
