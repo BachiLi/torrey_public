@@ -2,22 +2,19 @@
 UCSD CSE 168 renderer
 https://cseweb.ucsd.edu/~tzli/cse168/
 
-# Git-lfs
-This repository uses git-lfs to track binary files. To clone, first install [git-lfs](https://git-lfs.com/), then type:
-```
-git lfs install
-git clone https://github.com/BachiLi/torrey_public
-git lfs pull
-```
-
 # Build
 All the dependencies are included. Use CMake to build.
 ```
+git clone https://github.com/BachiLi/torrey_public
 mkdir build
 cd build
 cmake ..
 ```
 It requires compilers that support C++17 (gcc version >= 8, clang version >= 7, Apple Clang version >= 11.0, MSVC version >= 19.14).
+
+# Scenes
+You should also download the scenes we will use in later homeworks from the following Google drive link: 
+[https://drive.google.com/file/d/1SrGaw6AbyfhPs1NAuRjxSEQmf34DPKhm/view?usp=sharing](https://drive.google.com/file/d/1SrGaw6AbyfhPs1NAuRjxSEQmf34DPKhm/view?usp=sharing).
 
 # Run
 Try 

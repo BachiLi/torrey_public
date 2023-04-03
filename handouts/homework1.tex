@@ -38,16 +38,15 @@ Before you start coding, we recommend you to go through the whole handout to hav
 
 \section{Building Torrey}
 We are going to build our code on top of (a currently very barebone) renderer \emph{torrey}. Torrey already includes all the third party libraries (pugixml, stb\_image, tinyexr, miniz, tinyply) in its repository.
-We also include many 3D scenes we will render in the repository using \href{https://git-lfs.com/}{git-lfs}. Please install git-lfs in your system by downloading it in the linked webpage. Next, all you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
+All you need to do is to clone the repo and build it using CMake (assuming you are in a Unix-like system):
 \begin{lstlisting}[language=bash]
-  git lfs install
   git clone https://github.com/BachiLi/torrey_public
-  git lfs pull
   mkdir build
   cd build
   cmake ..
   make -j
 \end{lstlisting}
+You don't need it right now, but you should also download the scenes we will use in later homeworks from the following Google drive link: \url{https://drive.google.com/file/d/1SrGaw6AbyfhPs1NAuRjxSEQmf34DPKhm/view?usp=sharing}.
 
 After building, you should see an executable \lstinline{torrey}. Try typing the following command:
 \begin{lstlisting}[language=bash]
