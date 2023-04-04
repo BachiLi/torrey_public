@@ -60,4 +60,9 @@ set(SRCS src/3rdparty/miniz.h
 
 add_library(torrey_lib STATIC ${SRCS})
 add_executable(torrey src/main.cpp)
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(torrey Threads::Threads)
+
 target_link_libraries(torrey torrey_lib)
