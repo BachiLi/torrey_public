@@ -17,11 +17,10 @@ It is sufficient to show your work and the initial prototypes and experiments yo
 The key is to show how much you have learned in the process.
 
 \paragraph{Logistics.}
-Before 2/27, please let us know what you plan to do for the final project by submitting a 1-2 pages brief report to Canvas.
+Before 5/19, please let us know what you plan to do for the final project by submitting a brief report to Canvas.
 Schedule a chat with us if you have any question. 
-We will have a checkpoint at 3/13: send us a brief progress report in a few pages on Canvas (ideally provide results and images) describing what you did and what you plan to do next.
+We will have a checkpoint at 6/5: send us a brief progress report in a few pages on Canvas (ideally provide results and images) describing what you did and what you plan to do next.
 Let's have a maximum of two people in a group. 
-For the research type projects, to avoid conflicts, if multiple groups want to work on the same project, we will consider merging the groups. 
 
 \section{Ideas}
 
@@ -29,6 +28,9 @@ The general recommendation is to add some features to your renderer. Try to come
 
 \paragraph{Bump/normal mapping (very easy).}
 One way to add more details to surfaces is to use a \emph{bump map} or a \emph{normal map}: textures that modify the shading normal. Read \href{https://www.pbr-book.org/3ed-2018/Materials/Bump_Mapping}{PBRT} for detail about bump mapping and add it to your renderer.
+
+\paragraph{Anisotropic BRDFs (very easy).}
+The BRDFs we implemented in the homework are all isotropic, but real world materials often exhibit anisotropic highlights. Read \href{https://www.pbr-book.org/3ed-2018/Reflection_Models/Microfacet_Models}{PBRT} and implement some anisotropic BRDFs.
 
 \paragraph{Environment maps/image-based lighting (easy).}
 These are infinitely far away light sources with directionally varying intensity. Our \emph{background} in torrey is actually already secretly a constant color environment map. Read \href{https://www.pbr-book.org/3ed-2018/Light_Sources/Infinite_Area_Lights}{PBRT} for some references. 
