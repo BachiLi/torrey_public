@@ -29,7 +29,7 @@ Second, if the triangle mesh does not come with UV coordinates (\lstinline{uvs.s
 When looking up the texture given a UV coordinate, we will do something different from the RTNW book. Firstly, the RTNW book \emph{clamps} the UV coordinates when they are smaller than 0 or larger than 1. This is not ideal when we want to tile the textures and repeat them across the surface. Instead, we will wrap the UV coordinates around by taking a \lstinline{modulo} by one. For example, if $u = 1.5$, instead of clamping it to $1$, we wrap it to $0.5$. You may find the \lstinline{modulo} function defined in \lstinline{torrey.h} to be useful. Secondly, we introduce the parameters \lstinline{uscale, vscale, uoffset} and \lstinline{voffset} to scale and offset the UV coordinates (you can find them in \lstinline{ParsedImageTexture}). In particular, to map UV to integer image coordinates XY, we do the following:
 \begin{lstlisting}[language=C++]
 x = img.width * modulo(uscale * u + uoffset, 1);
-y = img.height * modulo(vscale * v + uoffset, 1);
+y = img.height * modulo(vscale * v + voffset, 1);
 \end{lstlisting}
 Finally, RTNW applies \href{https://en.wikipedia.org/wiki/Nearest-neighbor_interpolation}{nearest neighbor lookup}. This gives blocky artifacts when zooming into a texture. Instead, we will apply \emph{bilinear} interpolation. Read the \href{https://en.wikipedia.org/wiki/Bilinear_interpolation}{Wikipedia page} for how to do it.
 
