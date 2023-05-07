@@ -39,7 +39,7 @@ def radiance(scene, ray, rng):
     return scene.background_color
 \end{lstlisting}
 
-In this part, we will temporarily suspend \lstinline{direct_lighting} and the handling of \lstinline{metal} and \lstinline{plastic} -- we will add it back later in part 3.
+In this part, we will temporarily suspend \lstinline{direct_lighting} and the handling of \lstinline{metal} and \lstinline{plastic} -- we will add it back later in part 2 and 3.
 
 We will extend the scattering code to handle diffuse materials in this homework. As with the case of area light, conceptually this is simple: instead of always tracing rays towards the mirror reflection direction, we randomly sample rays at different directions and accumulate contributions (\href{https://raytracing.github.io/books/RayTracingInOneWeekend.html#diffusematerials}{Chapter 8} of RTOW describes one approach to do this). But what distribution should we use, and how do we weigh different directions? That's where we need to do the math.
 
