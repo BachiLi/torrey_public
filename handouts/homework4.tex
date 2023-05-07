@@ -357,17 +357,17 @@ $G$ can usually be derived from the geometric configuration of the microfacets. 
 \begin{equation}
 \begin{aligned}
 G(\omega_i, \omega_o) &= G_1(\omega_i) G_1(\omega_o) \\
-G_1(\omega) = \begin{cases}
+G_1(\omega) &= \begin{cases}
 0 & \text{ if } \omega \cdot h \leq 0 \\
 \hat{G}_1(\omega) & \text{ otherwise.}
 \end{cases}
 \end{aligned}
 \end{equation}
-We can derive $G_1$ using the conservation of projection area of the microfacet:
+We can derive $\hat{G}_1$ using the conservation of projection area of the microfacet:
 \begin{equation}
 \begin{aligned}
-\omega \cdot n_s &= \int_{\Omega_h} G_1(\omega) D(h) \omega \cdot h \mathrm{d} h \\
-G_1(\omega) &= \frac{\omega \cdot n_s}{\int_{\Omega_h} D(h) \omega \cdot h \mathrm{d} h}. 
+\omega \cdot n_s &= \int_{\Omega_h} \hat{G}_1(\omega) D(h) \omega \cdot h \mathrm{d} h \\
+\hat{G}_1(\omega) &= \frac{\omega \cdot n_s}{\int_{\Omega_h} D(h) \omega \cdot h \mathrm{d} h}. 
 \label{eq:smith_g1}
 \end{aligned}
 \end{equation}
