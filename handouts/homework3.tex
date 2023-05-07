@@ -209,7 +209,7 @@ We can do slightly better though. Notice the extra $\sin\theta$ factor in our Ja
 
 To do one step better, we can apply a \emph{change of variable} to rewrite the integral again, such that the Jacobian of the change of variable is $\frac{1}{\sin\theta_i}$. This change of variable will allow us to uniformly generate a set of points on the sphere. To achieve this, we need to apply \emph{inverse transform sampling}. 
 
-We want to find two variables $u_1, u_2$ such that a mapping $\theta, \phi = \mathbf{M}(u_1, u_2)$ has the Jacobian that is proportional to $\frac{1}{\sin\theta}$. Since our Jacobian does not depend on $\phi$, we can simplify the problem to finding a variable $u_1$ such that $\theta = M_{\theta}(u_1)$ and ${M_{\theta}}'(u_1) \propto \frac{1}{\sin\theta}$. Notice how this has become an \emph{antiderivative} problem: we want to find a function $M$ whose derivative is something specific. There is one awkward thing though: $M'(u_1)$ takes $u_1$ as input, but the derivative is specified in the output space $\theta$. The way we resolve this is to first find the inverse $M_{\theta}^{-1}(\theta)$. The derivative specification becomes ${M_{\theta}^{-1}}'(\theta) \propto \sin\theta$ (this comes from the \href{https://en.wikipedia.org/wiki/Inverse_function_theorem}{inverse function theorem}). 
+We want to find two variables $u_1, u_2$ such that a mapping $\theta, \phi = \mathbf{M}(u_1, u_2)$ has the Jacobian that is proportional to $\frac{1}{\sin\theta}$. Since our Jacobian does not depend on $\phi$, we can simplify the problem to finding a variable $u_1$ such that $\theta = M_{\theta}(u_1)$ and ${M_{\theta}}'(u_1) \propto \frac{1}{\sin\theta}$. Notice how this has become an \emph{antiderivative} problem: we want to find a function $M$ whose derivative is something specific. There is one awkward thing though: ${M_{\theta}}'(u_1)$ takes $u_1$ as input, but the derivative is specified in the output space $\theta$. The way we resolve this is to first find the inverse $M_{\theta}^{-1}(\theta)$. The derivative specification becomes ${M_{\theta}^{-1}}'(\theta) \propto \sin\theta$ (this comes from the \href{https://en.wikipedia.org/wiki/Inverse_function_theorem}{inverse function theorem}). 
 
 Since we know that ${M_{\theta}^{-1}}'(\theta)$ is exactly the PDF of our sampling process, we know that it has to integrate to one:
 \begin{equation}
@@ -224,7 +224,7 @@ To get $M_{\theta}(u_1)$ we can just invert $M_{\theta}^{-1}(\theta)$:
 \begin{equation}
 \theta = M_{\theta}(u_1) = \cos^{-1}\left(1 - 2u_1\right).
 \end{equation}
-Just to make things more unify, we can also generate $\phi$ from $u_2$:
+We can also generate $\phi$ from $u_2$:
 \begin{equation}
 \phi = M_{\phi}(u_2) = 2\pi u_2.
 \end{equation}
