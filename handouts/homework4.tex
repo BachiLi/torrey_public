@@ -207,16 +207,20 @@ Sampling the Phong BRDF isn't that different from sampling the diffuse BRDF. We 
 
 To importance sample the local cosine lobe, we turn into spherical coordinates and define the PDF we want to sample from:
 \begin{equation}
-\mathbf{p}_{\text{phong}}(\theta, \phi) \propto \left(\cos\theta\right)^{\alpha} \sin\theta.
+p_{\text{phong}}^{\theta, \phi}(\theta, \phi) \propto \left(\cos\theta\right)^{\alpha} \sin\theta.
 \end{equation}
 From Equation~\eqref{eq:phong_normalization}, we already know that the normalization factor of this PDF:
 \begin{equation}
-\mathbf{p}_{\text{phong}}(\theta, \phi) = \frac{\alpha + 1}{2\pi}\left(\cos\theta\right)^{\alpha}.
+\begin{aligned}
+p_{\text{phong}}^{\theta, \phi}(\theta, \phi) &= \frac{\alpha + 1}{2\pi}\left(\cos\theta\right)^{\alpha} \sin\theta \\
+p_{\text{phong}}^{\omega}(\omega) &= \frac{\alpha + 1}{2\pi}\left(\cos\theta\right)^{\alpha}
+\end{aligned}
 \end{equation}
+(Why are there two PDFs above? What are the differences between them?)
 
 \paragraph{Quiz:} Apply inverse transform sampling to derive the sampling procedure for the PDF above. Show your derivation process.
 
-From $\theta$ and $\phi$, we come up with the local direction. We can then convert this local direction to the coordinate basis defined by the mirror reflection direction $r$. This conversion is also a change of variable, and we normally have to account for the Jacobian of this coordinate transformation. Interestingly, because the coordinate basis is orthonormal, the conversion has an Jacobian of $1$, so we do not need to account for the Jacobian.
+After we get a local direction assuming the mirror reflection direction $r$ is facing towards $z$, we can then convert this local direction to the coordinate basis defined by $r$. This conversion is also a change of variable, and we normally have to account for the Jacobian of this coordinate transformation. However, because the coordinate basis is orthonormal, the conversion has an Jacobian of $1$.
 
 Now, add the Phong BRDF (Equation~\eqref{eq:phong}) into your \lstinline{hw_4_2} code. A Phong BRDF of a scene is stored in the following format:
 \begin{lstlisting}[language=C++]
@@ -379,10 +383,11 @@ Unfortunately, the integral in Equation~\eqref{eq:smith_g1} does not have a know
 a &= \frac{\sqrt{0.5 \alpha + 1}}{\tan\theta} \\
 \hat{G}_1(\omega) &= \begin{cases}
 \frac{3.535a + 2.181a^2}{1 + 2.276a + 2.577a^2} & \text{ if } a < 1.6 \\
-1 & \text{ otherwise}
+1 & \text{ otherwise.}
 \end{cases}
-\end{aligned}.
+\end{aligned}
 \end{equation}
+Here, $\tan\theta$ can be computed using trigonometry identities and $\cos\theta = \omega \cdot n_s$.
 
 Notice that our NDF (Equation~\eqref{eq:blinn_NDF}) is only defined up to a constant. Normalization of NDF is slightly different from normalizing the Phong BRDF. We, again, need to take the projection area of the microfacets into account:
 \begin{equation}
