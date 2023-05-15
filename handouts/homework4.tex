@@ -60,11 +60,13 @@ Firstly, we have replaced $S$ with $\mathcal{M}$ and $I$ with $L$ to emphasize t
 Also note that $\omega_o = l$.
 Here, the measure $\mathrm{d}\omega_o$ is often called the \href{https://en.wikipedia.org/wiki/Solid_angle}{solid angle} -- it represents an infinitesimal area of a point on a unit sphere. You will notice that the equation gets a lot simpler after we switch to the solid angle measure. This is because the Jacobian of the change of variable is exactly the reciprocal of $\frac{\max\left(-n_x \cdot \omega_o, 0\right)}{d^2} \cdot \text{visibility}$ (see \href{https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html#samplinglightsdirectly/gettingthepdfofalight}{Chapter 9.1} of RTRYL for an explanation). Intuitively, the Jacobian captures the ratio of area on the surface $\mathcal{M}$ and its projcted area on a unit sphere (if it is not blocked).
 
-We still need to decide what is the light color $I$. Remember in the mirror case, we recursively trace rays to determine the color. We can do the same thing for diffuse surfaces too!
+Also note that we use the geometric normal (normal defined by the triangles/spheres) $n_x$ for the cosine at the light, and the shading normal (normal defined by the interpolation of the vertex normals) $n_s$ at the shading point, just like the previous homework. The change of variable explains why we need to do this: the Jacobian needs to be consistent with the scene geometry, since they depend on the ray casting operation, which does not relate on the shading normal.
+
+We still need to decide what is the light color $I$/$L$. Remember in the mirror case, we recursively trace rays to determine the color. We can do the same thing for diffuse surfaces too!
 \begin{equation}
 L = \int_{\omega_o \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega_o, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega_o.
 \end{equation}
-This is however vacuous, because there is no \emph{base case} for this recursion. We will instead add the emission whenever we hit a light source\footnote{The infinite recursion defined in Equation~\eqref{eq:diffuse_rendering_equation} is actually mathematically well-behaved, as long as $K_d < 1$ for all channels. The reason is that after each bounce, some energy will be absorbed by $K_d$, and eventually the ray will carry zero energy.}:
+This is however vacuous, because there is no \emph{base case} for this recursion. We will instead add the emission whenever we hit a light source\footnote{The infinite recursion defined in Equation~\eqref{eq:diffuse_rendering_equation} is mathematically well-behaved as long as $K_d < 1$ for all channels. The reason is that after each bounce, some energy will be absorbed by $K_d$, and eventually the ray will carry zero energy.}:
 \begin{equation}
 L = L_e + \int_{\omega_o \in \Omega} \frac{K_d \cdot \max\left(n_s \cdot \omega_o, 0\right)}{\pi} \cdot L \cdot \mathrm{d}\omega_o.
 \label{eq:diffuse_rendering_equation}
@@ -98,9 +100,9 @@ To test your results, type:
 \end{figure}
 
 See Figure~\ref{fig:hw_4_1} for the references of our rendering. 
-You can notice that the images are much more noisy this time. I did not run all of them to convergence since it's starting to take a while to render (even so, these images can already take tens of minutes to render!). If you run them overnight (with, say, 10000 samples per pixel), you should see relatively clean images. Since we are relying on randomly trace light path until we hit a light source, the chance that it hits a light can often be small. The light sampling we will implement later helps with this, but it would not fully solve the problem as we have very large light sources in these scenes. This is why there are active research projects on trying to make rendering faster -- it's hard! Modern renderers will likely apply \href{https://cgg.mff.cuni.cz/~jirka/path-guiding-in-production/2019/index.htm}{path guiding}, \href{https://cs.dartmouth.edu/~wjarosz/publications/bitterli20spatiotemporal.html}{importance resampling} and \href{https://www.cmlab.csie.ntu.edu.tw/project/sbf/}{denoising} to speedup the rendering. These could be cool final projects if you are interested.
+You can notice that the images are much more noisy this time. I did not run all of them to convergence since it's starting to take a while to render (even so, these images can already take tens of minutes to render!). If you run them overnight (with, say, 10000 samples per pixel), you should see relatively clean images. Since we are relying on randomly trace light path until we hit a light source, the chance that it hits a light can often be small. The light sampling we will implement later helps with this, but it would not fully solve the problem as we have very large light sources in these scenes already. This is why there are active research projects on trying to make rendering faster -- it's hard! Modern renderers will likely apply \href{https://cgg.mff.cuni.cz/~jirka/path-guiding-in-production/2019/index.htm}{path guiding}, \href{https://cs.dartmouth.edu/~wjarosz/publications/bitterli20spatiotemporal.html}{importance resampling} and \href{https://www.cmlab.csie.ntu.edu.tw/project/sbf/}{denoising} to speedup the rendering. These could be cool final projects if you are interested.
 
-Another thing to notice is that how the global illumination automatically make the images look significantly more realistic! By physically simulating lights, we are able to automagically create realistic images without much efforts. Before people start to simulate global illumination in their renderers, artists have to manually place lights and draw textures to approximate the effect, which is extremely time consuming -- now we just let computers spend that time! Even better, compared to recent learning-based generative models, the physically-based rendering approach still let us have full precise control of how the image looks like. We fully understand how the color of each pixel is generated, and we can change the way it is generated if we know how to write a renderer.
+Another thing to notice is how the global illumination automatically make the images look significantly more realistic! By physically simulating lights, we are able to automagically create realistic images without much efforts. Before people start to simulate global illumination in their renderers, artists have to manually place lights and draw textures to approximate the effect, which is extremely time consuming -- now we just let computers spend that time! Even better, compared to recent learning-based generative models, the physically-based rendering approach still let us have full precise control of how the image looks like. We fully understand how the color of each pixel is generated, and we can change the way it is generated if we know how to write a renderer.
 
 \paragraph{[Energy conservation] Quiz (3 pts):} Remove the $\frac{1}{\pi}$ in Equation~\eqref{eq:diffuse_rendering_equation} and render the \lstinline{cbox} scene again (you still need to have the $\pi$ in your PDF since PDFs need to integrate to $1$). What do you observe? Why?
 
@@ -157,20 +159,20 @@ Figure~\ref{fig:hw_4_2_mirror_plastic} shows our renderings of them.
 \end{figure}
 
 \subsection{Phong BRDF}
-After you add back \lstinline{plastic}, let's add a few more materials. It feels weird that our rays either uniformly spread like a diffuse material, or it pinpoint at the mirror reflection direction -- there must be something in between! In general, instead of a cosine distribution multiplied by $\frac{K_d}{\pi}$, we can replace it with a general \emph{bidirectional reflectance distribution function} (BRDF) $\rho$\footnote{In many literatures, BRDF does not include the cosine term, but I find it cleaner to combine the both most of the time.}:
+After you add back \lstinline{plastic}, let's add a few more materials. It feels weird that our rays either uniformly spread like a diffuse material, or it pinpoint at the mirror reflection direction -- there must be something in between! In general, instead of a cosine distribution multiplied by $\frac{K_d}{\pi}$, we can replace it with a \emph{bidirectional reflectance distribution function} (BRDF) $\rho$\footnote{In many literatures, BRDF does not include the cosine term, but I find it cleaner to combine the both most of the time.}:
 \begin{equation}
 L = L_e + \int_{\omega_o \in \Omega} \rho \cdot L \cdot \mathrm{d}\omega_o.
 \label{eq:rendering_equation}
 \end{equation}
 
-Designing a good BRDF $\rho$ is an active research topic. A simple BRDF, again goes back to the legedary \href{https://en.wikipedia.org/wiki/Phong_reflection_model}{Phong}, is to define a cosine falloff function around the mirror reflection direction\footnote{Some variants add a cosine term to the end, but I find that produces darkening appearance at grazing angles.}:
+Designing a good BRDF $\rho$ is an active research topic. A simple BRDF, again goes back to the legendary \href{https://en.wikipedia.org/wiki/Phong_reflection_model}{Phong}, is to define a cosine falloff function around the mirror reflection direction\footnote{Some variants add a cosine term to the end, but I find that produces darkening appearance at grazing angles.}:
 \begin{equation}
 \rho_{\text{phong}} \propto \begin{cases}
 K_s \max\left(r \cdot \omega_o, 0\right)^\alpha & \text{ if } n_s \cdot \omega_o > 0 \\
 0 & \text{ otherwise} 
 \end{cases},
 \end{equation}
-where $K_s$ is the reflectance color, $r$ is the mirror reflection direction, and $\alpha$ is usually called the \emph{Phong exponent} -- the larger it is, the sharper the distribution is. Notice that we only define the distribution up to a normalization constant. Choosing a proper normalization is important for BRDFs (why?). When Phong derived his reflection model, they did not have to worry about normalization because they were not doing path tracing. To use Phong's reflection model in our renderer, we need to derive a constant.
+where $K_s$ is the reflectance color, $r$ is the mirror reflection direction, and $\alpha$ is usually called the \emph{Phong exponent} -- the larger it is, the sharper the distribution is. Notice that we only define the distribution up to a normalization constant. Choosing a proper normalization is important for BRDFs (why?). When Phong derived his reflection model, they did not have to worry about normalization because they were not doing path tracing. To use Phong's reflection model in our renderer, we need to derive the normalization constant.
 
 For a BRDF $\rho(\omega_i, \omega_o)$ to be energy conserving, it needs to satisfy the following condition:
 \begin{equation}
@@ -181,7 +183,7 @@ To ensure the Phong BRDF $\rho_{\text{phong}}$ satisfies this criterion, we need
 \begin{equation}
 C \cdot K_s \int_{\omega_o \in \Omega} \left(r \cdot \omega_o\right)^\alpha \mathrm{d} \omega_o \leq 1
 \end{equation}
-for any incoming direction $\omega_i$ ($r = -\omega_i + 2 n_s \left(n_s \cdot \omega_i\right)$). 
+for any incoming direction $\omega_i$ (where $r = -\omega_i + 2 n_s \left(n_s \cdot \omega_i\right)$). 
 We find that the maximum of the integral is achieved when $\omega_i = n_s$. In such case, the reflection direction $r$ is also at the normal direction $n_s$:
 \begin{equation}
 K_s \int_{\omega_o \in \Omega} \left(r \cdot \omega_o\right)^\alpha \mathrm{d} \omega_o \leq K_s \int_{\omega_o \in \Omega} \left(n_s \cdot \omega_o\right)^{\alpha} \mathrm{d} \omega_o.
@@ -205,7 +207,7 @@ K_s \frac{\alpha + 1}{2\pi} \max\left(r \cdot \omega_o, 0\right)^\alpha & \text{
 \label{eq:phong}
 \end{equation}
 
-Sampling the Phong BRDF isn't that different from sampling the diffuse BRDF. We first sample the cosine lobe ($\max\left(r \cdot \omega_o, 0\right)^\alpha$) assuming the mirror reflection direction $r$ is facing towards $z$. Then we build an orthonormal basis with the $z$ axis pointing towards the mirror reflection direction. We then use the orthonormal basis to transform the local 3D vector to the mirror reflection direction basis.
+Sampling the Phong BRDF isn't that different from sampling the diffuse BRDF. We first sample the cosine lobe ($\max\left(r \cdot \omega_o, 0\right)^\alpha$) assuming the mirror reflection direction $r$ is the $z$ vector. Then we build an orthonormal basis with the $z$ axis pointing towards the mirror reflection direction. We then use the orthonormal basis to transform the local 3D vector to the mirror reflection direction basis.
 
 To importance sample the local cosine lobe, we turn into spherical coordinates and define the PDF we want to sample from:
 \begin{equation}
@@ -215,14 +217,14 @@ From Equation~\eqref{eq:phong_normalization}, we already know that the normaliza
 \begin{equation}
 \begin{aligned}
 p_{\text{phong}}^{\theta, \phi}(\theta, \phi) &= \frac{\alpha + 1}{2\pi}\left(\cos\theta\right)^{\alpha} \sin\theta \\
-p_{\text{phong}}^{\omega}(\omega) &= \frac{\alpha + 1}{2\pi}\left(\cos\theta\right)^{\alpha}
+p_{\text{phong}}^{\omega}(\omega) &= \frac{\alpha + 1}{2\pi}\left(z \cdot \omega\right)^{\alpha}
 \end{aligned}
 \end{equation}
 (Why are there two PDFs above? What are the differences between them?)
 
-\paragraph{Quiz:} Apply inverse transform sampling to derive the sampling procedure for the PDF above. Show your derivation process.
+\paragraph{Quiz (5 pts):} Apply inverse transform sampling to derive the sampling procedure for the PDF above. Show your derivation process.
 
-After we get a local direction assuming the mirror reflection direction $r$ is facing towards $z$, we can then convert this local direction to the coordinate basis defined by $r$. This conversion is also a change of variable, and we normally have to account for the Jacobian of this coordinate transformation. However, because the coordinate basis is orthonormal, the conversion has an Jacobian of $1$.
+After we get a local direction assuming the mirror reflection direction $r$ is the $z$ vector, we can then convert this local direction to the coordinate basis defined by $r$. This conversion is also a change of variable, and we normally have to account for the Jacobian of this coordinate transformation. However, because the coordinate basis is orthonormal, the conversion has an Jacobian of $1$.
 
 Now, add the Phong BRDF (Equation~\eqref{eq:phong}) into your \lstinline{hw_4_2} code. A Phong BRDF of a scene is stored in the following format:
 \begin{lstlisting}[language=C++]
@@ -259,7 +261,7 @@ Our rendering of the scene is in Figure~\ref{fig:hw_4_2_phong}.
     \label{fig:phong_reflection}
 \end{figure}
 
-There are two issues of the Phong BRDF: firstly, the cosine lobe can be extended below the surface (Figure~\ref{fig:phong_reflection}), and this can lead to undesired discontinuity.\footnote{\href{https://learnopengl.com/Advanced-Lighting/Advanced-Lighting}{This article} illustrates the issue too.} See the last image in Figure~\ref{fig:hw_4_2_phong}: the teapot appears less specular at grazing angle, and there is some darkening of the floor because of the clamping. This makes it difficult for Phong BRDF to model reflection at grazing angle, such as sun's reflection on the sea close to the horizon.
+There are two issues of the Phong BRDF: firstly, the cosine lobe can be extended below the surface (Figure~\ref{fig:phong_reflection}), and this can lead to undesired discontinuities.\footnote{\href{https://learnopengl.com/Advanced-Lighting/Advanced-Lighting}{This article} illustrates the issue too.} See the last image in Figure~\ref{fig:hw_4_2_phong}: the teapot appears less specular at grazing angle, and there is some darkening of the floor because of the clamping. This makes it difficult for Phong BRDF to model reflection at grazing angle, such as sun's reflection on the sea close to the horizon.
 Secondly, it is not fully clear how to assign the Fresnel term like we did for \lstinline{mirror}: do we apply Fresnel using the normal and the viewing direction $n_s \cdot \omega_i$? Or do we apply Fresnel using the normal and the outgoing/light direction $n_s \cdot \omega_o$? Both can be good or bad depending on the situations.
 
 The Blinn-Phong BRDF attempts to fix the two issues with one trick.\footnote{The \href{https://dl.acm.org/doi/10.1145/360349.360353}{original paper} from Blinn did not include the Fresnel term, but it's natural to add it.} 
@@ -342,7 +344,7 @@ The use of half vectors in the Blinn-Phong BRDF reveals an important physical in
 Turns out we can build a geometrical/physical explanation of the idea of using half vectors to define BRDFs. The physical explanation is called \emph{Microfacet theory}.\footnote{Microfacet theory was developed in optical physics in 1960s by Beckmann anad Spizzchino to study electromagnectic wave scatter on surfaces. \href{https://www.graphics.cornell.edu/~westin/pubs/TorranceSparrowJOSA1967.pdf}{Torrance and Sparrow} then used similar theory to design microfacet BRDFs. \href{https://dl.acm.org/doi/10.1145/965141.563893}{Blinn} introduced the idea to graphics. \href{https://graphics.pixar.com/library/ReflectanceModel/paper.pdf}{Cook and Torrance} later wrote a more comprehensive introduction.} The idea is to treat the surface as a statistical collection of small oriented mirrors (and these mirrors are called the \emph{microfacets}). Mirrors only reflect lights when the half vector is aligned with its normal direction. So if we are reflecting light at half vector $h$, we must have hit a small mirror with \emph{micronormal} $m=h$. The half vector cosine lobe $\left(n_s \cdot h\right)^{\alpha}$ can be seen as defining a distribution of normals, by counting how many mirrors have the normal $h$. Each individual mirror also has its own Fresnel reflection, which is why we use half vector instead of shading normal for the Fresnel. Finally, the microfacets can block each other, causing shadowing effects. Mathematically, a microfacet BRDF is defined as:
 \begin{equation}
 \rho_{\text{microfacet}} = \begin{cases}
-\frac{F_h \cdot D \cdot G}{4 \left(n_s \cdot \omega_i\right)} \text{ if } n_s \cdot \omega_o > 0 \\
+\frac{F_h \cdot D \cdot G}{4 \left(n_s \cdot \omega_i\right)} & \text{ if } n_s \cdot \omega_o > 0 \\
 0 & \text{ otherwise} 
 \end{cases},
 \label{eq:microfacet}
@@ -397,7 +399,7 @@ Notice that our NDF (Equation~\eqref{eq:blinn_NDF}) is only defined up to a cons
 \end{equation}
 See \href{https://www.reedbeta.com/blog/hows-the-ndf-really-defined/}{this blog post} from Nathan Reed for a nice explanation. Fortunately, the integral above has a closed-form this time. Let $D(h) = C \left(n_s \cdot h\right)^{\alpha}$, the integral is exactly the same as Equation~\eqref{eq:phong_normalization}, so we get $C = \frac{\alpha + 2}{2\pi}$ again.
 
-We can reuse the sampling procedure for sampling Blinn-Phong for sampling the Blinn-Phong microfacet BRDF. It does not importance sample $G$, but typically the BRDF is dominated by the $D$ term, so it is usually fine.\footnote{\href{https://hal.inria.fr/hal-00996995/en}{A paper} from Heitz and d'Eon discusses how to importance sample $D \cdot G$.}
+We can reuse the sampling procedure for sampling Blinn-Phong for sampling the Blinn-Phong microfacet BRDF. It does not importance sample $G$, but typically the BRDF is dominated by the $D$ term, so it is usually fine.\footnote{\href{https://hal.inria.fr/hal-00996995/en}{A paper} from Heitz and d'Eon discusses how to importance sample $D \cdot G_1$.}
 
 Now, implement the Blinn-Phong microfacet BRDF in your \lstinline{hw_4_2} code. Our microfacet BRDF has the same parameters as a Phong BRDF:
 \begin{lstlisting}[language=C++]
